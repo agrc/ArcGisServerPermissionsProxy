@@ -1,0 +1,1 @@
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="ArcGisServerPermissionsProxy.Api.WebApiApplication" Language="C#" %>

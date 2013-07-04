@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace ArcGisServerPermissionsProxy
+namespace ArcGisServerPermissionsProxy.Api
 {
     public static class WebApiConfig
     {

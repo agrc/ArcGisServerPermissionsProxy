@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace ArcGisServerPermissionsProxy.Controllers
+namespace ArcGisServerPermissionsProxy.Api.Controllers
 {
     public class AuthenticateController : ApiController
     {

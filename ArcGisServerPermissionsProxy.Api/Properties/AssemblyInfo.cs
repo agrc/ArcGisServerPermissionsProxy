@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("ArcGisServerPermissionsProxy")]
+[assembly: AssemblyTitle("ArcGisServerPermissionsProxy.Api")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("ArcGisServerPermissionsProxy")]
+[assembly: AssemblyProduct("ArcGisServerPermissionsProxy.Api")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: Guid("41bc3fa0-6207-4515-97ab-7085d7a0178d")]
+[assembly: Guid("33cd8706-2376-4af6-a2f0-c6823aeb3c41")]
 
 // Version information for an assembly consists of the following four values:
 //

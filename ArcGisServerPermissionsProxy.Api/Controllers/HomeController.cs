@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace ArcGisServerPermissionsProxy.Controllers
+namespace ArcGisServerPermissionsProxy.Api.Controllers
 {
     public class HomeController : Controller
     {

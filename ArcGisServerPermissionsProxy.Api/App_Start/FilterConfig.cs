@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace ArcGisServerPermissionsProxy
+namespace ArcGisServerPermissionsProxy.Api
 {
     public class FilterConfig
     {
