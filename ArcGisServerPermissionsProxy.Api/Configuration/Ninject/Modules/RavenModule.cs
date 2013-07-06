@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using Ninject.Activation;
 using Ninject.Modules;
 using Raven.Client;
@@ -29,7 +30,7 @@ namespace ArcGisServerPermissionsProxy.Api.Configuration.Ninject.Modules
                     ((HttpWebRequest)args.Request).UnsafeAuthenticatedConnectionSharing = true;
                 };
 
-            //RavenConfig.Register(typeof(IndexApiKey), documentStore);
+            RavenConfig.Register(typeof(UserByEmailIndex), documentStore);
 
             return documentStore;
         }

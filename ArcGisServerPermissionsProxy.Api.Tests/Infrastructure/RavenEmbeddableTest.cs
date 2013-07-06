@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
+using NUnit.Framework;
 using Raven.Client;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;
@@ -17,7 +18,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Infrastructure
                 RunInMemory = true
             }.Initialize();
 
-            //IndexCreation.CreateIndexes(typeof(StatsPerService).Assembly, DocumentStore);
+            IndexCreation.CreateIndexes(typeof(UserByEmailIndex).Assembly, DocumentStore);
         }
 
         [TearDown]

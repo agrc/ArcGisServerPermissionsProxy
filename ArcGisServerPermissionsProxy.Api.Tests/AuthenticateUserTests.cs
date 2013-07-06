@@ -8,6 +8,7 @@ using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Formatters;
+using ArcGisServerPermissionsProxy.Api.Models.Database;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
@@ -18,24 +19,6 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
     [TestFixture]
     public class AuthenticateUserTests : RavenEmbeddableTest
     {
-        public class UserModel
-        {
-            public UserModel(string email, string password, string salt, string application, string role)
-            {
-                Email = email;
-                Password = password;
-                Salt = salt;
-                Application = application;
-                Role = role;
-            }
-
-            public string Email { get; set; }
-            public string Password { get; set; }
-            public string Application { get; set; }
-            public string Role { get; set; }
-            public string Salt { get; set; }
-        }
-
         private AuthenticateController _controller;
         private const string Pepper = ")(*&(*^%*&^$*^#$";
 
@@ -46,7 +29,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
             var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
-            var user = new UserModel("test@test.com", password.HashedPassword, salt, "app1", "role1");
+            var user = new User("test@test.com", password.HashedPassword, salt, "app1", "role1");
 
             using (var s = DocumentStore.OpenSession())
             {

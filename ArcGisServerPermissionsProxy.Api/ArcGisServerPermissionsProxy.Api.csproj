@@ -144,6 +144,8 @@
     <Compile Include="Controllers\AuthenticateController.cs" />
     <Compile Include="Controllers\Infrastructure\RavenController.cs" />
     <Compile Include="Formatters\TextPlainResponseFormatter.cs" />
+    <Compile Include="Raven\Indexes\UserByEmailIndex.cs" />
+    <Compile Include="Raven\Models\User.cs" />
     <Compile Include="Models\Response\ResponseContainer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
