@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Hosting;
-using AgrcPasswordManagement;
 using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Controllers;
@@ -21,9 +20,6 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
     [TestFixture]
     public class AuthenticateUserTests : RavenEmbeddableTest
     {
-        private AuthenticateController _controller;
-        private const string Pepper = ")(*&(*^%*&^$*^#$";
-
         public override void SetUp()
         {
             base.SetUp();
@@ -43,22 +39,25 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
             var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/");
 
             _controller = new AuthenticateController
-            {
-                Request = request,
-                DocumentStore =  DocumentStore
-            };
+                {
+                    Request = request,
+                    DocumentStore = DocumentStore
+                };
 
             _controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
         }
+
+        private AuthenticateController _controller;
+        private const string Pepper = ")(*&(*^%*&^$*^#$";
 
         private static ResponseContainer<AuthenticationResponse> GetResultContent(HttpResponseMessage response)
         {
             //Debug.Print(response.Result.Content.ReadAsStringAsync().Result);
 
             return response.Content.ReadAsAsync<ResponseContainer<AuthenticationResponse>>(new[]
-                    {
-                        new TextPlainResponseFormatter()
-                    }).Result;
+                {
+                    new TextPlainResponseFormatter()
+                }).Result;
         }
 
         [Test, Explicit]
@@ -66,8 +65,10 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
         {
             using (var s = DocumentStore.OpenSession())
             {
-                var users = s.Query<User, UserByEmailIndex>().Where(x => x.Email == "test@test.com" && x.Application == "app1");
-                
+                var users = s.Query<User, UserByEmailIndex>()
+                             .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                             .Where(x => x.Email == "test@test.com" && x.Application == "app1");
+
                 Assert.That(users, Is.Not.Null);
                 Assert.That(users.Count(), Is.EqualTo(1));
             }
@@ -82,7 +83,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
 
             var result = GetResultContent(response);
 
-            Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.OK));
+            Assert.That(result.Status, Is.EqualTo((int) HttpStatusCode.OK));
             Assert.That(result.Result, Is.Not.Null);
             Assert.That(result.Result.Token, Is.Not.Null);
         }
@@ -96,9 +97,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
 
             var result = GetResultContent(response);
 
-            Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.Unauthorized));
-            Assert.That(result.Result, Is.Not.Null);
-            Assert.That(result.Result.Token, Is.Null);
+            Assert.That(result.Status, Is.EqualTo((int) HttpStatusCode.Unauthorized));
+            Assert.That(result.Result, Is.Null);
         }
     }
 }

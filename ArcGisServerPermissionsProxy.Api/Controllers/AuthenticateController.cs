@@ -23,6 +23,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             using (var s = AsyncSession)
             {
                 var items = await s.Query<User, UserByEmailIndex>()
+                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                                    .Where(x => x.Email == login.Email && x.Application == login.AppId)
                                    .ToListAsync();
 
@@ -50,7 +51,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             if (!valid)
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                              new ResponseContainer((int) HttpStatusCode.NotFound,
+                                              new ResponseContainer((int) HttpStatusCode.Unauthorized,
                                                                     "Your password does not match our records."));
             }
 
