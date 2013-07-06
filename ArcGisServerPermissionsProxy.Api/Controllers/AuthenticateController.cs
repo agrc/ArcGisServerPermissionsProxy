@@ -1,18 +1,19 @@
-﻿using System.Web.Http;
+﻿using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AgrcPasswordManagement.Models.Account;
+using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
+using ArcGisServerPermissionsProxy.Api.Models.Response;
 
 namespace ArcGisServerPermissionsProxy.Api.Controllers
 {
-    public class AuthenticateController : ApiController
+    public class AuthenticateController : RavenApiController
     {
-        // GET api/values/5
-        public string Get(int id)
+        public async Task<HttpResponseMessage> Post(LoginCredentials user)
         {
-            return "value";
-        }
-
-        // POST api/values
-        public void Post([FromBody] string value)
-        {
+            return Request.CreateResponse(HttpStatusCode.OK,
+                                   new ResponseContainer<AuthenticationResponse>((int)HttpStatusCode.OK, null,
+                                                                                 new AuthenticationResponse("token")));
         }
     }
 }
