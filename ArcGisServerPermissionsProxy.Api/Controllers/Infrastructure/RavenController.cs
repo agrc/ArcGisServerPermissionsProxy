@@ -4,42 +4,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using Ninject;
 using Raven.Client;
-using Raven.Client.Document;
 
 namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
 {
     public abstract class RavenApiController : ApiController
     {
-        public static Lazy<IDocumentStore> DocumentStore = new Lazy<IDocumentStore>(() =>
-        {
-            var docStore = new DocumentStore
-            {
-                Url = "http://localhost:8080",
-                DefaultDatabase = "Webinars"
-            };
-            docStore.Initialize();
-
-            return docStore;
-        });
-
         private IDocumentSession _session;
         public IAsyncDocumentSession asyncSession;
 
-        public override async Task<HttpResponseMessage> ExecuteAsync(
-            HttpControllerContext controllerContext,
-            CancellationToken cancellationToken)
-        {
-            var result = await base.ExecuteAsync(controllerContext, cancellationToken);
-
-            if (_session != null)
-                _session.SaveChanges();
-            
-            if (asyncSession != null)
-                await asyncSession.SaveChangesAsync();
-            
-            return result;
-        }
+        [Inject]
+        public IDocumentStore DocumentStore { get; set; }
 
         public IDocumentSession Session
         {
@@ -47,7 +23,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
             {
                 if (asyncSession != null)
                     throw new NotSupportedException("Can't use both sync & async sessions in the same action");
-                return _session ?? (_session = DocumentStore.Value.OpenSession());
+                return _session ?? (_session = DocumentStore.OpenSession());
             }
             set { _session = value; }
         }
@@ -58,9 +34,23 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
             {
                 if (_session != null)
                     throw new NotSupportedException("Can't use both sync & async sessions in the same action");
-                return asyncSession ?? (asyncSession = DocumentStore.Value.OpenAsyncSession());
+                return asyncSession ?? (asyncSession = DocumentStore.OpenAsyncSession());
             }
             set { asyncSession = value; }
+        }
+
+        public override async Task<HttpResponseMessage> ExecuteAsync(HttpControllerContext controllerContext,
+                                                                     CancellationToken cancellationToken)
+        {
+            var result = await base.ExecuteAsync(controllerContext, cancellationToken);
+
+            if (_session != null)
+                _session.SaveChanges();
+
+            if (asyncSession != null)
+                await asyncSession.SaveChangesAsync();
+
+            return result;
         }
     }
 }

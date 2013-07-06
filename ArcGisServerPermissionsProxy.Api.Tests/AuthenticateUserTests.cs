@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement;
@@ -58,7 +59,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
 
             _controller = new AuthenticateController
             {
-                Request = request
+                Request = request,
+                DocumentStore =  DocumentStore
             };
 
             _controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
@@ -75,11 +77,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
         }
 
         [Test]
-        public void UserCanAuthenticatewithCorrectPassword()
+        public async Task UserCanAuthenticatewithCorrectPassword()
         {
             var login = new LoginCredentials("test@test.com", "123abc", "app1", "role1");
 
-            var response = _controller.Post(login);
+            var response = await _controller.Post(login);
 
             var result = GetResultContent(response);
 
@@ -89,11 +91,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
         }
 
         [Test]
-        public void UserIsDeniedOnBadPassword()
+        public async Task UserIsDeniedOnBadPassword()
         {
             var login = new LoginCredentials("test@test.com", "wrong", "app1", "role1");
 
-            var response = _controller.Post(login);
+            var response = await _controller.Post(login);
 
             var result = GetResultContent(response);
 

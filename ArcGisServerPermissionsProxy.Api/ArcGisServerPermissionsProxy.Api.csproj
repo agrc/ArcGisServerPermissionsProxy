@@ -52,6 +52,9 @@
     <Reference Include="Ninject.Web.Common">
       <HintPath>..\packages\Ninject.Web.Common.3.0.0.7\lib\net45-full\Ninject.Web.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Ninject.Web.Mvc">
+      <HintPath>..\packages\Ninject.MVC3.3.0.0.6\lib\net45-full\Ninject.Web.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="Raven.Abstractions">
       <HintPath>..\packages\RavenDB.Client.2.0.2375\lib\net40\Raven.Abstractions.dll</HintPath>
     </Reference>
@@ -134,6 +137,9 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />
+    <Compile Include="Configuration\Ninject\Modules\RavenModule.cs" />
+    <Compile Include="Configuration\Ninject\NinjectDependencyScope.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\AuthenticateController.cs" />
     <Compile Include="Controllers\Infrastructure\RavenController.cs" />
