@@ -10,6 +10,8 @@ namespace ArcGisServerPermissionsProxy.Api
     {
         public static IKernel Kernel { get; set; }
 
+        public static string Pepper { get { return ")(*&(*^%*&^$*^#$"; } }
+
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();

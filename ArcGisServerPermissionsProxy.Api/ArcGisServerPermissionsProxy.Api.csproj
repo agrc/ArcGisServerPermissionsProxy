@@ -135,6 +135,7 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="App_Start\RavenConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />
@@ -179,6 +180,10 @@
     <ProjectReference Include="..\..\..\Libraries\AgrcPasswordManagement\AgrcPasswordManagement.csproj">
       <Project>{882F2044-A716-43E1-89BD-5B59FACD4F71}</Project>
       <Name>AgrcPasswordManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\CommandPattern\CommandPattern.csproj">
+      <Project>{B041C22A-A2FA-4805-BB6C-80C1E1C4FE4D}</Project>
+      <Name>CommandPattern</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

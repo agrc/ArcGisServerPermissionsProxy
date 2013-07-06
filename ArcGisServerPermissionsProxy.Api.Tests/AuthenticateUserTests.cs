@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -10,6 +11,7 @@ using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Database;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
 using NUnit.Framework;
@@ -57,6 +59,18 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
                     {
                         new TextPlainResponseFormatter()
                     }).Result;
+        }
+
+        [Test, Explicit]
+        public void SeedingWorks()
+        {
+            using (var s = DocumentStore.OpenSession())
+            {
+                var users = s.Query<User, UserByEmailIndex>().Where(x => x.Email == "test@test.com" && x.Application == "app1");
+                
+                Assert.That(users, Is.Not.Null);
+                Assert.That(users.Count(), Is.EqualTo(1));
+            }
         }
 
         [Test]
