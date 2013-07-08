@@ -138,6 +138,9 @@
     <Compile Include="App_Start\RavenConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
+    <Compile Include="TextPlainResponseFormatter.cs" />
+    <Compile Include="Commands\GetTokenCommand.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />
     <Compile Include="Configuration\Ninject\Modules\RavenModule.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyScope.cs" />
@@ -145,7 +148,11 @@
     <Compile Include="Controllers\AuthenticateController.cs" />
     <Compile Include="Controllers\Infrastructure\RavenController.cs" />
     <Compile Include="Formatters\TextPlainResponseFormatter.cs" />
+    <Compile Include="Models\ArcGIS\ArcGisServerError.cs" />
+    <Compile Include="Models\Errors\Errorable.cs" />
+    <Compile Include="Models\ArcGIS\TokenModel.cs" />
     <Compile Include="Raven\Indexes\UserByEmailIndex.cs" />
+    <Compile Include="Raven\Models\Application.cs" />
     <Compile Include="Raven\Models\User.cs" />
     <Compile Include="Models\Response\ResponseContainer.cs" />
     <Compile Include="Global.asax.cs">

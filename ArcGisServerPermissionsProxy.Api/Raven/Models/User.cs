@@ -1,4 +1,4 @@
-﻿namespace ArcGisServerPermissionsProxy.Api.Models.Database
+﻿namespace ArcGisServerPermissionsProxy.Api.Raven.Models
 {
     public class User
     {
