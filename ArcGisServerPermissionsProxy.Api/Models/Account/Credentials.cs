@@ -5,7 +5,7 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Account
     public class Credentials : LoginCredentials
     {
         public Credentials(string email, string password, string applicationName, string roleName, string database)
-            : base(email, password, applicationName, roleName)
+            : base(email, password, roleName, applicationName)
         {
             database = database.ToLowerInvariant();
 

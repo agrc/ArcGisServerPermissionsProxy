@@ -6,6 +6,8 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
 {
     public class User
     {
+        private string _application;
+
         public User(string name, string email, string agency, string password, string salt, string application, IEnumerable<string> roles)
         {
             Email = email.ToLowerInvariant();
@@ -46,7 +48,19 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// The application or database the user exists inside.
         /// </value>
         [Required]
-        public string Application { get; set; }
+        public string Application
+        {
+            get { return _application; }
+            private set
+            {
+                if (value == null || value.ToLowerInvariant() == "system" || string.IsNullOrEmpty(value))
+                    _application = null;
+                else
+                {
+                    _application = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the role.

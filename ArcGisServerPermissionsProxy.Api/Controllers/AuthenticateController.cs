@@ -12,23 +12,29 @@ using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
+using ArcGisServerPermissionsProxy.Api.Services;
 using CommandPattern;
+using Ninject;
 using Raven.Client;
 
 namespace ArcGisServerPermissionsProxy.Api.Controllers
 {
     public class AuthenticateController : RavenApiController
     {
+        [Inject]
+        public ITokenService TokenService { get; set; }
+
         public async Task<HttpResponseMessage> Post(LoginCredentials login)
         {
             TokenModel token;
+            Database = login.Application;
 
             using (var s = AsyncSession)
             {
                 var items = await s.Query<User, UserByEmailIndex>()
                                    .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                   .Customize(x => x.Include<Application>(o => o.Name))
-                                   .Where(x => x.Email == login.Email && x.Application == login.ApplicationName)
+                                   //.Customize(x => x.Include<Application>(o => o.Name))
+                                   .Where(x => x.Email == login.Email)
                                    .ToListAsync();
 
                 if (items == null || items.Count != 1)
@@ -61,20 +67,17 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                                         "Your password does not match our records."));
                 }
 
-                if (user.Application != login.ApplicationName)
+                if (user.Application != login.Application)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                                   new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                         string.Format("You do not have access to {0}.",
-                                                                                      login.ApplicationName)));
+                                                                                      login.Application)));
                 }
 
-                var application = await s.LoadAsync<Application>(user.Application);
-
-                token = await CommandExecutor.ExecuteCommandAsync(
-                    new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", false, 6080),
-                                        new GetTokenCommandAsync.Credentials(login.ApplicationName, login.RoleName,
-                                                                        application.Password)));
+                token = await TokenService.GetToken(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", false, 6080),
+                                                    new GetTokenCommandAsync.Credentials(login.Application, login.Role,
+                                                                               login.Password));
 
                 if (!token.Successful)
                 {

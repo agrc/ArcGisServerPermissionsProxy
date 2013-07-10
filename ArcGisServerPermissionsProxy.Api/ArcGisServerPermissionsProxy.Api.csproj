@@ -151,6 +151,7 @@
     <Compile Include="Commands\Email\UserAcceptedEmailCommand.cs" />
     <Compile Include="Commands\Email\UserRegistrationNotificationEmailCommand.cs" />
     <Compile Include="Commands\Email\UserRejectedEmailCommand.cs" />
+    <Compile Include="Configuration\Ninject\Modules\TokenServiceModule.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Models\Account\Credentials.cs" />
@@ -158,6 +159,9 @@
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
     <Compile Include="Raven\Indexes\UsersByApprovedIndex.cs" />
     <Compile Include="Raven\Models\Config.cs" />
+    <Compile Include="Services\ITokenService.cs" />
+    <Compile Include="Services\MockTokenService.cs" />
+    <Compile Include="Services\TokenService.cs" />
     <Compile Include="TextPlainResponseFormatter.cs" />
     <Compile Include="Commands\GetTokenCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />
@@ -165,7 +169,7 @@
     <Compile Include="Configuration\Ninject\NinjectDependencyScope.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\AuthenticateController.cs" />
-    <Compile Include="Controllers\Infrastructure\RavenController.cs" />
+    <Compile Include="Controllers\Infrastructure\RavenApiController.cs" />
     <Compile Include="Formatters\TextPlainResponseFormatter.cs" />
     <Compile Include="Models\ArcGIS\ArcGisServerError.cs" />
     <Compile Include="Models\Errors\Errorable.cs" />

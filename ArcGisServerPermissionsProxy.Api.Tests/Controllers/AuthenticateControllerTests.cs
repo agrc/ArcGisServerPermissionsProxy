@@ -12,6 +12,7 @@ using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
+using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
 using NUnit.Framework;
@@ -28,9 +29,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
-            var user = new User("USERNAME", "test@test.com", "AGENCY", password.HashedPassword, salt, "security_role_1",
+            var user = new User("USERNAME", "test@test.com", "AGENCY", password.HashedPassword, salt, "",
                                 new Collection<string> {"admin"});
-            var app = new Application("security_role_1", "test");
+            var app = new Application("", "test");
 
             using (var s = DocumentStore.OpenSession())
             {
@@ -55,7 +56,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             _controller = new AuthenticateController
                 {
                     Request = request,
-                    DocumentStore = DocumentStore
+                    DocumentStore = DocumentStore,
+                    TokenService = new MockTokenService()
                 };
 
             _controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
@@ -82,13 +84,13 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 var users = s.Query<User, UserByEmailIndex>()
                              .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                              .Customize(x => x.Include<Application>(o => o.Name))
-                             .Where(x => x.Email == "test@test.com" && x.Application == "app1");
+                             .Where(x => x.Email == "test@test.com");
 
                 Assert.That(users.Count(), Is.EqualTo(1));
 
                 var app = s.Load<Application>(users.First().Application);
 
-                Assert.That(app.Name, Is.EqualTo("app1"));
+                Assert.That(app.Name, Is.Null);
 
                 var apps = s.Query<Application, ApplicationByNameIndex>()
                             .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
@@ -101,7 +103,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task UserCanAuthenticatewithCorrectPassword()
         {
-            var login = new LoginCredentials("test@test.com", "123abc", "security_role_1", "admin");
+            var login = new LoginCredentials("test@test.com", "123abc", "admin", "");
 
             var response = await _controller.Post(login);
 
@@ -115,7 +117,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task UserIsDeniedOnBadPassword()
         {
-            var login = new LoginCredentials("test@test.com", "wrong", "security_role_1", "admin");
+            var login = new LoginCredentials("test@test.com", "wrong", "admin", "");
 
             var response = await _controller.Post(login);
 

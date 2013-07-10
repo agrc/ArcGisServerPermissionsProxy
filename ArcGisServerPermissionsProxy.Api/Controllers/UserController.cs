@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -70,7 +71,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var password =
                     await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(user.Password, App.Pepper));
 
-                var newUser = new User(user.Name, user.Email, user.Agency, password.HashedPassword, password.Salt, user.ApplicationName,
+                var newUser = new User(user.Name, user.Email, user.Agency, password.HashedPassword, password.Salt, user.Application,
                                        Enumerable.Empty<string>());
 
                 await s.StoreAsync(newUser);
@@ -82,12 +83,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                         CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
                                                            new NewUserNotificationEmailCommand.MailTemplate(
                                                                config.AdministrativeEmails, new[] {"no-reply@utah.gov"}, user.Name, user.Agency,
-                                                               null, user.ApplicationName)));
+                                                               null, user.Application)));
 
 
                         CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
                                                            new UserRegistrationNotificationEmailCommand.MailTemplate(
-                                                               new[] {user.Email}, config.AdministrativeEmails, user.Name, user.Email, user.ApplicationName)));
+                                                               new[] {user.Email}, config.AdministrativeEmails, user.Name, user.Email, user.Application)));
                     });
             }
 
@@ -223,6 +224,28 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
         }
 
+        [HttpPut]
+        public async Task<HttpResponseMessage> ChangePassword(ChangePasswordRequestInformation info)
+        {
+            Database = info.Application;
+
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new ResponseContainer(HttpStatusCode.BadRequest,
+                                                    "Missing parameters."));
+
+            }
+
+            if (info.NewPassword != info.NewPasswordRepeated)
+            {
+                return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                              new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                    "New passwords do not match."));
+            }
+
+            return Request.CreateResponse(HttpStatusCode.Created);
+        }
+
         [HttpGet]
         public async Task<HttpResponseMessage> GetAllWaiting(RequestInformation info)
         {
@@ -268,6 +291,83 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
         }
 
+
+        /// <summary>
+        ///     A class encapsulating common request paramaters
+        /// </summary>
+        public class RequestInformation
+        {
+            private string _database;
+
+            public RequestInformation(string database, string token)
+            {
+                Database = database;
+                Token = token;
+            }
+
+            /// <summary>
+            ///     Gets the database.
+            /// </summary>
+            /// <value>
+            ///     The database or application name of the user.
+            /// </value>
+            public string Database
+            {
+                get { return _database; }
+                private set
+                {
+                    if (value.ToLowerInvariant() == "system" || string.IsNullOrEmpty(value))
+                        _database = null;
+                    else
+                    {
+                        _database = value;
+                    }
+                }
+            }
+
+            /// <summary>
+            ///     Gets the token.
+            /// </summary>
+            /// <value>
+            ///     The token arcgis server generated.
+            /// </value>
+            public string Token { get; private set; }
+        }
+
+        public class ChangePasswordRequestInformation
+        {
+            private string _application;
+
+            public ChangePasswordRequestInformation(string application, string currentPassword, string newPassword)
+            {
+                Application = application;
+                CurrentPassword = currentPassword;
+                NewPassword = newPassword;
+            }
+
+            public string Application
+            {
+                get { return _application; }
+                private set
+                {
+                    if (value == null || value.ToLowerInvariant() == "system" || string.IsNullOrEmpty(value))
+                        _application = null;
+                    else
+                    {
+                        _application = value;
+                    }
+                }
+            }
+
+            [Required]
+            public string CurrentPassword { get; set; }
+            
+            [Required]
+            public string NewPassword { get; set; }
+
+            [Required]
+            public string NewPasswordRepeated { get; set; }
+        }
 
         /// <summary>
         ///     A class for accepting users in the application
@@ -316,48 +416,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             ///     The email of the person to get the roles for.
             /// </value>
             public string Email { get; set; }
-        }
-
-        /// <summary>
-        ///     A class encapsulating common request paramaters
-        /// </summary>
-        public class RequestInformation
-        {
-            private string _database;
-
-            public RequestInformation(string database, string token)
-            {
-                Database = database;
-                Token = token;
-            }
-
-            /// <summary>
-            ///     Gets the database.
-            /// </summary>
-            /// <value>
-            ///     The database or application name of the user.
-            /// </value>
-            public string Database
-            {
-                get { return _database; }
-                private set
-                {
-                    if (value.ToLowerInvariant() == "system" || string.IsNullOrEmpty(value))
-                        _database = null;
-                    else
-                    {
-                        _database = value;
-                    }
-                }
-            }
-
-            /// <summary>
-            ///     Gets the token.
-            /// </summary>
-            /// <value>
-            ///     The token arcgis server generated.
-            /// </value>
-            public string Token { get; private set; }
         }
 
         /// <summary>

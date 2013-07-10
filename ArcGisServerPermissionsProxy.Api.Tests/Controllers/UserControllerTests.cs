@@ -188,5 +188,13 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 Assert.That(user.Salt, Is.Not.EqualTo(""));
             }
         }
+
+        [Test]
+        public async Task ChangePasswordFailsIfParametersAreEmpty()
+        {
+            var response = await _controller.ChangePassword(new UserController.ChangePasswordRequestInformation(null, null, null));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        }
     }
 }
