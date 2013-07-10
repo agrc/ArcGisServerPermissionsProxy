@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Net;
+using Newtonsoft.Json;
 
 namespace ArcGisServerPermissionsProxy.Api.Models.Response
 {
@@ -8,7 +9,8 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Response
     /// <typeparam name="T"></typeparam>
     public class ResponseContainer<T> : ResponseContainer where T : class
     {
-        public ResponseContainer(int status, string message, T result) : base(status, message)
+        public ResponseContainer(T result, HttpStatusCode status = HttpStatusCode.OK, string message = null)
+            : base(status, message)
         {
             Result = result;
         }
@@ -22,9 +24,9 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Response
     /// </summary>
     public class ResponseContainer
     {
-        public ResponseContainer(int status, string message)
+        public ResponseContainer(HttpStatusCode status, string message)
         {
-            Status = status;
+            Status = (int) status;
             Message = message;
         }
 

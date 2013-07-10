@@ -4,14 +4,15 @@ using Raven.Client.Indexes;
 
 namespace ArcGisServerPermissionsProxy.Api.Raven.Indexes
 {
-    public class UserByEmailIndex : AbstractIndexCreationTask<User>
+    public class UsersByApprovedIndex : AbstractIndexCreationTask<User>
     {
-        public UserByEmailIndex()
+        public UsersByApprovedIndex()
         {
             Map = users => from user in users
                            select new
                                {
-                                   user.Email
+                                   user.Approved,
+                                   user.Active
                                };
         }
     }

@@ -1,4 +1,6 @@
-﻿namespace ArcGisServerPermissionsProxy.Api.Models.Response
+﻿using Newtonsoft.Json;
+
+namespace ArcGisServerPermissionsProxy.Api.Models.Response.Authentication
 {
     public class AuthenticationResponse
     {
@@ -7,6 +9,7 @@
             Token = token;
         }
 
+        [JsonProperty(PropertyName="token")]
         public string Token { get; set; } 
     }
 }

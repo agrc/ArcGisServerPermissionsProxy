@@ -61,11 +61,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\GetTokenCommandTests.cs" />
+    <Compile Include="Commands\NewUserNotificationEmailCommandTests.cs" />
+    <Compile Include="Controllers\RegisterControllerTests.cs" />
+    <Compile Include="Controllers\UserControllerTests.cs" />
     <Compile Include="Infrastructure\RavenEmbeddableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AuthenticateUserTests.cs" />
+    <Compile Include="Controllers\AuthenticateControllerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

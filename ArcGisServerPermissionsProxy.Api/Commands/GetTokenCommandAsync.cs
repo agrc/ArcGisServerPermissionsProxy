@@ -10,7 +10,7 @@ using CommandPattern;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands
 {
-    public class GetTokenCommand : CommandAsync<TokenModel>
+    public class GetTokenCommandAsync : CommandAsync<TokenModel>
     {
         private readonly Credentials _credentials;
         private const string BaseUrlFormat = "http{0}://{1}{2}/{3}/";
@@ -18,7 +18,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
         private readonly UriBuilder _uriBuilder;
         private Uri _tokenUri;
 
-        public GetTokenCommand(GetTokenParams getTokenParams, Credentials credentials)
+        public GetTokenCommandAsync(GetTokenParams getTokenParams, Credentials credentials)
         {
             _credentials = credentials;
             var baseUrl = string.Format(BaseUrlFormat, getTokenParams.Https ? "s" : "",

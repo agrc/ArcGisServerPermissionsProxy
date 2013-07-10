@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,16 +9,17 @@ using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
 using NUnit.Framework;
 
-namespace ArcGisServerPermissionsProxy.Api.Tests
+namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 {
     [TestFixture]
-    public class AuthenticateUserTests : RavenEmbeddableTest
+    public class AuthenticateControllerTests : RavenEmbeddableTest
     {
         public override void SetUp()
         {
@@ -26,13 +28,23 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
             var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
-            var user = new User("test@test.com", password.HashedPassword, salt, "security_role_1", "admin");
+            var user = new User("test@test.com", password.HashedPassword, salt, "security_role_1",
+                                new Collection<string> {"admin"});
             var app = new Application("security_role_1", "test");
 
             using (var s = DocumentStore.OpenSession())
             {
-                s.Store(app, app.Name);
-                s.Store(user);
+                if (!s.Query<User, UserByEmailIndex>()
+                      .Any(x => x.Email == user.Email))
+                {
+                    s.Store(user);
+                }
+
+                if (!s.Query<Application, ApplicationByNameIndex>()
+                      .Any(x => x.Name == app.Name))
+                {
+                    s.Store(app, app.Name);
+                }
 
                 s.SaveChanges();
             }
@@ -75,12 +87,12 @@ namespace ArcGisServerPermissionsProxy.Api.Tests
                 Assert.That(users.Count(), Is.EqualTo(1));
 
                 var app = s.Load<Application>(users.First().Application);
-                
+
                 Assert.That(app.Name, Is.EqualTo("app1"));
 
                 var apps = s.Query<Application, ApplicationByNameIndex>()
-                           .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                           .Count();
+                            .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                            .Count();
 
                 Assert.That(apps, Is.EqualTo(1));
             }

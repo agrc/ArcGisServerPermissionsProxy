@@ -9,6 +9,7 @@ using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
@@ -33,7 +34,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 if (items == null || items.Count != 1)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound,
-                                                  new ResponseContainer((int) HttpStatusCode.NotFound, "User not found."));
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
                 }
 
                 User user;
@@ -44,7 +45,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 catch (InvalidOperationException)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound,
-                                                  new ResponseContainer((int) HttpStatusCode.NotFound, "User not found."));
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
                 }
 
 
@@ -56,14 +57,14 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 if (!valid)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                                  new ResponseContainer((int) HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                         "Your password does not match our records."));
                 }
 
                 if (user.Application != login.ApplicationName)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                                  new ResponseContainer((int) HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                         string.Format("You do not have access to {0}.",
                                                                                       login.ApplicationName)));
                 }
@@ -71,22 +72,19 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var application = await s.LoadAsync<Application>(user.Application);
 
                 token = await CommandExecutor.ExecuteCommandAsync(
-                    new GetTokenCommand(new GetTokenCommand.GetTokenParams("localhost", "arcgis", false, 6080),
-                                        new GetTokenCommand.Credentials(login.ApplicationName, login.RoleName,
+                    new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", false, 6080),
+                                        new GetTokenCommandAsync.Credentials(login.ApplicationName, login.RoleName,
                                                                         application.Password)));
 
                 if (!token.Successful)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                                  new ResponseContainer((int)HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                         token.Error.Message));
                 }
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK,
-                                          new ResponseContainer<AuthenticationResponse>((int) HttpStatusCode.OK, null,
-                                                                                        new AuthenticationResponse(
-                                                                                            token.Token)));
+            return Request.CreateResponse(HttpStatusCode.OK, new ResponseContainer<AuthenticationResponse>(new AuthenticationResponse(token.Token)));
         }
     }
 }

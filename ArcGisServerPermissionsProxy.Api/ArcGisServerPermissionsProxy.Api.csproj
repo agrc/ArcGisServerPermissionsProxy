@@ -15,7 +15,7 @@
     <AssemblyName>ArcGisServerPermissionsProxy.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -41,6 +41,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MarkdownSharp">
+      <HintPath>..\packages\MarkdownSharp.1.13.0.0\lib\35\MarkdownSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -54,6 +57,9 @@
     </Reference>
     <Reference Include="Ninject.Web.Mvc">
       <HintPath>..\packages\Ninject.MVC3.3.0.0.6\lib\net45-full\Ninject.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="Nustache.Core">
+      <HintPath>..\packages\Nustache.1.13.6.20\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
     <Reference Include="Raven.Abstractions">
       <HintPath>..\packages\RavenDB.Client.2.0.2375\lib\net40\Raven.Abstractions.dll</HintPath>
@@ -138,9 +144,20 @@
     <Compile Include="App_Start\RavenConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Commands\Email\NewUserNotificationEmailCommand.cs" />
+    <Compile Include="Commands\Email\PasswordResetEmailCommand.cs" />
+    <Compile Include="Commands\Email\UserAcceptedEmailCommand.cs" />
+    <Compile Include="Commands\Email\UserRegistrationNotificationEmailCommand.cs" />
+    <Compile Include="Commands\Email\UserRejectedEmailCommand.cs" />
+    <Compile Include="Controllers\Admin\AdminController.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Models\Account\Credentials.cs" />
+    <Compile Include="Models\Response\Password\PasswordReset.cs" />
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
+    <Compile Include="Raven\Indexes\UsersByApprovedIndex.cs" />
     <Compile Include="TextPlainResponseFormatter.cs" />
-    <Compile Include="Commands\GetTokenCommand.cs" />
+    <Compile Include="Commands\GetTokenCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />
     <Compile Include="Configuration\Ninject\Modules\RavenModule.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyScope.cs" />
@@ -162,6 +179,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\css\site.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
@@ -209,9 +227,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerPort>54203</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:54721/</IISUrl>
+          <IISUrl>http://arcgissecurity/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

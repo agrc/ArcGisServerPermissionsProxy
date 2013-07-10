@@ -12,7 +12,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
     public abstract class RavenApiController : ApiController
     {
         private IDocumentSession _session;
-        public IAsyncDocumentSession asyncSession;
+        private IAsyncDocumentSession _asyncSession;
+        public string Database { get; set; }
 
         [Inject]
         public IDocumentStore DocumentStore { get; set; }
@@ -21,9 +22,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
         {
             get
             {
-                if (asyncSession != null)
+                if (_asyncSession != null)
                     throw new NotSupportedException("Can't use both sync & async sessions in the same action");
-                return _session ?? (_session = DocumentStore.OpenSession());
+                return _session ?? (_session = DocumentStore.OpenSession(Database));
             }
             set { _session = value; }
         }
@@ -34,9 +35,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
             {
                 if (_session != null)
                     throw new NotSupportedException("Can't use both sync & async sessions in the same action");
-                return asyncSession ?? (asyncSession = DocumentStore.OpenAsyncSession());
+                return _asyncSession ?? (_asyncSession = DocumentStore.OpenAsyncSession(Database));
             }
-            set { asyncSession = value; }
+            set { _asyncSession = value; }
         }
 
         public override async Task<HttpResponseMessage> ExecuteAsync(HttpControllerContext controllerContext,
@@ -47,8 +48,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
             if (_session != null)
                 _session.SaveChanges();
 
-            if (asyncSession != null)
-                await asyncSession.SaveChangesAsync();
+            if (_asyncSession != null)
+                await _asyncSession.SaveChangesAsync();
 
             return result;
         }
