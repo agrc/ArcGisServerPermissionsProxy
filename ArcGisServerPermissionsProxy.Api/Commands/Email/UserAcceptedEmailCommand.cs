@@ -13,7 +13,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 You have been granted permission to login to the {{Application}} web application.
 
 Your user name is `{{email}}`  
-Your assigned role is: `{{role}}`
+Your assigned role is: `{{#roles}}{{.}} {{/roles}}`
 
 If you have any questions, you may reply to this email.
 

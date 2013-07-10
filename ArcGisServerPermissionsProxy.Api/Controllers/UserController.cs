@@ -126,7 +126,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                     () =>
                     CommandExecutor.ExecuteCommand(
                         new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(user.Name, user.Email,
-                                                                                               "description"))));
+                                                                                               "description", info.Roles))));
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             }
@@ -165,8 +165,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                       CommandExecutor.ExecuteCommand(
                                           new UserRejectedEmailCommand(
                                               new UserRejectedEmailCommand.MailTemplate(user.Name,
-                                                                                        user.Application,
-                                                                                        user.Email))));
+                                                                                        user.Email, user.Application))));
 
 
                 return Request.CreateResponse(HttpStatusCode.Accepted);
@@ -209,8 +208,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 Task.Factory.StartNew(() =>
                                       CommandExecutor.ExecuteCommand(
                                           new PasswordResetEmailCommand(
-                                              new PasswordResetEmailCommand.MailTemplate(user.Email, user.Name, password,
-                                                                                         new[] {"emails"}, "url"))));
+                                              new PasswordResetEmailCommand.MailTemplate(user.Name, user.Email,
+                                                                                         password, new[] {"emails"}, "url"))));
 
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);

@@ -12,7 +12,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 
 Your password has been reset to: `{{Password}}`
 
-This new password is intended to be **temporary**. Please [change this temporary password]({{ChangePasswordUrl}}) to a password of your choosing.
+This new password is intended to be **temporary**. Please [change this temporary password]({{ChangePasswordUrl}}) to one of your choosing.
 
 If you have any questions, you may reply to this email.
 

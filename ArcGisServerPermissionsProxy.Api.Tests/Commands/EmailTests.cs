@@ -28,8 +28,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             {
                 CommandExecutor.ExecuteCommand(
                     new PasswordResetEmailCommand(
-                        new PasswordResetEmailCommand.MailTemplate("Email", "Name", "password",
-                                                                   new[] {"emails"}, "url")));
+                        new PasswordResetEmailCommand.MailTemplate("Name", "Email",
+                                                                   "password", new[] {"emails"}, "url")));
             }
         }
 
@@ -41,7 +41,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             {
                 CommandExecutor.ExecuteCommand(
                         new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate("Name", "Email",
-                                                                                               "description")));
+                                                                                               "description", new[]{"multiple","roles"})));
             }
         }
 
@@ -54,8 +54,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                 CommandExecutor.ExecuteCommand(
                                            new UserRejectedEmailCommand(
                                                new UserRejectedEmailCommand.MailTemplate("Name",
-                                                                                         "Application",
-                                                                                         "Email")));
+                                                                                         "Email", "Application")));
             }
         }
 
