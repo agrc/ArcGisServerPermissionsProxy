@@ -10,15 +10,17 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"### Dear {{Name}},
 
-We appreciate your interest in the {{Application}}. Your information has been recieved but you have not been granted access yet. You will receive an email from an administrator with further instructions.
+We appreciate your interest in the {{ApplicationDescription}}. Your information **has been recieved** but you have **not been granted access** *yet*. You will receive an email from an administrator with further instructions.
 
 Your user name is: `{{Email}}`
 
-Thank you for your patience";
+Thank you for your patience.";
 
             MailMessage.To.Add("test@test.com");
             MailMessage.From = new MailAddress("no-reply@utah.gov");
             MailMessage.Subject = "Registration Confirmation";
+
+            Init();
         }
 
         public override sealed string MessageTemplate { get; protected internal set; }

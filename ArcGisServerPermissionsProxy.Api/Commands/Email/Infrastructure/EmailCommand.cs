@@ -14,23 +14,23 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure
         private string _html;
         private string _plainText;
 
-        protected EmailCommand()
-        {
-            Init();
-        }
-
         public abstract string MessageTemplate { get; protected internal set; }
         public abstract dynamic TemplateData { get; protected internal set; }
 
-        public void Init()
+        protected EmailCommand()
         {
             Mailman = new SmtpClient();
             MailMessage = new MailMessage
-                {
-                    IsBodyHtml = true
-                };
+            {
+                IsBodyHtml = true
+            };
 
             Markdowner = new Markdown();
+        }
+
+        public void Init()
+        {
+           
             _plainText = Render.StringToString(MessageTemplate, TemplateData);
             _html = Markdowner.Transform(_plainText);
 

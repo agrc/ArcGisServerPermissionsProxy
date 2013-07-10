@@ -12,7 +12,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 
 Your password has been reset to: `{{Password}}`
 
-This new password is intended to be **temporary**. Please [change this temporary password]({{ChangePasswordUrl}} to a password of your choosing.
+This new password is intended to be **temporary**. Please [change this temporary password]({{ChangePasswordUrl}}) to a password of your choosing.
 
 If you have any questions, you may reply to this email.
 
@@ -20,7 +20,9 @@ Thank you";
 
             MailMessage.To.Add("test@test.com");
             MailMessage.From = new MailAddress("no-reply@utah.gov");
-            MailMessage.Subject = "Registration Confirmation";
+            MailMessage.Subject = "Password Reset";
+
+            Init();
         }
 
         public override sealed string MessageTemplate { get; protected internal set; }
@@ -28,7 +30,7 @@ Thank you";
 
         public class MailTemplate
         {
-            public MailTemplate(string email, string name, string password, string[] adminEmails, string changePasswordUrl)
+            public MailTemplate(string name, string email, string password, string[] adminEmails, string changePasswordUrl)
             {
                 Email = email;
                 Name = name;

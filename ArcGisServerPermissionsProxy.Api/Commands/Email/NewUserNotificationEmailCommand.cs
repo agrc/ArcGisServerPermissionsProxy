@@ -17,6 +17,8 @@ Please use [the user admin page]({{url}}) to **accept** or **reject** their requ
             MailMessage.To.Add("test@test.com");
             MailMessage.From = new MailAddress("no-reply@utah.gov");
             MailMessage.Subject = "Notification of Registration";
+
+            Init();
         }
 
         public override sealed string MessageTemplate { get; protected internal set; }
@@ -24,7 +26,7 @@ Please use [the user admin page]({{url}}) to **accept** or **reject** their requ
 
         public override string ToString()
         {
-            return string.Format("{0}, NewUser: {1}", "NewUserNotificationEmailCommandAsync", _templateData);
+            return string.Format("{0}, NewUser: {1}", "NewUserNotificationEmailCommandAsync", TemplateData);
         }
 
         public class MailTemplate
