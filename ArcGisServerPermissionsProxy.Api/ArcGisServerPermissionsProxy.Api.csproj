@@ -150,7 +150,6 @@
     <Compile Include="Commands\Email\UserRegistrationNotificationEmailCommand.cs" />
     <Compile Include="Commands\Email\UserRejectedEmailCommand.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
-    <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Models\Account\Credentials.cs" />
     <Compile Include="Models\Response\Password\PasswordReset.cs" />

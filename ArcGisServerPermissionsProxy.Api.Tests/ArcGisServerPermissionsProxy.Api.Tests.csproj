@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="Commands\GetTokenCommandTests.cs" />
     <Compile Include="Commands\NewUserNotificationEmailCommandTests.cs" />
-    <Compile Include="Controllers\RegisterControllerTests.cs" />
     <Compile Include="Controllers\UserControllerTests.cs" />
     <Compile Include="Infrastructure\RavenEmbeddableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
