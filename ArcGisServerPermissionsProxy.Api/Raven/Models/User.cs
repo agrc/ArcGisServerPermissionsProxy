@@ -6,9 +6,11 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
 {
     public class User
     {
-        public User(string email, string password, string salt, string application, IEnumerable<string> roles)
+        public User(string name, string email, string agency, string password, string salt, string application, IEnumerable<string> roles)
         {
             Email = email.ToLowerInvariant();
+            Name = name;
+            Agency = agency;
             Password = password;
             Salt = salt;
             Application = application;
@@ -86,5 +88,13 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// The name.
         /// </value>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the agency.
+        /// </summary>
+        /// <value>
+        /// The agency.
+        /// </value>
+        public string Agency { get; set; }
     }
 }

@@ -70,22 +70,24 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var password =
                     await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(user.Password, App.Pepper));
 
-                var newUser = new User(user.Email, password.HashedPassword, password.Salt, user.ApplicationName,
+                var newUser = new User(user.Name, user.Email, user.Agency, password.HashedPassword, password.Salt, user.ApplicationName,
                                        Enumerable.Empty<string>());
 
                 await s.StoreAsync(newUser);
+
+                var config = await s.LoadAsync<Config>("1");
 
                 Task.Factory.StartNew(() =>
                     {
                         CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
                                                            new NewUserNotificationEmailCommand.MailTemplate(
-                                                               new[] {""}, new[] {""}, user.Name, user.Agency,
+                                                               config.AdministrativeEmails, new[] {"no-reply@utah.gov"}, user.Name, user.Agency,
                                                                null, user.ApplicationName)));
 
 
                         CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
                                                            new UserRegistrationNotificationEmailCommand.MailTemplate(
-                                                               new[] {user.Email}, new[] {""}, user.Name, user.Email, user.ApplicationName)));
+                                                               new[] {user.Email}, config.AdministrativeEmails, user.Name, user.Email, user.ApplicationName)));
                     });
             }
 
@@ -121,10 +123,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 await s.SaveChangesAsync();
 
+                var config = await s.LoadAsync<Config>("1");
+
                 Task.Factory.StartNew(
                     () =>
                     CommandExecutor.ExecuteCommand(
-                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] { user.Email }, new[] { "" }, 
+                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] { user.Email }, config.AdministrativeEmails, 
                             user.Name, info.Roles, user.Email, user.Application))));
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);
@@ -160,10 +164,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 await s.SaveChangesAsync();
 
+                var config = await s.LoadAsync<Config>("1");
+
                 Task.Factory.StartNew(() =>
                                       CommandExecutor.ExecuteCommand(
                                           new UserRejectedEmailCommand(
-                                              new UserRejectedEmailCommand.MailTemplate(new[] { user.Email }, new[] { "" }, user.Name,
+                                              new UserRejectedEmailCommand.MailTemplate(new[] { user.Email }, config.AdministrativeEmails, user.Name,
                                                                                         user.Application))));
 
 
@@ -204,10 +210,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 await s.SaveChangesAsync();
 
+                var config = await s.LoadAsync<Config>("1");
+
                 Task.Factory.StartNew(() =>
                                       CommandExecutor.ExecuteCommand(
                                           new PasswordResetEmailCommand(
-                                              new PasswordResetEmailCommand.MailTemplate(new[] { user.Email }, new[] { "" }, user.Name,
+                                              new PasswordResetEmailCommand.MailTemplate(new[] { user.Email },config.AdministrativeEmails, user.Name,
                                                                                          password,"url", user.Application))));
 
 

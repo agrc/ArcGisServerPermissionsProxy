@@ -1,11 +1,12 @@
-﻿using System.Net.Mail;
+﻿using System.Linq;
+using System.Net.Mail;
 using ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 {
     public class NewUserNotificationEmailCommand : EmailCommand
     {
-        public NewUserNotificationEmailCommand(MailTemplate templateData)
+        public NewUserNotificationEmailCommand(dynamic templateData)
         {
             TemplateData = templateData;
             MessageTemplate = @"### Dear Admin,
@@ -14,8 +15,14 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
     
 Please use [the user admin page]({{url}}) to **accept** or **reject** their request.";
 
-            MailMessage.To.Add("test@test.com");
-            MailMessage.From = new MailAddress("no-reply@utah.gov");
+            MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
+            MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
+
+            if (templateData.FromAddresses.Length > 1)
+            {
+                MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
+            }
+
             MailMessage.Subject = "Notification of Registration";
 
             Init();

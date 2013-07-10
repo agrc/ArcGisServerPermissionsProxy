@@ -157,6 +157,7 @@
     <Compile Include="Models\Response\Password\PasswordReset.cs" />
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
     <Compile Include="Raven\Indexes\UsersByApprovedIndex.cs" />
+    <Compile Include="Raven\Models\Config.cs" />
     <Compile Include="TextPlainResponseFormatter.cs" />
     <Compile Include="Commands\GetTokenCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />

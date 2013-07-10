@@ -28,7 +28,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
-            var user = new User("test@test.com", password.HashedPassword, salt, "security_role_1",
+            var user = new User("USERNAME", "test@test.com", "AGENCY", password.HashedPassword, salt, "security_role_1",
                                 new Collection<string> {"admin"});
             var app = new Application("security_role_1", "test");
 

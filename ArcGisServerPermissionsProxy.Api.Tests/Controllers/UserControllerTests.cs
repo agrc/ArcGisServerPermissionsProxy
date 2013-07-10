@@ -24,17 +24,19 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             base.SetUp();
 
-            var notApprovedActiveUser = new User("notApprovedActiveUser@test.com", "password", "", "",
+            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"});
+
+            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGeNCY", "password", "SALT", "APPLICATION",
                                                  new Collection<string>());
 
-            var approvedActiveUser = new User("approvedActiveUser@test.com", "password", "", "",
+            var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY", "password", "SALT", "APPLICATION",
                                               new Collection<string> {"admin", "boss"})
                 {
                     Active = false,
                     Approved = true
                 };
 
-            var notApprovedNotActiveUser = new User("notApprovedNotActiveUser@test.com", "password", "", "",
+            var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com", "AGENCY", "password", "SALT", "APPLICATION",
                                                     new Collection<string>())
                 {
                     Active = false
@@ -42,6 +44,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             using (var s = DocumentStore.OpenSession())
             {
+                s.Store(appConfig, "1");
                 s.Store(approvedActiveUser);
                 s.Store(notApprovedActiveUser);
                 s.Store(notApprovedNotActiveUser);
@@ -152,7 +155,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                            _controller.Reject(new UserController.RejectRequestInformation(Database, "emptyToken",
                                                                                           "approvedActiveUser@test.com"));
 
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
 
             using (var s = DocumentStore.OpenSession())
             {
@@ -171,7 +174,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.ResetPassword(new UserController.ResetRequestInformation(Database, "emptyToken",
-                                                                                          "approvedActiveUser@test.com"));
+                                                                                                "approvedActiveUser@test.com"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 

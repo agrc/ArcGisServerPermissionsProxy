@@ -1,4 +1,5 @@
-﻿using System.Net.Mail;
+﻿using System.Linq;
+using System.Net.Mail;
 using ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Email
@@ -14,8 +15,14 @@ We appreciate your interest in the {{Application}} application; however, your re
 
 Thank you for understanding.";
 
-            MailMessage.To.Add("test@test.com");
-            MailMessage.From = new MailAddress("no-reply@utah.gov");
+            MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
+            MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
+
+            if (templateData.FromAddresses.Length > 1)
+            {
+                MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
+            }
+
             MailMessage.Subject = "Access Reject";
 
             Init();
