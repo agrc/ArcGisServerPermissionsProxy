@@ -11,7 +11,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
          public void IsThereAnEmailInTheFolder()
          {
              CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
-                                   new NewUserNotificationEmailCommand.NewUserNotificationTemplate(
+                                   new NewUserNotificationEmailCommand.MailTemplate(
                                        "test@test.com", "Name", "Agency", "ApplicationName", "http://url.com")));
 
          }

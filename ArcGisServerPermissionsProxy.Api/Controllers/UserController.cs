@@ -46,15 +46,15 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 catch (AggregateException aex)
                 {
                     aex.Flatten().Handle(ex => // Note that we still need to call Flatten
-                    {
-                        if (ex is WebException)
                         {
-                            Database = null;
-                            return true;
-                        }
+                            if (ex is WebException)
+                            {
+                                Database = null;
+                                return true;
+                            }
 
-                        return false; // All other exceptions will get rethrown
-                    });
+                            return false; // All other exceptions will get rethrown
+                        });
                 }
 
                 if (Database == null)
@@ -75,13 +75,146 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 await s.StoreAsync(newUser);
 
-                CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
-                                                   new NewUserNotificationEmailCommand.NewUserNotificationTemplate(
-                                                       "sgourley@utah.gov", user.Name, user.Agency, user.ApplicationName,
-                                                       "url")));
+                Task.Factory.StartNew(() =>
+                    {
+                        CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
+                                                           new NewUserNotificationEmailCommand.MailTemplate(
+                                                               "sgourley@utah.gov", user.Name, user.Agency,
+                                                               user.ApplicationName,
+                                                               "url")));
+
+
+                        CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
+                                                           new UserRegistrationNotificationEmailCommand.MailTemplate(
+                                                               "sgourley@utah.gov", user.Name, user.ApplicationName)));
+                    });
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
+        }
+
+        [HttpPut]
+        public async Task<HttpResponseMessage> Accept(AcceptRequestInformation info)
+        {
+            Database = info.Database;
+
+            using (var s = AsyncSession)
+            {
+                var users = await s.Query<User, UserByEmailIndex>()
+                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                   .Where(x => x.Email == info.Email.ToLowerInvariant())
+                                   .ToListAsync();
+
+                User user;
+                try
+                {
+                    user = users.Single();
+                }
+                catch (InvalidOperationException)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
+                }
+
+                user.Active = true;
+                user.Approved = true;
+                user.Roles = info.Roles;
+
+                await s.SaveChangesAsync();
+
+                Task.Factory.StartNew(
+                    () =>
+                    CommandExecutor.ExecuteCommand(
+                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(user.Name, user.Email,
+                                                                                               "description"))));
+
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<HttpResponseMessage> Reject(RejectRequestInformation info)
+        {
+            Database = info.Database;
+
+            using (var s = AsyncSession)
+            {
+                var users = await s.Query<User, UserByEmailIndex>()
+                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                   .Where(x => x.Email == info.Email.ToLowerInvariant())
+                                   .ToListAsync();
+
+                User user;
+                try
+                {
+                    user = users.Single();
+                }
+                catch (InvalidOperationException)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
+                }
+
+                user.Active = false;
+                user.Approved = false;
+                user.Roles = new string[0];
+
+                await s.SaveChangesAsync();
+
+                Task.Factory.StartNew(() =>
+                                      CommandExecutor.ExecuteCommand(
+                                          new UserRejectedEmailCommand(
+                                              new UserRejectedEmailCommand.MailTemplate(user.Name,
+                                                                                        user.Application,
+                                                                                        user.Email))));
+
+
+                return Request.CreateResponse(HttpStatusCode.Accepted);
+            }
+        }
+
+        [HttpPut]
+        public async Task<HttpResponseMessage> ResetPassword(ResetRequestInformation info)
+        {
+            Database = info.Database;
+
+            using (var s = AsyncSession)
+            {
+                var users = await s.Query<User, UserByEmailIndex>()
+                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                   .Where(x => x.Email == info.Email.ToLowerInvariant())
+                                   .ToListAsync();
+
+                User user;
+                try
+                {
+                    user = users.Single();
+                }
+                catch (InvalidOperationException)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
+                }
+
+                var password = CommandExecutor.ExecuteCommand(new GeneratePasswordCommand(12));
+
+                var hashed =
+                    await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
+
+                user.Password = hashed.HashedPassword;
+                user.Salt = hashed.Salt;
+
+                await s.SaveChangesAsync();
+
+                Task.Factory.StartNew(() =>
+                                      CommandExecutor.ExecuteCommand(
+                                          new PasswordResetEmailCommand(
+                                              new PasswordResetEmailCommand.MailTemplate(user.Email, user.Name, password,
+                                                                                         new[] {"emails"}, "url"))));
+
+
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            }
         }
 
         [HttpGet]
@@ -129,147 +262,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<HttpResponseMessage> Accept(AcceptRequestInformation info)
-        {
-            Database = info.Database;
-
-            using (var s = AsyncSession)
-            {
-                var users = await s.Query<User, UserByEmailIndex>()
-                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                   .Where(x => x.Email == info.Email.ToLowerInvariant())
-                                   .ToListAsync();
-
-                User user;
-                try
-                {
-                    user = users.Single();
-                }
-                catch (InvalidOperationException)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound,
-                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
-                }
-
-                user.Active = true;
-                user.Approved = true;
-                user.Roles = info.Roles;
-
-                await s.SaveChangesAsync();
-
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-            }
-        }
-
-        [HttpDelete]
-        public async Task<HttpResponseMessage> Reject(RejectRequestInformation info)
-        {
-            Database = info.Database;
-
-            using (var s = AsyncSession)
-            {
-                var users = await s.Query<User, UserByEmailIndex>()
-                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                   .Where(x => x.Email == info.Email.ToLowerInvariant())
-                                   .ToListAsync();
-
-                User user;
-                try
-                {
-                    user = users.Single();
-                }
-                catch (InvalidOperationException)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound,
-                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
-                }
-
-                user.Active = false;
-                user.Approved = false;
-                user.Roles = new string[0];
-
-                await s.SaveChangesAsync();
-
-                return Request.CreateResponse(HttpStatusCode.Accepted);
-            }
-        }
-
-        [HttpPut]
-        public async Task<HttpResponseMessage> ResetPassword(ResetRequestInformation info)
-        {
-            Database = info.Database;
-
-            using (var s = AsyncSession)
-            {
-                var users = await s.Query<User, UserByEmailIndex>()
-                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                   .Where(x => x.Email == info.Email.ToLowerInvariant())
-                                   .ToListAsync();
-
-                User user;
-                try
-                {
-                    user = users.Single();
-                }
-                catch (InvalidOperationException)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound,
-                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
-                }
-
-                var password = CommandExecutor.ExecuteCommand(new GeneratePasswordCommand(12));
-
-                var hashed = await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
-
-                user.Password = hashed.HashedPassword;
-                user.Salt = hashed.Salt;
-
-                await s.SaveChangesAsync();
-
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-            }
-        }
-
-        /// <summary>
-        ///     A class for reseting a users password
-        /// </summary>
-        public class ResetRequestInformation : RequestInformation
-        {
-            public ResetRequestInformation(string database, string token, string email)
-                : base(database, token)
-            {
-                Email = email;
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            public string Email { get; set; }
-        }
-
-        /// <summary>
-        ///     A class for getting user role requests
-        /// </summary>
-        public class RejectRequestInformation : RequestInformation
-        {
-            public RejectRequestInformation(string database, string token, string email)
-                : base(database, token)
-            {
-                Email = email;
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            public string Email { get; set; }
-        }
 
         /// <summary>
         ///     A class for accepting users in the application
@@ -303,9 +295,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         /// <summary>
         ///     A class for getting user role requests
         /// </summary>
-        public class RoleRequestInformation : RequestInformation
+        public class RejectRequestInformation : RequestInformation
         {
-            public RoleRequestInformation(string database, string token, string email)
+            public RejectRequestInformation(string database, string token, string email)
                 : base(database, token)
             {
                 Email = email;
@@ -360,6 +352,46 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             ///     The token arcgis server generated.
             /// </value>
             public string Token { get; private set; }
+        }
+
+        /// <summary>
+        ///     A class for reseting a users password
+        /// </summary>
+        public class ResetRequestInformation : RequestInformation
+        {
+            public ResetRequestInformation(string database, string token, string email)
+                : base(database, token)
+            {
+                Email = email;
+            }
+
+            /// <summary>
+            ///     Gets or sets the email.
+            /// </summary>
+            /// <value>
+            ///     The email of the person to get the roles for.
+            /// </value>
+            public string Email { get; set; }
+        }
+
+        /// <summary>
+        ///     A class for getting user role requests
+        /// </summary>
+        public class RoleRequestInformation : RequestInformation
+        {
+            public RoleRequestInformation(string database, string token, string email)
+                : base(database, token)
+            {
+                Email = email;
+            }
+
+            /// <summary>
+            ///     Gets or sets the email.
+            /// </summary>
+            /// <value>
+            ///     The email of the person to get the roles for.
+            /// </value>
+            public string Email { get; set; }
         }
     }
 }

@@ -144,6 +144,7 @@
     <Compile Include="App_Start\RavenConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Commands\Email\Infrastructure\EmailCommand.cs" />
     <Compile Include="Commands\Email\NewUserNotificationEmailCommand.cs" />
     <Compile Include="Commands\Email\PasswordResetEmailCommand.cs" />
     <Compile Include="Commands\Email\UserAcceptedEmailCommand.cs" />

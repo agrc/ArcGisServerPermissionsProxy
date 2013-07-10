@@ -1,49 +1,35 @@
 ﻿using System.Net.Mail;
-using System.Net.Mime;
 using ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure;
-using Nustache.Core;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 {
     public class NewUserNotificationEmailCommand : EmailCommand
     {
-        private const string Template = @"### Dear Admins,
+        public NewUserNotificationEmailCommand(MailTemplate templateData)
+        {
+            TemplateData = templateData;
+            MessageTemplate = @"### Dear Admin,
 
 {{name}} from {{agency}} has requested access to the {{application}} web application. 
     
-Please use [the user admin page]({{url}}) to accept or reject their request.";
-        private readonly NewUserNotificationTemplate _templateData;
+Please use [the user admin page]({{url}}) to **accept** or **reject** their request.";
 
-        public NewUserNotificationEmailCommand(NewUserNotificationTemplate templateData)
-        {
-            _templateData = templateData;
-        }      
+            MailMessage.To.Add("test@test.com");
+            MailMessage.From = new MailAddress("no-reply@utah.gov");
+            MailMessage.Subject = "Notification of Registration";
+        }
+
+        public override sealed string MessageTemplate { get; protected internal set; }
+        public override sealed dynamic TemplateData { get; protected internal set; }
 
         public override string ToString()
         {
             return string.Format("{0}, NewUser: {1}", "NewUserNotificationEmailCommandAsync", _templateData);
         }
 
-        public override void Execute()
+        public class MailTemplate
         {
-            var markup = Render.StringToString(Template, _templateData);
-            var markdown = Markdowner.Transform(markup);
-
-            MailMessage.To.Add("test@test.com");
-            MailMessage.From = new MailAddress("no-reply@utah.gov");
-            MailMessage.Body = markup;
-            MailMessage.Subject = "Notification of Registration";
-            MailMessage.AlternateViews.Add(AlternateView(markup, MediaTypeNames.Text.Plain));
-            MailMessage.AlternateViews.Add(AlternateView(markdown, MediaTypeNames.Text.Html));
-
-            Mailman.SendAsync(MailMessage, "sending");
-
-            MailMessage.Dispose();
-        }
-
-        public class NewUserNotificationTemplate
-        {
-            public NewUserNotificationTemplate(string to, string name, string agency, string application, string url)
+            public MailTemplate(string to, string name, string agency, string application, string url)
             {
                 To = to;
                 Name = name;

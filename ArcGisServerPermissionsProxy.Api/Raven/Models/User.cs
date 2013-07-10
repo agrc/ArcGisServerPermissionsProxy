@@ -78,5 +78,13 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         ///   <c>true</c> if active; otherwise, <c>false</c>.
         /// </value>
         public bool Active { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
+        public string Name { get; set; }
     }
 }
