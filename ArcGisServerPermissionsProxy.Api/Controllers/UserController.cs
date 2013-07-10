@@ -79,14 +79,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                     {
                         CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
                                                            new NewUserNotificationEmailCommand.MailTemplate(
-                                                               "sgourley@utah.gov", user.Name, user.Agency,
-                                                               user.ApplicationName,
-                                                               "url")));
+                                                               new[] {""}, new[] {""}, user.Name, user.Agency,
+                                                               null, user.ApplicationName)));
 
 
                         CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
                                                            new UserRegistrationNotificationEmailCommand.MailTemplate(
-                                                               "sgourley@utah.gov", user.Name, user.ApplicationName)));
+                                                               new[] {user.Email}, new[] {""}, user.Name, user.Email, user.ApplicationName)));
                     });
             }
 
@@ -125,8 +124,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 Task.Factory.StartNew(
                     () =>
                     CommandExecutor.ExecuteCommand(
-                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(user.Name, user.Email,
-                                                                                               "description", info.Roles))));
+                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] { user.Email }, new[] { "" }, 
+                            user.Name, info.Roles, user.Email, user.Application))));
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             }
@@ -164,8 +163,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 Task.Factory.StartNew(() =>
                                       CommandExecutor.ExecuteCommand(
                                           new UserRejectedEmailCommand(
-                                              new UserRejectedEmailCommand.MailTemplate(user.Name,
-                                                                                        user.Email, user.Application))));
+                                              new UserRejectedEmailCommand.MailTemplate(new[] { user.Email }, new[] { "" }, user.Name,
+                                                                                        user.Application))));
 
 
                 return Request.CreateResponse(HttpStatusCode.Accepted);
@@ -208,8 +207,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 Task.Factory.StartNew(() =>
                                       CommandExecutor.ExecuteCommand(
                                           new PasswordResetEmailCommand(
-                                              new PasswordResetEmailCommand.MailTemplate(user.Name, user.Email,
-                                                                                         password, new[] {"emails"}, "url"))));
+                                              new PasswordResetEmailCommand.MailTemplate(new[] { user.Email }, new[] { "" }, user.Name,
+                                                                                         password,"url", user.Application))));
 
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);

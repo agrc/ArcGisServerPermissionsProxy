@@ -29,18 +29,12 @@ Thank you for understanding.";
             return string.Format("{0}, TemplateData: {1}", "UserRejectedEmailCommand", TemplateData);
         }
 
-        public class MailTemplate
+        public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string name, string email, string application)
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string application)
+                : base(toAddresses, fromAddresses, name, application)
             {
-                Name = name;
-                Application = application;
-                Email = email;
             }
-
-            public string Name { get; set; }
-            public string Application { get; set; }
-            public string Email { get; set; }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 
 We appreciate your interest in the {{Application}}. Your information **has been recieved** but you have **not been granted access** *yet*. You will receive an email from an administrator with further instructions.
 
-Your user name is: `{{Email}}`
+Your user name is: `{{UserName}}`
 
 Thank you for your patience.";
 
@@ -31,23 +31,14 @@ Thank you for your patience.";
             return string.Format("{0}, TemplateData: {1}", "UserRegistrationNotificationEmailCommand", TemplateData);
         }
 
-        public class MailTemplate
+        public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string name, string email, string application)
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string userName, string application) : base(toAddresses, fromAddresses, name, application)
             {
-                Name = name;
-                Email = email;
-                Application = application;
+                UserName = userName;
             }
 
-            public string Name { get; set; }
-            public string Email { get; set; }
-            public string Application { get; set; }
-
-            public override string ToString()
-            {
-                return string.Format("Name: {0}, Email: {1}, Application: {2}", Name, Email, Application);
-            }
+            public string UserName { get; set; }
         }
     }
 }

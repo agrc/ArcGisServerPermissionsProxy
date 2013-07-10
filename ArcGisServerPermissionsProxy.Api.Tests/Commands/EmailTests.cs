@@ -14,9 +14,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             {
                 CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
                                                    new NewUserNotificationEmailCommand.MailTemplate(
-                                                       "test@test.com", "Name", "Agency", "ApplicationName",
-                                                       "http://url.com")));
-
+                                                       new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
+                                                       new[] {"admin@application.com"}, "Name", "Agency",
+                                                       "http://url.com", "application")));
             }
         }
 
@@ -28,8 +28,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             {
                 CommandExecutor.ExecuteCommand(
                     new PasswordResetEmailCommand(
-                        new PasswordResetEmailCommand.MailTemplate("Name", "Email",
-                                                                   "password", new[] {"emails"}, "url")));
+                        new PasswordResetEmailCommand.MailTemplate(new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
+                                                       new[] {"admin@application.com"}, "Name", "Password", "http://url.com", "Agency")));
             }
         }
 
@@ -40,21 +40,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             public void IsThereAnEmailInTheFolder()
             {
                 CommandExecutor.ExecuteCommand(
-                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate("Name", "Email",
-                                                                                               "description", new[]{"multiple","roles"})));
-            }
-        }
-
-        [TestFixture]
-        public class UserRejectedEmailCommandTests
-        {
-            [Test]
-            public void IsThereAnEmailInTheFolder()
-            {
-                CommandExecutor.ExecuteCommand(
-                                           new UserRejectedEmailCommand(
-                                               new UserRejectedEmailCommand.MailTemplate("Name",
-                                                                                         "Email", "Application")));
+                    new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
+                                                       new[] {"admin@application.com"}, "Name", new[]{"role1","role2"}, "UserName", "Application")));
             }
         }
 
@@ -65,8 +52,21 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             public void IsThereAnEmailInTheFolder()
             {
                 CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
-                                                   new UserRegistrationNotificationEmailCommand.MailTemplate(
-                                                       "sgourley@utah.gov", "Name", "ApplicationName")));
+                                                   new UserRegistrationNotificationEmailCommand.MailTemplate(new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
+                                                       new[] {"admin@application.com"},"Name", "UserName", "Application")));
+            }
+        }
+
+        [TestFixture]
+        public class UserRejectedEmailCommandTests
+        {
+            [Test]
+            public void IsThereAnEmailInTheFolder()
+            {
+                CommandExecutor.ExecuteCommand(
+                    new UserRejectedEmailCommand(
+                        new UserRejectedEmailCommand.MailTemplate(new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
+                                                       new[] {"admin@application.com"}, "Name", "Application")));
             }
         }
     }

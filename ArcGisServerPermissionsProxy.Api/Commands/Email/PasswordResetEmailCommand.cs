@@ -28,27 +28,16 @@ Thank you";
         public override sealed string MessageTemplate { get; protected internal set; }
         public override sealed dynamic TemplateData { get; protected internal set; }
 
-        public class MailTemplate
+        public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string name, string email, string password, string[] adminEmails, string changePasswordUrl)
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string password, string changePasswordUrl, string application) : base(toAddresses, fromAddresses, name, application)
             {
-                Email = email;
-                Name = name;
                 Password = password;
-                AdminEmails = adminEmails;
                 ChangePasswordUrl = changePasswordUrl;
             }
 
-            public string Email { get; set; }
-            public string Name { get; set; }
             public string Password { get; set; }
-            public string[] AdminEmails { get; set; }
             public string ChangePasswordUrl { get; set; }
-
-            public override string ToString()
-            {
-                return string.Format("Email: {0}, Name: {1}, Password: {2}, AdminEmails: {3}, ChangePasswordUrl: {4}", Email, Name, Password, AdminEmails, ChangePasswordUrl);
-            }
         }
 
         public override string ToString()

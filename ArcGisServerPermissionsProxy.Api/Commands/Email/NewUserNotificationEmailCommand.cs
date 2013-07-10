@@ -29,22 +29,21 @@ Please use [the user admin page]({{url}}) to **accept** or **reject** their requ
             return string.Format("{0}, NewUser: {1}", "NewUserNotificationEmailCommandAsync", TemplateData);
         }
 
-        public class MailTemplate
+        public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string to, string name, string agency, string application, string url)
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string agency, string url, string application) : base(toAddresses, fromAddresses, name, application)
             {
-                To = to;
-                Name = name;
                 Agency = agency;
-                Application = application;
                 Url = url;
             }
 
-            public string To { get; set; }
-            public string Name { get; set; }
             public string Agency { get; set; }
-            public string Application { get; set; }
             public string Url { get; set; }
+
+            public override string ToString()
+            {
+                return string.Format("Agency: {0}, Url: {1}", Agency, Url);
+            }
         }
     }
 }
