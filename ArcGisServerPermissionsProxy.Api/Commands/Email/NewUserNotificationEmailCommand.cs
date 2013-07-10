@@ -1,12 +1,11 @@
 ﻿using System.Net.Mail;
 using System.Net.Mime;
-using CommandPattern;
-using MarkdownSharp;
+using ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure;
 using Nustache.Core;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 {
-    public class NewUserNotificationEmailCommand : Command
+    public class NewUserNotificationEmailCommand : EmailCommand
     {
         private const string Template = @"### Dear Admins,
 
@@ -14,22 +13,11 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
     
 Please use [the user admin page]({{url}}) to accept or reject their request.";
         private readonly NewUserNotificationTemplate _templateData;
-        private readonly MailMessage _mailMessage;
-        private readonly Markdown _markdowner;
-        private readonly SmtpClient _mailman;
 
         public NewUserNotificationEmailCommand(NewUserNotificationTemplate templateData)
         {
             _templateData = templateData;
-
-            _mailman = new SmtpClient();
-            _mailMessage = new MailMessage
-                {
-                    IsBodyHtml = true
-                };
-
-            _markdowner = new Markdown();
-        }
+        }      
 
         public override string ToString()
         {
@@ -39,23 +27,18 @@ Please use [the user admin page]({{url}}) to accept or reject their request.";
         public override void Execute()
         {
             var markup = Render.StringToString(Template, _templateData);
-            var markdown = _markdowner.Transform(markup);
+            var markdown = Markdowner.Transform(markup);
 
-            _mailMessage.To.Add("test@test.com");
-            _mailMessage.From = new MailAddress("no-reply@utah.gov");
-            _mailMessage.Body = markup;
-            _mailMessage.Subject = "Notification of Registration";
-            _mailMessage.AlternateViews.Add(AlternateView(markup, MediaTypeNames.Text.Plain));
-            _mailMessage.AlternateViews.Add(AlternateView(markdown, MediaTypeNames.Text.Html));
+            MailMessage.To.Add("test@test.com");
+            MailMessage.From = new MailAddress("no-reply@utah.gov");
+            MailMessage.Body = markup;
+            MailMessage.Subject = "Notification of Registration";
+            MailMessage.AlternateViews.Add(AlternateView(markup, MediaTypeNames.Text.Plain));
+            MailMessage.AlternateViews.Add(AlternateView(markdown, MediaTypeNames.Text.Html));
 
-            _mailman.SendAsync(_mailMessage, "sending");
+            Mailman.SendAsync(MailMessage, "sending");
 
-            _mailMessage.Dispose();
-        }
-
-        private static AlternateView AlternateView(string text, string mediaType)
-        {
-            return System.Net.Mail.AlternateView.CreateAlternateViewFromString(text, null, mediaType);
+            MailMessage.Dispose();
         }
 
         public class NewUserNotificationTemplate
