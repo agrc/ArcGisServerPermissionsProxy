@@ -1,0 +1,35 @@
+﻿{
+    "id": "a74a0aef-3125-0eef-b7e4-976e78703198",
+    "name": "AuthenticateController",
+    "timestamp": 1373399469109,
+    "requests": [
+        {
+            "collectionId": "a74a0aef-3125-0eef-b7e4-976e78703198",
+            "id": "9303fcd7-c59c-7513-50eb-a4dbad07f915",
+            "name": "Successful Login",
+            "description": "",
+            "url": "http://arcgissecurity/api/authenticate/user",
+            "method": "POST",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"role\": \"role\",\n  \"application\": \"app1\",\n  \"password\": \"password\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578400669
+        },
+        {
+            "collectionId": "a74a0aef-3125-0eef-b7e4-976e78703198",
+            "id": "b3175e4c-c6e8-c8d3-501e-5dfcfd99e030",
+            "name": "Bad Login",
+            "description": "",
+            "url": "http://arcgissecurity/api/authenticate/user",
+            "method": "POST",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"role\": \"role\",\n  \"application\": \"app1\",\n  \"wrong\": \"test\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578414748
+        }
+    ]
+}

@@ -1,0 +1,49 @@
+﻿{
+    "id": "856d92d7-6cc3-4bdc-9506-bc98354c44da",
+    "name": "AdminController",
+    "timestamp": 1373399482580,
+    "requests": [
+        {
+            "collectionId": "856d92d7-6cc3-4bdc-9506-bc98354c44da",
+            "id": "a57211ea-d221-69e8-4424-f8b986df7177",
+            "name": "CreateApplication",
+            "description": "",
+            "url": "http://arcgissecurity/api/admin/createapplication",
+            "method": "POST",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"application\":\"app1\",\n  \"adminEmails\":[\"sgourley@utah.gov\"]\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578154486
+        },
+        {
+            "collectionId": "856d92d7-6cc3-4bdc-9506-bc98354c44da",
+            "id": "cdfdb53e-1b03-fc4d-8944-f2ac49283336",
+            "name": "Reject",
+            "description": "",
+            "url": "http://arcgissecurity/api/admin/reject",
+            "method": "DELETE",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"app1\",\n  \"token\": \"token\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578426789
+        },
+        {
+            "collectionId": "856d92d7-6cc3-4bdc-9506-bc98354c44da",
+            "id": "e0d7cbdc-eaeb-084a-f1ba-641ec7da4426",
+            "name": "Accept",
+            "description": "",
+            "url": "http://arcgissecurity/api/admin/accept",
+            "method": "PUT",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"roles\": [\"role\"],\n  \"application\": \"app1\",\n  \"token\": \"token\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578443326
+        }
+    ]
+}

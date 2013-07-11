@@ -1,0 +1,84 @@
+﻿{
+    "id": "5e8d94d0-897d-13a5-4f30-bd715bab1da0",
+    "name": "UserController",
+    "timestamp": 1373400748521,
+    "order": [
+        "bd4ff2e7-83a7-c7a5-6229-f9742457e426",
+        "d2dc84b6-cb4f-da07-65c0-89584a6da227",
+        "4b1121df-b198-25e8-57ac-044d622d1608",
+        "17007cb8-1023-664a-4840-7fdcdf72c3df",
+        "cfc6f494-3202-b31c-0be0-d7ff452c1e85"
+    ],
+    "requests": [
+        {
+            "collectionId": "5e8d94d0-897d-13a5-4f30-bd715bab1da0",
+            "id": "17007cb8-1023-664a-4840-7fdcdf72c3df",
+            "name": "GetRoles",
+            "description": "",
+            "url": "http://arcgissecurity/api/user/getroles?application=app1&email=stdavis@utah.gov",
+            "method": "GET",
+            "headers": "",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"password\":\"password\",\n  \"application\": \"app1\",\n  \"name\": \"Scott\",\n  \"agency\": \"AGRC\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578375468
+        },
+        {
+            "collectionId": "5e8d94d0-897d-13a5-4f30-bd715bab1da0",
+            "id": "4b1121df-b198-25e8-57ac-044d622d1608",
+            "name": "Register",
+            "description": "",
+            "url": "http://arcgissecurity/api/user/register",
+            "method": "POST",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"password\":\"password\",\n  \"application\": \"app1\",\n  \"name\": \"Scott\",\n  \"agency\": \"AGRC\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578368205
+        },
+        {
+            "collectionId": "5e8d94d0-897d-13a5-4f30-bd715bab1da0",
+            "id": "bd4ff2e7-83a7-c7a5-6229-f9742457e426",
+            "name": "GetAllWaiting",
+            "description": "",
+            "url": "http://arcgissecurity/api/user/getallwaiting?application=app1",
+            "method": "GET",
+            "headers": "",
+            "data": "{\"email\":\"stdavis@utah.gov\",\"role\": \"role\", \"application\": \"app1\", \"password\": \"test\"}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578201779
+        },
+        {
+            "collectionId": "5e8d94d0-897d-13a5-4f30-bd715bab1da0",
+            "id": "cfc6f494-3202-b31c-0be0-d7ff452c1e85",
+            "name": "ResetPassword",
+            "description": "",
+            "url": "http://arcgissecurity/api/user/resetpassword",
+            "method": "PUT",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"app1\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "responses": [],
+            "version": 2
+        },
+        {
+            "collectionId": "5e8d94d0-897d-13a5-4f30-bd715bab1da0",
+            "id": "d2dc84b6-cb4f-da07-65c0-89584a6da227",
+            "name": "ChangePassword",
+            "description": "",
+            "url": "http://arcgissecurity/api/user/changepassword",
+            "method": "PUT",
+            "headers": "Content-Type: application/json\n",
+            "data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"currentPassword\": \"password\", \n  \"newpassword\": \"changed\",\n  \"newpasswordrepeated\": \"changed\",\n  \"application\": \"app1\"\n}",
+            "dataMode": "raw",
+            "timestamp": 0,
+            "version": 2,
+            "time": 1373578326394
+        }
+    ]
+}
