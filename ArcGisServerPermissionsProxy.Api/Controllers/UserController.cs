@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
+using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
@@ -106,101 +107,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         }
 
         [HttpPut]
-        public async Task<HttpResponseMessage> Accept(AcceptRequestInformation info)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
-            }
-
-            Database = info.Application;
-
-            using (var s = AsyncSession)
-            {
-                var user = await GetUser(info.Email, s);
-
-                user.Active = true;
-                user.Approved = true;
-                user.Roles = info.Roles;
-
-                await s.SaveChangesAsync();
-
-                var config = await s.LoadAsync<Config>("1");
-
-                Task.Factory.StartNew(
-                    () =>
-                    CommandExecutor.ExecuteCommand(
-                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {user.Email},
-                                                                                               config.
-                                                                                                   AdministrativeEmails,
-                                                                                               user.Name, info.Roles,
-                                                                                               user.Email,
-                                                                                               user.Application))));
-
-                return Request.CreateResponse(HttpStatusCode.NoContent);
-            }
-        }
-
-        private static async Task<User> GetUser(string email, IAsyncDocumentSession s)
-        {
-            var users = await s.Query<User, UserByEmailIndex>()
-                               .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                               .Where(x => x.Email == email.ToLowerInvariant())
-                               .ToListAsync();
-
-            User user = null;
-            try
-            {
-                user = users.Single();
-            }
-            catch (InvalidOperationException)
-            {
-                return user;
-            }
-
-            return user;
-        }
-
-        [HttpDelete]
-        public async Task<HttpResponseMessage> Reject(RejectRequestInformation info)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
-            }
-
-            Database = info.Application;
-
-            using (var s = AsyncSession)
-            {
-                var user = await GetUser(info.Email, s);
-
-                user.Active = false;
-                user.Approved = false;
-                user.Roles = new string[0];
-
-                await s.SaveChangesAsync();
-
-                var config = await s.LoadAsync<Config>("1");
-
-                Task.Factory.StartNew(() =>
-                                      CommandExecutor.ExecuteCommand(
-                                          new UserRejectedEmailCommand(
-                                              new UserRejectedEmailCommand.MailTemplate(new[] {user.Email},
-                                                                                        config.AdministrativeEmails,
-                                                                                        user.Name,
-                                                                                        user.Application))));
-
-
-                return Request.CreateResponse(HttpStatusCode.Accepted);
-            }
-        }
-
-        [HttpPut]
         public async Task<HttpResponseMessage> ResetPassword(ResetRequestInformation info)
         {
             if (!ModelState.IsValid)
@@ -214,7 +120,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
             using (var s = AsyncSession)
             {
-                var user = await GetUser(info.Email, s);
+                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
                 var password = CommandExecutor.ExecuteCommand(new GeneratePasswordCommand(12));
 
@@ -266,7 +172,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             {
                 try
                 {
-                    user = await GetUser(info.Email, s);
+                    user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
                 }
                 catch (AggregateException aex)
                 {
@@ -318,6 +224,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         [HttpGet]
         public async Task<HttpResponseMessage> GetAllWaiting(RequestInformation info)
         {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
             Database = info.Application;
 
             using (var s = AsyncSession)
@@ -360,36 +273,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
         }
 
-        /// <summary>
-        ///     A class for accepting users in the application
-        /// </summary>
-        public class AcceptRequestInformation : RequestInformation
-        {
-            public AcceptRequestInformation(string application, string token, string email, IEnumerable<string> roles)
-                : base(application, token)
-            {
-                Email = email;
-                Roles = roles.Select(x => x.ToLowerInvariant()).ToArray();
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            [EmailAddress]
-            public string Email { get; set; }
-
-            /// <summary>
-            ///     Gets or sets the roles.
-            /// </summary>
-            /// <value>
-            ///     The roles.
-            /// </value>
-            [Required]
-            public string[] Roles { get; set; }
-        }
 
         public class ChangePasswordRequestInformation : RequestInformation
         {
@@ -422,26 +305,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             public string Email { get; set; }
         }
 
-        /// <summary>
-        ///     A class for getting user role requests
-        /// </summary>
-        public class RejectRequestInformation : RequestInformation
-        {
-            public RejectRequestInformation(string application, string token, string email)
-                : base(application, token)
-            {
-                Email = email;
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            [EmailAddress]
-            public string Email { get; set; }
-        }
 
         /// <summary>
         ///     A class encapsulating common request paramaters
@@ -465,10 +328,10 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             [Required]
             public string Application
             {
-                get { return _application; }
+                get { return _application.ToLowerInvariant(); }
                 private set
                 {
-                    if (value == null || value.ToLowerInvariant() == "system" || string.IsNullOrEmpty(value))
+                    if (value == null || string.IsNullOrEmpty(value))
                         _application = null;
                     else
                     {
@@ -483,6 +346,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             /// <value>
             ///     The token arcgis server generated.
             /// </value>
+            [Required]
             public string Token { get; private set; }
         }
 

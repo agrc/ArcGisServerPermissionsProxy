@@ -117,65 +117,6 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
-        public async Task AcceptUserSetsTheUserAcceptPropertyToTrue()
-        {
-            var response = await
-                           _controller.Accept(new UserController.AcceptRequestInformation(Database, "emptyToken",
-                                                                                          "notApprovedActiveUser@test.com",
-                                                                                          new Collection<string>
-                                                                                              {
-                                                                                                  "Monkey"
-                                                                                              }));
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
-
-            using (var s = DocumentStore.OpenSession())
-            {
-                var user = s.Query<User, UserByEmailIndex>()
-                            .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                            .Single(x => x.Email == "notApprovedActiveUser@test.com".ToLowerInvariant());
-
-                Assert.That(user.Approved, Is.True);
-                Assert.That(user.Roles, Is.EquivalentTo(new Collection<string> {"monkey"}));
-            }
-        }
-
-        [Test]
-        public async Task AcceptUserFailsGracefully()
-        {
-            var response = await
-                           _controller.Accept(new UserController.AcceptRequestInformation(Database, "emptyToken",
-                                                                                          "where@am.i",
-                                                                                          new Collection<string>
-                                                                                              {
-                                                                                                  "Monkey"
-                                                                                              }));
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
-        }
-
-        [Test]
-        public async Task RejectUserRemovesAllPrivs()
-        {
-            var response = await
-                           _controller.Reject(new UserController.RejectRequestInformation(Database, "emptyToken",
-                                                                                          "approvedActiveUser@test.com"));
-
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
-
-            using (var s = DocumentStore.OpenSession())
-            {
-                var user = s.Query<User, UserByEmailIndex>()
-                            .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                            .Single(x => x.Email == "approvedActiveUser@test.com".ToLowerInvariant());
-
-                Assert.That(user.Approved, Is.False);
-                Assert.That(user.Active, Is.False);
-                Assert.That(user.Roles, Is.Empty);
-            }
-        }
-
-        [Test]
         public async Task ResetPasswordChangesSaltAndPassword()
         {
             var response = await
