@@ -4,8 +4,8 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Account
 {
     public class Credentials : LoginCredentials
     {
-        public Credentials(string email, string password, string applicationName, string roleName, string application)
-            : base(email, password, roleName, applicationName)
+        public Credentials(string email, string password, string application)
+            : base(email, password, null, application)
         {
         }
 

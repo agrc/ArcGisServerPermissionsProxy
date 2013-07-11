@@ -13,7 +13,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
     {
         private IDocumentSession _session;
         private IAsyncDocumentSession _asyncSession;
-        public string Database { get; set; }
+        private string _database;
+        public string Database
+        {
+            get { return "app_" + _database.ToLowerInvariant(); }
+            set { _database = value; }
+        }
 
         [Inject]
         public IDocumentStore DocumentStore { get; set; }

@@ -50,10 +50,10 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         [Required]
         public string Application
         {
-            get { return _application; }
+            get { return _application.ToLowerInvariant(); }
             private set
             {
-                if (value == null || value.ToLowerInvariant() == "system" || string.IsNullOrEmpty(value))
+                if (value == null || string.IsNullOrEmpty(value))
                     _application = null;
                 else
                 {

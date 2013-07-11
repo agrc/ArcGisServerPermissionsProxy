@@ -12,10 +12,10 @@
 
         public string Name
         {
-            get { return _name; }
+            get { return _name.ToLowerInvariant(); }
             private set
             {
-                if (value == null || value.ToLowerInvariant() == "system" || string.IsNullOrEmpty(value))
+                if (value == null || string.IsNullOrEmpty(value))
                     _name = null;
                 else
                 {
