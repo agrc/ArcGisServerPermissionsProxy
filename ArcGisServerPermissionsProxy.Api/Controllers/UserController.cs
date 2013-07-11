@@ -361,7 +361,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             /// <value>
             ///     The token arcgis server generated.
             /// </value>
-            [Required]
             public string Token { get; protected set; }
         }
 
