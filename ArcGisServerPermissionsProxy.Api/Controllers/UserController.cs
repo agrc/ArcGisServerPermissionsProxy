@@ -290,9 +290,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 var currentPassword = await
-                                     CommandExecutor.ExecuteCommandAsync(
-                                         new HashPasswordCommandAsync(info.CurrentPassword, user.Salt,
-                                                                      App.Pepper));
+                                      CommandExecutor.ExecuteCommandAsync(
+                                          new HashPasswordCommandAsync(info.CurrentPassword, user.Salt,
+                                                                       App.Pepper));
 
                 if (currentPassword.HashedPassword != user.Password)
                 {
@@ -302,9 +302,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 var newPassword = await
-                                     CommandExecutor.ExecuteCommandAsync(
-                                         new HashPasswordCommandAsync(info.NewPassword, user.Salt,
-                                                                      App.Pepper));
+                                  CommandExecutor.ExecuteCommandAsync(
+                                      new HashPasswordCommandAsync(info.NewPassword, user.Salt,
+                                                                   App.Pepper));
 
                 user.Password = newPassword.HashedPassword;
                 user.Salt = newPassword.Salt;
@@ -360,7 +360,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
         }
 
-
         /// <summary>
         ///     A class for accepting users in the application
         /// </summary>
@@ -394,7 +393,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
         public class ChangePasswordRequestInformation : RequestInformation
         {
-            public ChangePasswordRequestInformation(string email, string currentPassword, string newPassword, string newPasswordRepeated, string application, string token) : base(application, token)
+            public ChangePasswordRequestInformation(string email, string currentPassword, string newPassword,
+                                                    string newPasswordRepeated, string application, string token)
+                : base(application, token)
             {
                 CurrentPassword = currentPassword;
                 NewPassword = newPassword;
