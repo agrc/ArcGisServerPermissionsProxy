@@ -12,6 +12,7 @@ using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Models.Response.Account;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
@@ -222,16 +223,16 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<HttpResponseMessage> GetAllWaiting(RequestInformation info)
+        public async Task<HttpResponseMessage> GetAllWaiting(string application)
         {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrEmpty(application))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
                                                                     "Missing parameters."));
             }
 
-            Database = info.Application;
+            Database = application;
 
             using (var s = AsyncSession)
             {
@@ -241,7 +242,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                           .ToListAsync();
 
                 return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<IList<User>>(waitingUsers));
+                                              new ResponseContainer<IList<UsersWaiting>>(
+                                                  waitingUsers.Select(x => new UsersWaiting(x)).ToList()));
             }
         }
 

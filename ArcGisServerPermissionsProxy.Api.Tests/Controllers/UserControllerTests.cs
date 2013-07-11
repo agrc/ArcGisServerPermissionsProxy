@@ -73,8 +73,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task GetAllWaitingReturnsAllActiveNotApprovedUsers()
         {
-            var response =
-                await _controller.GetAllWaiting(new UserController.RequestInformation(Database, "emptyToken"));
+            var response = await _controller.GetAllWaiting(Database);
 
             var result = await response.Content.ReadAsAsync<ResponseContainer<IList<User>>>(new[]
                 {
