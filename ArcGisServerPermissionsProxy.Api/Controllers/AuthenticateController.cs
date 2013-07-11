@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web.Http;
 using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Commands;
@@ -24,7 +25,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         [Inject]
         public ITokenService TokenService { get; set; }
 
-        public async Task<HttpResponseMessage> Post(LoginCredentials login)
+        [HttpPost]
+        public async Task<HttpResponseMessage> User(LoginCredentials login)
         {
             TokenModel token;
             Database = login.Application;
@@ -33,7 +35,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             {
                 var items = await s.Query<User, UserByEmailIndex>()
                                    .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                   //.Customize(x => x.Include<Application>(o => o.Name))
                                    .Where(x => x.Email == login.Email)
                                    .ToListAsync();
 
@@ -76,8 +77,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 token = await TokenService.GetToken(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", false, 6080),
-                                                    new GetTokenCommandAsync.Credentials(login.Application, login.Role,
-                                                                               login.Password));
+                                                    new GetTokenCommandAsync.Credentials(login.Application, login.Role, App.Password));
 
                 if (!token.Successful)
                 {

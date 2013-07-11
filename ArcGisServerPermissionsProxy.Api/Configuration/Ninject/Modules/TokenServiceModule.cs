@@ -8,9 +8,7 @@ namespace ArcGisServerPermissionsProxy.Api.Configuration.Ninject.Modules
     {
         public override void Load()
         {
-#if !DEBUG
             Bind<ITokenService>().To<TokenService>().InRequestScope();
-#endif
         }
     }
 }

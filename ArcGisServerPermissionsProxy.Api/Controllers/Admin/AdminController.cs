@@ -33,7 +33,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
             using (var s = Session)
             {
-                DocumentStore.DatabaseCommands.EnsureDatabaseExists(database);
+                DocumentStore.DatabaseCommands.EnsureDatabaseExists(Database);
                 
                 var catalog = new AssemblyCatalog(typeof (UserByEmailIndex).Assembly);
                 var provider = new CatalogExportProvider(catalog)

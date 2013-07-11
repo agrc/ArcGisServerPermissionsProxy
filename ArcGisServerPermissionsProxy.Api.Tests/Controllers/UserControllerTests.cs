@@ -86,9 +86,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task GetRolesGetsTheRolesForSpecificUser()
         {
-            var response = await
-                           _controller.GetRoles(new UserController.RoleRequestInformation(Database, "emptyToken",
-                                                                                          "approvedActiveUser@test.com"));
+            var response = await _controller.GetRoles("approvedActiveUser@test.com", Database);
 
             var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
                 {
@@ -102,9 +100,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task GetRolesFailsGracefully()
         {
-            var response = await
-                           _controller.GetRoles(new UserController.RoleRequestInformation(Database, "emptyToken",
-                                                                                          "where@am.i"));
+            var response = await _controller.GetRoles("where@am.i", Database);
 
             var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
                 {
@@ -119,8 +115,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         public async Task ResetPasswordChangesSaltAndPassword()
         {
             var response = await
-                           _controller.ResetPassword(new UserController.ResetRequestInformation(Database, "emptyToken",
-                                                                                                "approvedActiveUser@test.com"));
+                           _controller.ResetPassword(new UserController.ResetRequestInformation("approvedActiveUser@test.com", Database, "emptyToken"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 

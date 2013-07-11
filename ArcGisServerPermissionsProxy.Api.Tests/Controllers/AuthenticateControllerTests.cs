@@ -105,7 +105,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var login = new LoginCredentials("test@test.com", "123abc", "admin", "");
 
-            var response = await _controller.Post(login);
+            var response = await _controller.User(login);
 
             var result = GetResultContent(response);
 
@@ -119,7 +119,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var login = new LoginCredentials("test@test.com", "wrong", "admin", "");
 
-            var response = await _controller.Post(login);
+            var response = await _controller.User(login);
 
             var result = GetResultContent(response);
 

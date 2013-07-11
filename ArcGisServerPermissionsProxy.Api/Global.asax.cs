@@ -12,6 +12,8 @@ namespace ArcGisServerPermissionsProxy.Api
 
         public static string Pepper { get { return ")(*&(*^%*&^$*^#$"; } }
 
+        public static string Password = "test_password";
+
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();

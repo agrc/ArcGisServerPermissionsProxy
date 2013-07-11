@@ -248,15 +248,23 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<HttpResponseMessage> GetRoles(RoleRequestInformation info)
+        public async Task<HttpResponseMessage> GetRoles(string email, string application)
         {
-            Database = info.Application;
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(application))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+
+            Database = application;
 
             using (var s = AsyncSession)
             {
                 var users = await s.Query<User, UserByEmailIndex>()
                                    .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                   .Where(x => x.Email == info.Email.ToLowerInvariant())
+                                   .Where(x => x.Email == email.ToLowerInvariant())
                                    .ToListAsync();
 
                 User user;
@@ -315,6 +323,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         {
             private string _application;
 
+            public RequestInformation()
+            {
+                
+            }
+
             public RequestInformation(string application, string token)
             {
                 Application = application;
@@ -331,7 +344,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             public string Application
             {
                 get { return _application.ToLowerInvariant(); }
-                private set
+                protected set
                 {
                     if (value == null || string.IsNullOrEmpty(value))
                         _application = null;
@@ -349,7 +362,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             ///     The token arcgis server generated.
             /// </value>
             [Required]
-            public string Token { get; private set; }
+            public string Token { get; protected set; }
         }
 
         /// <summary>
@@ -357,7 +370,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         /// </summary>
         public class ResetRequestInformation : RequestInformation
         {
-            public ResetRequestInformation(string application, string token, string email)
+            public ResetRequestInformation(string email, string application, string token)
                 : base(application, token)
             {
                 Email = email;
@@ -378,7 +391,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         /// </summary>
         public class RoleRequestInformation : RequestInformation
         {
-            public RoleRequestInformation(string application, string token, string email)
+            public RoleRequestInformation()
+            {
+                
+            }
+
+            public RoleRequestInformation(string email, string application, string token)
                 : base(application, token)
             {
                 Email = email;
