@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Commands\GetTokenCommandTests.cs" />
     <Compile Include="Commands\EmailTests.cs" />
+    <Compile Include="Controllers\AdminControllerTests.cs" />
     <Compile Include="Controllers\UserControllerTests.cs" />
     <Compile Include="Infrastructure\RavenEmbeddableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -84,6 +85,14 @@
       <Project>{dc6c1e7f-3a95-4091-89a2-3c6de8c46b49}</Project>
       <Name>ArcGisServerPermissionsProxy.Api</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\jasmine.css" />
+    <Content Include="Scripts\dojo\dojo.js" />
+    <Content Include="Scripts\dojo\dojo.js.uncompressed.js" />
+    <Content Include="Scripts\jasmine-html.js" />
+    <Content Include="Scripts\jasmine.js" />
+    <Content Include="Scripts\Tests.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

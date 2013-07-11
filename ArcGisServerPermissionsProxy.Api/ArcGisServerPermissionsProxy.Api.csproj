@@ -151,6 +151,7 @@
     <Compile Include="Commands\Email\UserAcceptedEmailCommand.cs" />
     <Compile Include="Commands\Email\UserRegistrationNotificationEmailCommand.cs" />
     <Compile Include="Commands\Email\UserRejectedEmailCommand.cs" />
+    <Compile Include="Commands\Query\GetUserCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\Modules\TokenServiceModule.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\UserController.cs" />
