@@ -8,9 +8,8 @@ namespace ArcGisServerPermissionsProxy.Api
         {
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new {id = RouteParameter.Optional}
-                );
+                routeTemplate: "api/{controller}/{action}"
+            );
 
             // Uncomment the following line of code to enable query support for actions with an IQueryable or IQueryable<T> return type.
             // To avoid processing unexpected or malicious queries, use the validation settings on QueryableAttribute to validate incoming queries.
