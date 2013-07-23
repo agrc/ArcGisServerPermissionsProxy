@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -27,23 +26,26 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             base.SetUp();
 
-            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"});
+            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"}, new[] {"admin"});
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
 
-            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
+            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY",
+                                                 hashedPassword.Result.HashedPassword, "SALT", null,
                                                  null);
 
-            var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
+            var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY",
+                                              hashedPassword.Result.HashedPassword, "SALT", null,
                                               "admin")
                 {
                     Active = false,
                     Approved = true
                 };
 
-            var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
+            var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com",
+                                                    "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
                                                     null)
                 {
                     Active = false
@@ -116,7 +118,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         public async Task ResetPasswordChangesSaltAndPassword()
         {
             var response = await
-                           _controller.ResetPassword(new UserController.ResetRequestInformation("approvedActiveUser@test.com", Database, "emptyToken"));
+                           _controller.ResetPassword(
+                               new UserController.ResetRequestInformation("approvedActiveUser@test.com", Database,
+                                                                          "emptyToken"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
@@ -134,7 +138,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task ChangePasswordChangesTheUsersPassword()
         {
-            var response = await _controller.ChangePassword(new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password", "newPassword", "newPassword", "", ""));
+            var response =
+                await
+                _controller.ChangePassword(
+                    new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password",
+                                                                        "newPassword", "newPassword", "", ""));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
 
@@ -155,7 +163,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task ChangePasswordFailsGracefullyIfCurrentPasswordIsWrong()
         {
-            var response = await _controller.ChangePassword(new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "wrong", "newPassword", "newPassword", "", ""));
+            var response =
+                await
+                _controller.ChangePassword(
+                    new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "wrong",
+                                                                        "newPassword", "newPassword", "", ""));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }
@@ -163,7 +175,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task ChangePasswordFailsGracefullyIfPasswordsDontMatch()
         {
-            var response = await _controller.ChangePassword(new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password", "1", "2", "", ""));
+            var response =
+                await
+                _controller.ChangePassword(
+                    new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password", "1",
+                                                                        "2", "", ""));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }

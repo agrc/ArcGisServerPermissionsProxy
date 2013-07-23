@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 var existingConfig = s.Load<Config>("1");
                 if (existingConfig == null)
                 {
-                    var config = new Config(parameters.AdminEmails);
+                    var config = new Config(parameters.AdminEmails, parameters.Roles);
 
                     s.Store(config, "1");
                     s.SaveChanges();
@@ -68,6 +69,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
             using (var s = AsyncSession)
             {
+                var config = await s.LoadAsync<Config>("1");
+
+                //get role make sure exists
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
                 if (user == null)
@@ -75,13 +79,16 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     return Request.CreateResponse(HttpStatusCode.NotFound, new ResponseContainer(HttpStatusCode.NotFound, "User was not found."));
                 }
 
+                if (!config.Roles.Contains(info.Role.ToLowerInvariant()))
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, new ResponseContainer(HttpStatusCode.NotFound, "Role was not found.")); 
+                }
+
                 user.Active = true;
                 user.Approved = true;
                 user.Role = info.Role;
 
                 await s.SaveChangesAsync();
-
-                var config = await s.LoadAsync<Config>("1");
 
                 Task.Factory.StartNew(
                     () =>
@@ -195,6 +202,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
             [Required]
             public string[] AdminEmails { get; set; }
+
+            [Required]
+            public string[] Roles { get; set; }
         }
     }
 }

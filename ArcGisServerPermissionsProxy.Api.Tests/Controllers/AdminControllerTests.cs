@@ -24,13 +24,13 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             base.SetUp();
 
-            var appConfig = new Config(new[] { "admin1@email.com", "admin2@email.com" });
+            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"}, new[] {"admin"});
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
 
-            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGeNCY", hashedPassword.Result.HashedPassword, "SALT", null,
+            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
                                                  null);
 
             var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
@@ -89,10 +89,20 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
-        public async Task AcceptUserFailsGracefully()
+        public async Task AcceptUserFailsGracefullyWhenEmailDoesNotExist()
         {
             var response = await
                            _controller.Accept(new AdminController.AcceptRequestInformation("where@am.i",
+                                                                                         "Monkey", "emptyToken", Database));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+        }
+
+        [Test]
+        public async Task AcceptUserFailsGracefullyWhenRoleDoesNotExist()
+        {
+            var response = await
+                           _controller.Accept(new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
                                                                                          "Monkey", "emptyToken", Database));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -117,6 +127,5 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 Assert.That(user.Role, Is.Empty);
             }
         }
-
     }
 }
