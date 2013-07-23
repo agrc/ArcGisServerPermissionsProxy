@@ -7,9 +7,9 @@ namespace ArcGisServerPermissionsProxy.Api.Services.Token
 {
     public class TokenService : ITokenService
     {
-        public Task<TokenModel> GetToken(GetTokenCommandAsync.GetTokenParams tokenParams, GetTokenCommandAsync.Credentials credentials)
+        public Task<TokenModel> GetToken(GetUsersTokenForApplicationCommandAsync.GetTokenParams tokenParams, GetUsersTokenForApplicationCommandAsync.User user, string application, string role)
         {
-            return CommandExecutor.ExecuteCommandAsync(new GetTokenCommandAsync(tokenParams, credentials));
+            return CommandExecutor.ExecuteCommandAsync(new GetUsersTokenForApplicationCommandAsync(tokenParams, user, application, role));
         }
     }
 }

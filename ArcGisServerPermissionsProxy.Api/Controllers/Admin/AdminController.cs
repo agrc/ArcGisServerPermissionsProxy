@@ -5,13 +5,16 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
+using ArcGisServerPermissionsProxy.Api.Services.Token;
 using CommandPattern;
+using Ninject;
 using Raven.Client.Extensions;
 using Raven.Client.Indexes;
 
@@ -51,6 +54,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     s.SaveChanges();
                 }
             }
+
+            CommandExecutor.ExecuteCommandAsync(new BootstrapArcGisServerSecurityCommandAsync(parameters, App.AdminInformation));
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }

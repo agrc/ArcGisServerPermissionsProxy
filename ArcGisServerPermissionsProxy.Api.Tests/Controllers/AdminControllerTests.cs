@@ -73,7 +73,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Accept(new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
-                                                                                          "Monkey", "emptyToken", Database));
+                                                                                          "ADMIN", "emptyToken", Database));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
@@ -84,7 +84,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                             .Single(x => x.Email == "notApprovedActiveUser@test.com".ToLowerInvariant());
 
                 Assert.That(user.Approved, Is.True);
-                Assert.That(user.Role, Is.EquivalentTo("monkey"));
+                Assert.That(user.Role, Is.EquivalentTo("admin"));
             }
         }
 

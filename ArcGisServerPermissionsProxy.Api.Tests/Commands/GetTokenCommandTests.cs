@@ -13,8 +13,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             [Test]
             public async Task CanGetErrorMessageWithInvalidCredentials()
             {
-                var command = new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams(),
-                                                  new GetTokenCommandAsync.Credentials("app1", "role", "wrong"));
+                var command = new GetUsersTokenForApplicationCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams(),
+                                                  new GetTokenCommandAsyncBase.User(null, "wrong"), "app1", "role");
 
                 var actual = await CommandExecutor.ExecuteCommandAsync(command);
 
@@ -26,8 +26,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             [Test]
             public async Task CanGetTokenWithValidCredentials()
             {
-                var command = new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams(),
-                                                  new GetTokenCommandAsync.Credentials("app1", "role", "test"));
+                var command = new GetUsersTokenForApplicationCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams(),
+                                                  new GetTokenCommandAsyncBase.User(null, "test"), "app1", "role");
 
                 var actual = await CommandExecutor.ExecuteCommandAsync(command);
 
@@ -43,8 +43,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             [Test]
             public void BasicUrlGetCreatedCorrectly()
             {
-                var command = new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams(),
-                                                  new GetTokenCommandAsync.Credentials("app1", "role", "test"));
+                var command = new GetUsersTokenForApplicationCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams(),
+                                                  new GetTokenCommandAsyncBase.User(null, "test"), "app1", "role");
 
                 var actual = command.BuildUri();
 
@@ -57,8 +57,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             public void ComplexUrlGetCreatedCorrectly()
             {
                 var command =
-                    new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", true, 6080),
-                                        new GetTokenCommandAsync.Credentials("app1", "role", "test"));
+                    new GetUsersTokenForApplicationCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", true, 6080),
+                                        new GetTokenCommandAsyncBase.User(null, "test"), "app1", "role");
                 var actual = command.BuildUri();
 
                 Assert.That(actual.ToString(),

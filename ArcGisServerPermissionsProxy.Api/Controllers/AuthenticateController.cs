@@ -75,8 +75,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                                                       login.Application)));
                 }
 
-                token = await TokenService.GetToken(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", false, 6080),
-                                                    new GetTokenCommandAsync.Credentials(login.Application, user.Role, App.Password));
+                token =
+                    await
+                    TokenService.GetToken(
+                        new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
+                        new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);
 
                 if (!token.Successful)
                 {
@@ -86,7 +89,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK, new ResponseContainer<AuthenticationResponse>(new AuthenticationResponse(token.Token)));
+            return Request.CreateResponse(HttpStatusCode.OK,
+                                          new ResponseContainer<AuthenticationResponse>(
+                                              new AuthenticationResponse(token.Token)));
         }
     }
 }
