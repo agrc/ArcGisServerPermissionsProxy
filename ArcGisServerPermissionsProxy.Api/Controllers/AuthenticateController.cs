@@ -13,7 +13,6 @@ using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
-using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
 using CommandPattern;
 using Ninject;
