@@ -8,7 +8,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
     {
         private string _application;
 
-        public User(string name, string email, string agency, string password, string salt, string application, IEnumerable<string> roles)
+        public User(string name, string email, string agency, string password, string salt, string application, string role)
         {
             Email = email.ToLowerInvariant();
             Name = name;
@@ -16,7 +16,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
             Password = password;
             Salt = salt;
             Application = application;
-            Roles = roles.Select(x=>x.ToLowerInvariant()).ToArray();
+            Role = role == null ? "" : role.ToLowerInvariant();
             Approved = false;
             Active = true;
         }
@@ -50,7 +50,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         [Required]
         public string Application
         {
-            get { return _application.ToLowerInvariant(); }
+            get { return _application == null ? null : _application.ToLowerInvariant(); }
             private set
             {
                 if (value == null || string.IsNullOrEmpty(value))
@@ -68,7 +68,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// <value>
         /// The role of the user.
         /// </value>
-        public string[] Roles { get; set; }
+        public string Role { get; set; }
 
         /// <summary>
         /// Gets or sets the salt.

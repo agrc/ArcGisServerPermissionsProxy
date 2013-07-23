@@ -72,9 +72,14 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             {
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
+                if (user == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, new ResponseContainer(HttpStatusCode.NotFound, "User was not found."));
+                }
+
                 user.Active = true;
                 user.Approved = true;
-                user.Roles = info.Roles;
+                user.Role = info.Role;
 
                 await s.SaveChangesAsync();
 
@@ -86,7 +91,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                         new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] { user.Email },
                                                                                                config.
                                                                                                    AdministrativeEmails,
-                                                                                               user.Name, info.Roles,
+                                                                                               user.Name, info.Role,
                                                                                                user.Email,
                                                                                                user.Application))));
 
@@ -112,7 +117,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
                 user.Active = false;
                 user.Approved = false;
-                user.Roles = new string[0];
+                user.Role = null;
 
                 await s.SaveChangesAsync();
 
@@ -136,11 +141,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         /// </summary>
         public class AcceptRequestInformation : UserController.RequestInformation
         {
-            public AcceptRequestInformation(string email, IEnumerable<string> roles, string token, string application)
+            public AcceptRequestInformation(string email, string role, string token, string application)
                 : base(application, token)
             {
                 Email = email;
-                Roles = roles.Select(x => x.ToLowerInvariant()).ToArray();
+                Role = role == null ? "" : role.ToLowerInvariant();
             }
 
             /// <summary>
@@ -159,7 +164,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             ///     The roles.
             /// </value>
             [Required]
-            public string[] Roles { get; set; }
+            public string Role { get; set; }
         }
 
 

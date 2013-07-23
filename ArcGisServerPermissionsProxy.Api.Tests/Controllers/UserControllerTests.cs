@@ -11,6 +11,7 @@ using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
+using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
 using NUnit.Framework;
@@ -32,18 +33,18 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
 
-            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGeNCY", hashedPassword.Result.HashedPassword, "SALT", "APPLICATION",
-                                                 new Collection<string>());
+            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
+                                                 null);
 
-            var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", "APPLICATION",
-                                              new Collection<string> {"admin", "boss"})
+            var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
+                                              "admin")
                 {
                     Active = false,
                     Approved = true
                 };
 
-            var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", "APPLICATION",
-                                                    new Collection<string>())
+            var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com", "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
+                                                    null)
                 {
                     Active = false
                 };
@@ -64,7 +65,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             _controller = new UserController
                 {
                     Request = request,
-                    DocumentStore = DocumentStore
+                    DocumentStore = DocumentStore,
+                    ValidationService = new MockValidationService()
                 };
 
             _controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
@@ -88,13 +90,12 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await _controller.GetRoles("approvedActiveUser@test.com", Database);
 
-            var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
+            var result = await response.Content.ReadAsAsync<ResponseContainer<string>>(new[]
                 {
                     new TextPlainResponseFormatter()
                 });
 
-            Assert.That(result.Result.Count, Is.EqualTo(2));
-            Assert.That(result.Result, Is.EquivalentTo(new List<string> {"admin", "boss"}));
+            Assert.That(result.Result, Is.EqualTo("admin"));
         }
 
         [Test]

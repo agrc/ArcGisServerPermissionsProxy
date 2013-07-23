@@ -81,8 +81,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                     await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(user.Password, App.Pepper));
 
                 var newUser = new User(user.Name, user.Email, user.Agency, password.HashedPassword, password.Salt,
-                                       user.Application,
-                                       Enumerable.Empty<string>());
+                                       user.Application, null);
 
                 await s.StoreAsync(newUser);
 
@@ -225,7 +224,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         [HttpGet]
         public async Task<HttpResponseMessage> GetAllWaiting(string application)
         {
-            if (string.IsNullOrEmpty(application))
+            if (!ValidationService.IsValid(application))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
@@ -250,13 +249,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         [HttpGet]
         public async Task<HttpResponseMessage> GetRoles(string email, string application)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(application))
+            if (string.IsNullOrEmpty(email) || !ValidationService.IsValid(application))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
                                                                     "Missing parameters."));
             }
-
 
             Database = application;
 
@@ -279,10 +277,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<IList<string>>(user.Roles));
+                                              new ResponseContainer<string>(user.Role));
             }
         }
-
 
         public class ChangePasswordRequestInformation : RequestInformation
         {
@@ -315,7 +312,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             public string Email { get; set; }
         }
 
-
         /// <summary>
         ///     A class encapsulating common request paramaters
         /// </summary>
@@ -343,7 +339,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             [Required]
             public string Application
             {
-                get { return _application.ToLowerInvariant(); }
+                get { return _application == null ? null : _application.ToLowerInvariant(); }
                 protected set
                 {
                     if (value == null || string.IsNullOrEmpty(value))

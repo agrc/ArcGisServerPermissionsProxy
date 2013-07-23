@@ -41,7 +41,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             {
                 CommandExecutor.ExecuteCommand(
                     new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
-                                                       new[] {"admin@application.com"}, "Name", new[]{"role1","role2"}, "UserName", "Application")));
+                                                       new[] {"admin@application.com"}, "Name", "role1", "UserName", "Application")));
             }
         }
 

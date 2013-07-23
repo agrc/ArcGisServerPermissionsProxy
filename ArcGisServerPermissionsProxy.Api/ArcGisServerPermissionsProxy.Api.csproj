@@ -153,6 +153,7 @@
     <Compile Include="Commands\Email\UserRejectedEmailCommand.cs" />
     <Compile Include="Commands\Query\GetUserCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\Modules\TokenServiceModule.cs" />
+    <Compile Include="Configuration\Ninject\Modules\ValidationServiceModule.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Models\Account\Credentials.cs" />
@@ -161,9 +162,12 @@
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
     <Compile Include="Raven\Indexes\UsersByApprovedIndex.cs" />
     <Compile Include="Raven\Models\Config.cs" />
-    <Compile Include="Services\ITokenService.cs" />
-    <Compile Include="Services\MockTokenService.cs" />
-    <Compile Include="Services\TokenService.cs" />
+    <Compile Include="Services\IValidationService.cs" />
+    <Compile Include="Services\MockValidationService.cs" />
+    <Compile Include="Services\Token\ITokenService.cs" />
+    <Compile Include="Services\Token\MockTokenService.cs" />
+    <Compile Include="Services\Token\TokenService.cs" />
+    <Compile Include="Services\ValidationService.cs" />
     <Compile Include="TextPlainResponseFormatter.cs" />
     <Compile Include="Commands\GetTokenCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />

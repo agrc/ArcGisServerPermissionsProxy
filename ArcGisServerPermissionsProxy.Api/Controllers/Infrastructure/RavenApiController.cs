@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using ArcGisServerPermissionsProxy.Api.Services;
 using Ninject;
 using Raven.Client;
 
@@ -16,9 +17,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure
         private string _database;
         public string Database
         {
-            get { return "app_" + _database.ToLowerInvariant(); }
+            get { return string.IsNullOrEmpty(_database) ? null : "app_" + _database.ToLowerInvariant(); }
             set { _database = value; }
         }
+
+        [Inject]
+        public IValidationService ValidationService { get; set; }
 
         [Inject]
         public IDocumentStore DocumentStore { get; set; }

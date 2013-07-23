@@ -14,7 +14,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             public async Task CanGetErrorMessageWithInvalidCredentials()
             {
                 var command = new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams(),
-                                                  new GetTokenCommandAsync.Credentials("security_role_1", "admin", "wrong"));
+                                                  new GetTokenCommandAsync.Credentials("app1", "role", "wrong"));
 
                 var actual = await CommandExecutor.ExecuteCommandAsync(command);
 
@@ -27,7 +27,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             public async Task CanGetTokenWithValidCredentials()
             {
                 var command = new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams(),
-                                                  new GetTokenCommandAsync.Credentials("security_role_1", "admin", "test"));
+                                                  new GetTokenCommandAsync.Credentials("app1", "role", "test"));
 
                 var actual = await CommandExecutor.ExecuteCommandAsync(command);
 
@@ -44,13 +44,13 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             public void BasicUrlGetCreatedCorrectly()
             {
                 var command = new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams(),
-                                                  new GetTokenCommandAsync.Credentials("app1", "admin", "test"));
+                                                  new GetTokenCommandAsync.Credentials("app1", "role", "test"));
 
                 var actual = command.BuildUri();
 
                 Assert.That(actual.ToString(),
                             Is.EqualTo(
-                                "http://localhost/arcgis/tokens/generateToken?username=app1_admin&password=test&f=json"));
+                                "http://localhost/arcgis/tokens/generateToken?username=app1_role&password=test&f=json"));
             }
 
             [Test]
@@ -58,12 +58,12 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             {
                 var command =
                     new GetTokenCommandAsync(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", true, 6080),
-                                        new GetTokenCommandAsync.Credentials("app1", "admin", "test"));
+                                        new GetTokenCommandAsync.Credentials("app1", "role", "test"));
                 var actual = command.BuildUri();
 
                 Assert.That(actual.ToString(),
                             Is.EqualTo(
-                                "https://localhost:6080/arcgis/tokens/generateToken?username=app1_admin&password=test&f=json"));
+                                "https://localhost:6080/arcgis/tokens/generateToken?username=app1_role&password=test&f=json"));
             }
         }
     }

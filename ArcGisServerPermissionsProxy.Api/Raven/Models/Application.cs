@@ -12,7 +12,7 @@
 
         public string Name
         {
-            get { return _name.ToLowerInvariant(); }
+            get { return _name == null ? null : _name.ToLowerInvariant(); }
             private set
             {
                 if (value == null || string.IsNullOrEmpty(value))

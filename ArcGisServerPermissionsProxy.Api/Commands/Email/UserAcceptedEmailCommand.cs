@@ -14,7 +14,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 You have been granted permission to login to the {{Application}} web application.
 
 Your user name is `{{username}}`  
-Your assigned role is: `{{#roles}}{{.}} {{/roles}}`
+Your assigned role is: `{role}}`
 
 If you have any questions, you may reply to this email.
 
@@ -44,20 +44,20 @@ Thank you";
 
         public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string[] role,
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string role,
                                 string userName, string application)
                 : base(toAddresses, fromAddresses, name, application)
             {
                 UserName = userName;
-                Roles = role;
+                Role = role;
             }
 
-            public string[] Roles { get; set; }
+            public string Role { get; set; }
             public string UserName { get; set; }
 
             public override string ToString()
             {
-                return string.Format("{0}, Roles: {1}, UserName: {2}", base.ToString(), string.Join(", ", Roles),
+                return string.Format("{0}, Role: {1}, UserName: {2}", base.ToString(), Role,
                                      UserName);
             }
         }

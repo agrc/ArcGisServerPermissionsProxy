@@ -14,6 +14,7 @@ using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using ArcGisServerPermissionsProxy.Api.Services;
+using ArcGisServerPermissionsProxy.Api.Services.Token;
 using CommandPattern;
 using Ninject;
 using Raven.Client;
@@ -25,8 +26,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         [Inject]
         public ITokenService TokenService { get; set; }
 
-        [HttpPost]
-        public async Task<HttpResponseMessage> User(LoginCredentials login)
+        [HttpPost, ActionName("User")]
+        public async Task<HttpResponseMessage> UserLogin(LoginCredentials login)
         {
             TokenModel token;
             Database = login.Application;
@@ -55,7 +56,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                   new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
                 }
 
-
                 var valid = await CommandExecutor.ExecuteCommand(
                     new ValidateUserPasswordCommand(login.Password,
                                                     new ValidateLoginCredentials(user.Password, user.Salt, App.Pepper,
@@ -77,7 +77,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 token = await TokenService.GetToken(new GetTokenCommandAsync.GetTokenParams("localhost", "arcgis", false, 6080),
-                                                    new GetTokenCommandAsync.Credentials(login.Application, login.Role, App.Password));
+                                                    new GetTokenCommandAsync.Credentials(login.Application, user.Role, App.Password));
 
                 if (!token.Successful)
                 {
