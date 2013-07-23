@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -12,7 +11,6 @@ using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
-using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;

@@ -12,9 +12,7 @@ using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
-using ArcGisServerPermissionsProxy.Api.Services.Token;
 using CommandPattern;
-using Ninject;
 using Raven.Client.Extensions;
 using Raven.Client.Indexes;
 
@@ -177,7 +175,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             public string Role { get; set; }
         }
 
-
         /// <summary>
         ///     A class for getting user role requests
         /// </summary>
@@ -198,7 +195,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             [EmailAddress]
             public string Email { get; set; }
         }
-
 
         public class CreateApplicationParams
         {
