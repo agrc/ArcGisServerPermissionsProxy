@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.Composition.Hosting;
+﻿using System;
+using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
@@ -6,8 +7,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using ArcGisServerPermissionsProxy.Api.Commands;
-using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
+using ArcGisServerPermissionsProxy.Api.Commands.Users;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
@@ -72,39 +73,55 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
             using (var s = AsyncSession)
             {
-                var config = await s.LoadAsync<Config>("1");
 
-                //get role make sure exists
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
-                if (user == null)
+                var response = await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
+
+                if (response != null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, new ResponseContainer(HttpStatusCode.NotFound, "User was not found."));
+                    return response;
                 }
-
-                if (!config.Roles.Contains(info.Role.ToLowerInvariant()))
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, new ResponseContainer(HttpStatusCode.NotFound, "Role was not found.")); 
-                }
-
-                user.Active = true;
-                user.Approved = true;
-                user.Role = info.Role;
-
-                await s.SaveChangesAsync();
-
-                Task.Factory.StartNew(
-                    () =>
-                    CommandExecutor.ExecuteCommand(
-                        new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] { user.Email },
-                                                                                               config.
-                                                                                                   AdministrativeEmails,
-                                                                                               user.Name, info.Role,
-                                                                                               user.Email,
-                                                                                               user.Application))));
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             }
+        }
+
+        [HttpGet]
+        public async Task<HttpResponseMessage> Accept(AcceptRequestInformation info, Guid emailToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            Database = info.Application;
+
+            using (var s = AsyncSession)
+            {
+                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
+
+                if (user.Token != emailToken)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
+                }
+
+                if (user.ExpirationDateTicks > DateTime.Now.Ticks)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, new ResponseContainer(HttpStatusCode.BadRequest, "This token has expired after one month of inactivity."));  
+                }
+
+                var response = await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
+
+                if (response != null)
+                {
+                    return response;
+                }
+
+                return Request.CreateResponse(HttpStatusCode.NoContent);
+            } 
         }
 
         [HttpDelete]
@@ -123,22 +140,42 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             {
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
-                user.Active = false;
-                user.Approved = false;
-                user.Role = null;
+                await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
 
-                await s.SaveChangesAsync();
+                return Request.CreateResponse(HttpStatusCode.Accepted);
+            }
+        }
 
-                var config = await s.LoadAsync<Config>("1");
+        [HttpGet]
+        public async Task<HttpResponseMessage> Reject(RejectRequestInformation info, Guid emailToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
 
-                Task.Factory.StartNew(() =>
-                                      CommandExecutor.ExecuteCommand(
-                                          new UserRejectedEmailCommand(
-                                              new UserRejectedEmailCommand.MailTemplate(new[] { user.Email },
-                                                                                        config.AdministrativeEmails,
-                                                                                        user.Name,
-                                                                                        user.Application))));
+            Database = info.Application;
 
+            using (var s = AsyncSession)
+            {
+                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
+
+                if (user.Token != emailToken)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                                  new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
+                }
+
+                if (user.ExpirationDateTicks > DateTime.Now.Ticks)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                                  new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                        "This token has expired after one month of inactivity."));
+                }
+
+                await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
 
                 return Request.CreateResponse(HttpStatusCode.Accepted);
             }

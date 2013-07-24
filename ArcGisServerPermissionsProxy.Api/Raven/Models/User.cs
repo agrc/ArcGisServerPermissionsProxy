@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ArcGisServerPermissionsProxy.Api.Raven.Models
 {
@@ -108,5 +109,21 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// The agency.
         /// </value>
         public string Agency { get; set; }
+
+        /// <summary>
+        /// Gets or sets the token.
+        /// </summary>
+        /// <value>
+        /// The token used to authenticate someone.
+        /// </value>
+        public Guid Token { get; set; }
+
+        /// <summary>
+        /// Gets or sets the expiration date ticks.
+        /// </summary>
+        /// <value>
+        /// The expiration date ticks.
+        /// </value>
+        public float ExpirationDateTicks { get; set; }
     }
 }

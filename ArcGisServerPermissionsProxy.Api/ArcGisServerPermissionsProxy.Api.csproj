@@ -155,6 +155,8 @@
     <Compile Include="Commands\GetTokenCommandAsync.cs" />
     <Compile Include="Commands\GetTokenCommandAsyncBase.cs" />
     <Compile Include="Commands\Query\GetUserCommandAsync.cs" />
+    <Compile Include="Commands\Users\AcceptUserCommandAsync.cs" />
+    <Compile Include="Commands\Users\RejectUserCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\Modules\TokenServiceModule.cs" />
     <Compile Include="Configuration\Ninject\Modules\ValidationServiceModule.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
