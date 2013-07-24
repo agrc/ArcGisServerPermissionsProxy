@@ -2,12 +2,6 @@
 
 ## Initial Setup
 
-In the manager application add security roles.
- 
-Add users to those roles.   
-Convention is to do `appName_accessLevel`
+Make request to Create Application. ArcGIS erver roles and users are created.
 
-Setup security on folder to match
-
-
-
+Add roles to folders/services in ArcGIS server as needed.
