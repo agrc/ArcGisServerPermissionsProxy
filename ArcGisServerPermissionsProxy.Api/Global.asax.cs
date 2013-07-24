@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Security.Policy;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -20,6 +21,8 @@ namespace ArcGisServerPermissionsProxy.Api
         public static string Password { get; set; }
 
         public static AdminCredentials AdminInformation { get; set; }
+
+        public const string Url = "http://arcgissecurity/api";
 
         protected void Application_Start()
         {

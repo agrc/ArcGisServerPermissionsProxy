@@ -18,6 +18,8 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
             Role = role == null ? "" : role.ToLowerInvariant();
             Approved = false;
             Active = true;
+            Token = Guid.NewGuid();
+            ExpirationDateTicks = DateTime.Now.AddMonths(1).Ticks;
         }
 
         public string Id { get; set; }
@@ -124,6 +126,6 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// <value>
         /// The expiration date ticks.
         /// </value>
-        public float ExpirationDateTicks { get; set; }
+        public long ExpirationDateTicks { get; set; }
     }
 }

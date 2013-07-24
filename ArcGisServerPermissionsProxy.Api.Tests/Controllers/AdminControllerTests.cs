@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -72,7 +73,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Accept(new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
-                                                                                          "ADMIN", "emptyToken", Database));
+                                                                                          "ADMIN", Guid.Empty, Database));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
@@ -92,7 +93,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Accept(new AdminController.AcceptRequestInformation("where@am.i",
-                                                                                         "Monkey", "emptyToken", Database));
+                                                                                         "Monkey", Guid.Empty, Database));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
@@ -102,7 +103,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Accept(new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
-                                                                                         "Monkey", "emptyToken", Database));
+                                                                                         "Monkey", Guid.Empty, Database));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
@@ -111,7 +112,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         public async Task RejectUserRemovesAllPrivs()
         {
             var response = await
-                           _controller.Reject(new AdminController.RejectRequestInformation("approvedActiveUser@test.com", "emptyToken", Database));
+                           _controller.Reject(new AdminController.RejectRequestInformation("approvedActiveUser@test.com", Guid.Empty, Database));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
 

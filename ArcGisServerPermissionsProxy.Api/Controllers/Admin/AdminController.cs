@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -88,30 +87,32 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<HttpResponseMessage> Accept(AcceptRequestInformation info, Guid emailToken)
+        public async Task<HttpResponseMessage> Accept(string application, string role, Guid token)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || string.IsNullOrEmpty(application) || string.IsNullOrEmpty(role) || token == Guid.Empty)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
                                                                     "Missing parameters."));
             }
 
-            Database = info.Application;
+            Database = application;
 
             using (var s = AsyncSession)
             {
-                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
+                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserByTokenCommandAsync(token, s));
 
-                if (user.Token != emailToken)
+                if (user.Token != token)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
                 }
 
-                if (user.ExpirationDateTicks > DateTime.Now.Ticks)
+                if (user.ExpirationDateTicks < DateTime.Now.Ticks)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest, new ResponseContainer(HttpStatusCode.BadRequest, "This token has expired after one month of inactivity."));  
                 }
+
+                var info = new AcceptRequestInformation(user.Email, role, token, application);
 
                 var response = await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
 
@@ -147,28 +148,28 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<HttpResponseMessage> Reject(RejectRequestInformation info, Guid emailToken)
+        public async Task<HttpResponseMessage> Reject(string application, Guid token)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || string.IsNullOrEmpty(application) || token == Guid.Empty)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
                                                                     "Missing parameters."));
             }
 
-            Database = info.Application;
+            Database = application;
 
             using (var s = AsyncSession)
             {
-                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
+                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserByTokenCommandAsync(token, s));
 
-                if (user.Token != emailToken)
+                if (user.Token != token)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest,
                                                   new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
                 }
 
-                if (user.ExpirationDateTicks > DateTime.Now.Ticks)
+                if (user.ExpirationDateTicks < DateTime.Now.Ticks)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest,
                                                   new ResponseContainer(HttpStatusCode.BadRequest,
@@ -186,7 +187,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         /// </summary>
         public class AcceptRequestInformation : UserController.RequestInformation
         {
-            public AcceptRequestInformation(string email, string role, string token, string application)
+            public AcceptRequestInformation()
+            {
+                
+            }
+
+            public AcceptRequestInformation(string email, string role, Guid token, string application)
                 : base(application, token)
             {
                 Email = email;
@@ -217,7 +223,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         /// </summary>
         public class RejectRequestInformation : UserController.RequestInformation
         {
-            public RejectRequestInformation(string email, string token, string application)
+            public RejectRequestInformation(string email, Guid token, string application)
                 : base(application, token)
             {
                 Email = email;

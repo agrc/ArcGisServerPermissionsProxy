@@ -147,13 +147,14 @@
     <Compile Include="Commands\BootstrapArcGisServerSecurityCommand.cs" />
     <Compile Include="Commands\Email\Infrastructure\EmailCommand.cs" />
     <Compile Include="Commands\Email\Infrastructure\MailTemplateBase.cs" />
-    <Compile Include="Commands\Email\NewUserNotificationEmailCommand.cs" />
+    <Compile Include="Commands\Email\NewUserAdminNotificationEmailCommand.cs" />
     <Compile Include="Commands\Email\PasswordResetEmailCommand.cs" />
     <Compile Include="Commands\Email\UserAcceptedEmailCommand.cs" />
     <Compile Include="Commands\Email\UserRegistrationNotificationEmailCommand.cs" />
     <Compile Include="Commands\Email\UserRejectedEmailCommand.cs" />
     <Compile Include="Commands\GetTokenCommandAsync.cs" />
     <Compile Include="Commands\GetTokenCommandAsyncBase.cs" />
+    <Compile Include="Commands\Query\GetUserByTokenCommandAsync.cs" />
     <Compile Include="Commands\Query\GetUserCommandAsync.cs" />
     <Compile Include="Commands\Users\AcceptUserCommandAsync.cs" />
     <Compile Include="Commands\Users\RejectUserCommandAsync.cs" />

@@ -46,7 +46,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 
             await _session.SaveChangesAsync();
 
-            Task.Factory.StartNew(
+            await Task.Factory.StartNew(
                 () =>
                 CommandExecutor.ExecuteCommand(
                     new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] { _user.Email },

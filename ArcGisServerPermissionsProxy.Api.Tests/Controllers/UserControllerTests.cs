@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -120,7 +121,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await
                            _controller.ResetPassword(
                                new UserController.ResetRequestInformation("approvedActiveUser@test.com", Database,
-                                                                          "emptyToken"));
+                                                                          Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
@@ -142,7 +143,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 await
                 _controller.ChangePassword(
                     new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password",
-                                                                        "newPassword", "newPassword", "", ""));
+                                                                        "newPassword", "newPassword", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
 
@@ -167,7 +168,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 await
                 _controller.ChangePassword(
                     new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "wrong",
-                                                                        "newPassword", "newPassword", "", ""));
+                                                                        "newPassword", "newPassword", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }
@@ -179,7 +180,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 await
                 _controller.ChangePassword(
                     new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password", "1",
-                                                                        "2", "", ""));
+                                                                        "2", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }

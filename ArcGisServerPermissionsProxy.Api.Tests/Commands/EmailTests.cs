@@ -1,4 +1,5 @@
-﻿using ArcGisServerPermissionsProxy.Api.Commands.Email;
+﻿using System;
+using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using CommandPattern;
 using NUnit.Framework;
 
@@ -12,11 +13,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             [Test]
             public void IsThereAnEmailInTheFolder()
             {
-                CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
-                                                   new NewUserNotificationEmailCommand.MailTemplate(
+                CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
+                                                   new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
                                                        new[] {"admin@application.com"}, "Name", "Agency",
-                                                       "http://url.com", "application")));
+                                                       "http://url.com", "application", Guid.NewGuid(), new[]{"admin","editor","readonly"})));
             }
         }
 

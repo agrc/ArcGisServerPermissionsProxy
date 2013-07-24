@@ -89,11 +89,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 Task.Factory.StartNew(() =>
                     {
-                        CommandExecutor.ExecuteCommand(new NewUserNotificationEmailCommand(
-                                                           new NewUserNotificationEmailCommand.MailTemplate(
+                        CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
+                                                           new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                                config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
                                                                user.Name, user.Agency,
-                                                               null, user.Application)));
+                                                               null, user.Application, newUser.Token, config.Roles)));
 
 
                         CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
@@ -284,7 +284,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         public class ChangePasswordRequestInformation : RequestInformation
         {
             public ChangePasswordRequestInformation(string email, string currentPassword, string newPassword,
-                                                    string newPasswordRepeated, string application, string token)
+                                                    string newPasswordRepeated, string application, Guid token)
                 : base(application, token)
             {
                 CurrentPassword = currentPassword;
@@ -324,7 +324,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 
             }
 
-            public RequestInformation(string application, string token)
+            public RequestInformation(string application, Guid token)
             {
                 Application = application;
                 Token = token;
@@ -357,7 +357,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             /// <value>
             ///     The token arcgis server generated.
             /// </value>
-            public string Token { get; protected set; }
+            public Guid Token { get; protected set; }
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         /// </summary>
         public class ResetRequestInformation : RequestInformation
         {
-            public ResetRequestInformation(string email, string application, string token)
+            public ResetRequestInformation(string email, string application, Guid token)
                 : base(application, token)
             {
                 Email = email;
@@ -391,7 +391,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 
             }
 
-            public RoleRequestInformation(string email, string application, string token)
+            public RoleRequestInformation(string email, string application, Guid token)
                 : base(application, token)
             {
                 Email = email;

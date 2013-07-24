@@ -11,7 +11,8 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Indexes
             Map = users => from user in users
                            select new
                                {
-                                   user.Email
+                                   user.Email,
+                                   user.Token
                                };
         }
     }
