@@ -1,80 +1,114 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ArcGisServerPermissionsProxy.Api.Controllers.Admin;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
+using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using CommandPattern;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands
 {
-    public class BootstrapArcGisServerSecurityCommandAsync : CommandAsync
+    public class BootstrapArcGisServerSecurityCommandAsync : CommandAsync<IEnumerable<string>> 
     {
         private const string CreateUserUrl = "http://localhost/arcgis/admin/security/users/add";
         private const string CreateRoleUrl = "http://localhost/arcgis/admin/security/roles/add";
         private const string AssignRoleUrl = "http://localhost/arcgis/admin/security/users/assignRoles";
 
-        private readonly AdminController.CreateApplicationParams _parameters;
         private readonly AdminCredentials _adminInformation;
+        private readonly AdminController.CreateApplicationParams _parameters;
 
-        public BootstrapArcGisServerSecurityCommandAsync(AdminController.CreateApplicationParams parameters, AdminCredentials adminInformation)
+        public BootstrapArcGisServerSecurityCommandAsync(AdminController.CreateApplicationParams parameters,
+                                                         AdminCredentials adminInformation)
         {
             _parameters = parameters;
             _adminInformation = adminInformation;
         }
 
-        public override async Task<bool> Execute()
+        public override async Task<IEnumerable<string>> Execute()
         {
+            var responseMessages = new Collection<string>();
+
             using (var client = new HttpClient())
             {
                 var token =
                     await
                     CommandExecutor.ExecuteCommandAsync(
                         new GetTokenCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams(),
-                                                 new GetTokenCommandAsyncBase.User(_adminInformation.Username, _adminInformation.Password)));
+                                                 new GetTokenCommandAsyncBase.User(_adminInformation.Username,
+                                                                                   _adminInformation.Password)));
 
                 //post to create user
                 var usersAndRolesToCreate =
                     _parameters.Roles.Select(x => string.Format("{0}_{1}", _parameters.Application, x));
 
+                var mediaType = new[]{new TextPlainResponseFormatter()};
+
                 foreach (var name in usersAndRolesToCreate)
                 {
-                    var createUserResponse =await  client.PostAsync(CreateUserUrl,
-                                                              new FormUrlEncodedContent(new Dictionary<string, string>
-                                                                  {
-                                                                      {"username", name},
-                                                                      {"password", "test"},
-                                                                      {"f", "json"},
-                                                                      {"token", token.Token}
-                                                                  }));
+                    var createUserRequest = await client.PostAsync(CreateUserUrl,
+                                                                    new FormUrlEncodedContent(new Dictionary
+                                                                                                  <string, string>
+                                                                        {
+                                                                            {"username", name},
+                                                                            {"password", ConfigurationManager.AppSettings["accountPassword"]},
+                                                                            {"f", "json"},
+                                                                            {"token", token.Token}
+                                                                        }));
 
-                    Debug.Print(await createUserResponse.Content.ReadAsStringAsync());
+                    var createUserResponse = await createUserRequest.Content.ReadAsAsync<AdminServerStatus>(mediaType);
 
-                    var createRoleResponse = await client.PostAsync(CreateRoleUrl,
-                                                              new FormUrlEncodedContent(new Dictionary<string, string>
-                                                                  {
-                                                                      {"rolename", name},
-                                                                      {"f", "json"},
-                                                                      {"token", token.Token}
-                                                                  }));
+                    foreach (var message in createUserResponse.Messages)
+                    {
+                        responseMessages.Add(message);
+                    }
 
-                    Debug.Print(await createRoleResponse.Content.ReadAsStringAsync());
+                    Debug.Print(await createUserRequest.Content.ReadAsStringAsync());
 
-                    var assignRoleResponse = await client.PostAsync(AssignRoleUrl,
-                                                              new FormUrlEncodedContent(new Dictionary<string, string>
-                                                                  {
-                                                                      {"username", name},
-                                                                      {"roles", name},
-                                                                      {"f", "json"},
-                                                                      {"token", token.Token}
-                                                                  }));
+                    var createRoleRequest = await client.PostAsync(CreateRoleUrl,
+                                                                    new FormUrlEncodedContent(new Dictionary
+                                                                                                  <string, string>
+                                                                        {
+                                                                            {"rolename", name},
+                                                                            {"f", "json"},
+                                                                            {"token", token.Token}
+                                                                        }));
 
-                    Debug.Print(await assignRoleResponse.Content.ReadAsStringAsync());
+                    var createRoleResponse = await createRoleRequest.Content.ReadAsAsync<AdminServerStatus>(mediaType);
+
+                    foreach (var message in createRoleResponse.Messages)
+                    {
+                        responseMessages.Add(message);
+                    }
+
+                    Debug.Print(await createRoleRequest.Content.ReadAsStringAsync());
+
+                    var assignRoleRequest = await client.PostAsync(AssignRoleUrl,
+                                                                    new FormUrlEncodedContent(new Dictionary
+                                                                                                  <string, string>
+                                                                        {
+                                                                            {"username", name},
+                                                                            {"roles", name},
+                                                                            {"f", "json"},
+                                                                            {"token", token.Token}
+                                                                        }));
+
+                    var assignRoleResponse = await assignRoleRequest.Content.ReadAsAsync<AdminServerStatus>(mediaType);
+
+                    foreach (var message in assignRoleResponse.Messages)
+                    {
+                        responseMessages.Add(message);
+                    }
+
+
+                    Debug.Print(await assignRoleRequest.Content.ReadAsStringAsync());
                 }
             }
 
-            return true;
+            return responseMessages;
         }
 
         public override string ToString()

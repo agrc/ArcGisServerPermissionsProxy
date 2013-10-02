@@ -166,6 +166,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Models\Account\AdminCredentials.cs" />
     <Compile Include="Models\Account\Credentials.cs" />
+    <Compile Include="Models\ArcGIS\AdminServerStatus.cs" />
     <Compile Include="Models\Response\Password\PasswordReset.cs" />
     <Compile Include="Models\Response\Account\UsersWaiting.cs" />
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
