@@ -340,7 +340,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             public string Application
             {
                 get { return _application == null ? null : _application.ToLowerInvariant(); }
-                protected set
+                set
                 {
                     if (value == null || string.IsNullOrEmpty(value))
                         _application = null;
