@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -21,7 +23,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
     public class AdminController : RavenApiController
     {
         [HttpPost]
-        public HttpResponseMessage CreateApplication(CreateApplicationParams parameters)
+        public async Task<HttpResponseMessage> CreateApplication(CreateApplicationParams parameters)
         {
             if (!ModelState.IsValid)
             {
@@ -43,6 +45,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
                 IndexCreation.CreateIndexes(provider, DocumentStore.DatabaseCommands.ForDatabase(Database), DocumentStore.Conventions);
 
+                if (!parameters.Roles.Select(x=>x.ToLower()).Contains("admin"))
+                {
+                    parameters.Roles.Add("admin");
+                }
+
                 var existingConfig = s.Load<Config>("1");
                 if (existingConfig == null)
                 {
@@ -53,7 +60,15 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 }
             }
 
-            CommandExecutor.ExecuteCommandAsync(new BootstrapArcGisServerSecurityCommandAsync(parameters, App.AdminInformation));
+            //add admin email to admin group and send email to reset password.
+            var messages = await CommandExecutor.ExecuteCommandAsync(new BootstrapArcGisServerSecurityCommandAsync(parameters, App.AdminInformation));
+
+            if (messages.Any())
+            {
+                return Request.CreateResponse(HttpStatusCode.Created,
+                                             new ResponseContainer(HttpStatusCode.Created, 
+                                             string.Join(" ", messages.Select(x=>x))));
+            }
 
             return Request.CreateResponse(HttpStatusCode.Created);
         }
@@ -72,7 +87,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
             using (var s = AsyncSession)
             {
-
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
                 var response = await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
@@ -82,7 +96,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     return response;
                 }
 
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return Request.CreateResponse(HttpStatusCode.Accepted);
             }
         }
 
@@ -121,6 +135,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     return response;
                 }
 
+                //TODO: This should return some html or something
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             } 
         }
@@ -248,7 +263,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             public string[] AdminEmails { get; set; }
 
             [Required]
-            public string[] Roles { get; set; }
+            public Collection<string> Roles { get; set; }
         }
     }
 }

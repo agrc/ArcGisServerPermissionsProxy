@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Threading.Tasks;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers.Admin;
@@ -26,7 +27,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             var command = new BootstrapArcGisServerSecurityCommandAsync(new AdminController.CreateApplicationParams
                 {
                     Application = "unitTests",
-                    Roles = new[] {"admin", "publisher", "editor", "readonly"}
+                    Roles = new Collection<string> {"admin", "publisher", "editor", "readonly"}
                 }, _adminCredentials);
 
             await CommandExecutor.ExecuteCommandAsync(command);
