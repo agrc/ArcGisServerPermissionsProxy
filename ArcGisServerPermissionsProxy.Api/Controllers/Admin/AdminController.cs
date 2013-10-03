@@ -11,6 +11,7 @@ using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Commands.Users;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
+using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
@@ -135,8 +136,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     return response;
                 }
 
-                //TODO: This should return some html or something
-                return Request.CreateResponse(HttpStatusCode.NoContent);
+                return Request.CreateResponse(HttpStatusCode.OK, "Done.", new TextPlainResponseFormatter());
             } 
         }
 
@@ -193,7 +193,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
                 await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
 
-                return Request.CreateResponse(HttpStatusCode.Accepted);
+                return Request.CreateResponse(HttpStatusCode.OK, "Done.", new TextPlainResponseFormatter());
             }
         }
 
