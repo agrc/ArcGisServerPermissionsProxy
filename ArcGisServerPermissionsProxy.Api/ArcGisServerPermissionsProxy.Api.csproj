@@ -225,10 +225,6 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libraries\AgrcPasswordManagement\AgrcPasswordManagement.csproj">
-      <Project>{882F2044-A716-43E1-89BD-5B59FACD4F71}</Project>
-      <Name>AgrcPasswordManagement</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\CommandPattern\CommandPattern.csproj">
       <Project>{B041C22A-A2FA-4805-BB6C-80C1E1C4FE4D}</Project>
       <Name>CommandPattern</Name>
