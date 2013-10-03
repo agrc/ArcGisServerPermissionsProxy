@@ -8,6 +8,7 @@ using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers;
+using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
@@ -91,7 +92,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task GetRolesGetsTheRolesForSpecificUser()
         {
-            var response = await _controller.GetRoles("approvedActiveUser@test.com", Database);
+            var response = await _controller.GetRole("approvedActiveUser@test.com", Database);
 
             var result = await response.Content.ReadAsAsync<ResponseContainer<string>>(new[]
                 {
@@ -104,7 +105,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task GetRolesFailsGracefully()
         {
-            var response = await _controller.GetRoles("where@am.i", Database);
+            var response = await _controller.GetRole("where@am.i", Database);
 
             var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
                 {

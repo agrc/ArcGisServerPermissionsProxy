@@ -178,7 +178,6 @@
     <Compile Include="Services\Token\MockTokenService.cs" />
     <Compile Include="Services\Token\TokenService.cs" />
     <Compile Include="Services\ValidationService.cs" />
-    <Compile Include="TextPlainResponseFormatter.cs" />
     <Compile Include="Commands\GetUsersTokenForApplicationCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />
     <Compile Include="Configuration\Ninject\Modules\RavenModule.cs" />

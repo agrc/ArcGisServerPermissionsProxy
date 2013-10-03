@@ -247,7 +247,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<HttpResponseMessage> GetRoles(string email, string application)
+        public async Task<HttpResponseMessage> GetRole(string email, string application)
         {
             if (string.IsNullOrEmpty(email) || !ValidationService.IsValid(application))
             {
