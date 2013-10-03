@@ -1,3 +1,6 @@
 [submodule "CommandPattern"]
 	path = CommandPattern
 	url = https://github.com/steveoh/CommandPattern.git
+[submodule "AgrcPasswordManagement"]
+	path = AgrcPasswordManagement
+	url = https://github.com/agrc/AgrcPasswordManagement.git

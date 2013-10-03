@@ -235,6 +235,16 @@
   <ItemGroup>
     <None Include="Properties\PublishProfiles\Stage.pubxml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AgrcPasswordManagement\AgrcPasswordManagement.csproj">
+      <Project>{882f2044-a716-43e1-89bd-5b59facd4f71}</Project>
+      <Name>AgrcPasswordManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CommandPattern\CommandPattern.csproj">
+      <Project>{b041c22a-a2fa-4805-bb6c-80c1e1c4fe4d}</Project>
+      <Name>CommandPattern</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
