@@ -101,14 +101,6 @@
     <None Include="Postman\AdminController.json" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libraries\AgrcPasswordManagement\AgrcPasswordManagement.csproj">
-      <Project>{882f2044-a716-43e1-89bd-5b59facd4f71}</Project>
-      <Name>AgrcPasswordManagement</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Libraries\CommandPattern\CommandPattern.csproj">
-      <Project>{b041c22a-a2fa-4805-bb6c-80c1e1c4fe4d}</Project>
-      <Name>CommandPattern</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ArcGisServerPermissionsProxy.Api\ArcGisServerPermissionsProxy.Api.csproj">
       <Project>{dc6c1e7f-3a95-4091-89a2-3c6de8c46b49}</Project>
       <Name>ArcGisServerPermissionsProxy.Api</Name>

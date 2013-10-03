@@ -1,0 +1,3 @@
+[submodule "CommandPattern"]
+	path = CommandPattern
+	url = https://github.com/steveoh/CommandPattern.git

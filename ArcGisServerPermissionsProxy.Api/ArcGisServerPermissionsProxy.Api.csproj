@@ -225,12 +225,6 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libraries\CommandPattern\CommandPattern.csproj">
-      <Project>{B041C22A-A2FA-4805-BB6C-80C1E1C4FE4D}</Project>
-      <Name>CommandPattern</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="secrets.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
