@@ -37,7 +37,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             // does database exist
             if (Database == null)
             {
-                return Request.CreateResponse(HttpStatusCode.NotFound, "12");
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Invalid application name."));
             }
 
             using (var s = AsyncSession)
@@ -69,12 +71,16 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 if (Database == null)
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "12");
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                               new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                     "Invalid application name."));
                 }
 
                 if (emailExists)
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "6");
+                    return Request.CreateResponse(HttpStatusCode.Conflict,
+                                              new ResponseContainer(HttpStatusCode.Conflict,
+                                                                    "Duplicate user name."));
                 }
 
                 var password =
@@ -321,7 +327,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
             public RequestInformation()
             {
-                
             }
 
             public RequestInformation(string application, Guid token)
@@ -388,7 +393,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         {
             public RoleRequestInformation()
             {
-                
             }
 
             public RoleRequestInformation(string email, string application, Guid token)

@@ -37,16 +37,17 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             using (var s = Session)
             {
                 DocumentStore.DatabaseCommands.EnsureDatabaseExists(Database);
-                
+
                 var catalog = new AssemblyCatalog(typeof (UserByEmailIndex).Assembly);
                 var provider = new CatalogExportProvider(catalog)
                     {
                         SourceProvider = new CatalogExportProvider(catalog)
                     };
 
-                IndexCreation.CreateIndexes(provider, DocumentStore.DatabaseCommands.ForDatabase(Database), DocumentStore.Conventions);
+                IndexCreation.CreateIndexes(provider, DocumentStore.DatabaseCommands.ForDatabase(Database),
+                                            DocumentStore.Conventions);
 
-                if (!parameters.Roles.Select(x=>x.ToLower()).Contains("admin"))
+                if (!parameters.Roles.Select(x => x.ToLower()).Contains("admin"))
                 {
                     parameters.Roles.Add("admin");
                 }
@@ -62,13 +63,16 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             }
 
             //add admin email to admin group and send email to reset password.
-            var messages = await CommandExecutor.ExecuteCommandAsync(new BootstrapArcGisServerSecurityCommandAsync(parameters, App.AdminInformation));
+            var messages =
+                await
+                CommandExecutor.ExecuteCommandAsync(new BootstrapArcGisServerSecurityCommandAsync(parameters,
+                                                                                                  App.AdminInformation));
 
             if (messages.Any())
             {
                 return Request.CreateResponse(HttpStatusCode.Created,
-                                             new ResponseContainer(HttpStatusCode.Created, 
-                                             string.Join(" ", messages.Select(x=>x))));
+                                              new ResponseContainer(HttpStatusCode.Created,
+                                                                    string.Join(" ", messages.Select(x => x))));
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
@@ -90,7 +94,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             {
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
-                var response = await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
+                var response =
+                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
 
                 if (response != null)
                 {
@@ -104,7 +109,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         [HttpGet]
         public async Task<HttpResponseMessage> Accept(string application, string role, Guid token)
         {
-            if (!ModelState.IsValid || string.IsNullOrEmpty(application) || string.IsNullOrEmpty(role) || token == Guid.Empty)
+            if (!ModelState.IsValid || string.IsNullOrEmpty(application) || string.IsNullOrEmpty(role) ||
+                token == Guid.Empty)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
@@ -119,17 +125,21 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
                 if (user.Token != token)
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                                  new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
                 }
 
                 if (user.ExpirationDateTicks < DateTime.Now.Ticks)
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, new ResponseContainer(HttpStatusCode.BadRequest, "This token has expired after one month of inactivity."));  
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                                  new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                        "This token has expired after one month of inactivity."));
                 }
 
                 var info = new AcceptRequestInformation(user.Email, role, token, application);
 
-                var response = await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
+                var response =
+                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
 
                 if (response != null)
                 {
@@ -137,7 +147,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, "Done.", new TextPlainResponseFormatter());
-            } 
+            }
         }
 
         [HttpDelete]
@@ -204,7 +214,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         {
             public AcceptRequestInformation()
             {
-                
             }
 
             public AcceptRequestInformation(string email, string role, Guid token, string application)
@@ -233,6 +242,18 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             public string Role { get; set; }
         }
 
+        public class CreateApplicationParams
+        {
+            [Required]
+            public string Application { get; set; }
+
+            [Required]
+            public string[] AdminEmails { get; set; }
+
+            [Required]
+            public Collection<string> Roles { get; set; }
+        }
+
         /// <summary>
         ///     A class for getting user role requests
         /// </summary>
@@ -252,18 +273,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             /// </value>
             [EmailAddress]
             public string Email { get; set; }
-        }
-
-        public class CreateApplicationParams
-        {
-            [Required]
-            public string Application { get; set; }
-
-            [Required]
-            public string[] AdminEmails { get; set; }
-
-            [Required]
-            public Collection<string> Roles { get; set; }
         }
     }
 }
