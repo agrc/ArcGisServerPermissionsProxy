@@ -1,6 +1,7 @@
 ﻿using System.Web.Http;
 using ArcGisServerPermissionsProxy.Api.Configuration.Ninject;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ArcGisServerPermissionsProxy.Api
 {
@@ -15,6 +16,7 @@ namespace ArcGisServerPermissionsProxy.Api
 
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
             GlobalConfiguration.Configuration.DependencyResolver = new NinjectDependencyResolver(App.Kernel);
 
