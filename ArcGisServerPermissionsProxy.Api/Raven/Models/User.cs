@@ -72,6 +72,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// <value>
         /// The role of the user.
         /// </value>
+        [JsonProperty]
         public string Role { get; set; }
 
         /// <summary>
