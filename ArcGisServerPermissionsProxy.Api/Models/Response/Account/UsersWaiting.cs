@@ -13,13 +13,13 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Response.Account
             Email = user.Email;
         }
 
-        [JsonProperty(PropertyName = "Email")]
+        [JsonProperty]
         protected string Email { get; private set; }
 
-        [JsonProperty(PropertyName = "name")]
+        [JsonProperty]
         protected string Name { get; set; }
 
-        [JsonProperty(PropertyName = "agency")]
+        [JsonProperty]
         protected string Agency { get; set; }
     }
 }

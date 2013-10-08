@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using Newtonsoft.Json;
 
 namespace ArcGisServerPermissionsProxy.Api.Models.Response
 {
@@ -15,7 +14,6 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Response
             Result = result;
         }
 
-        [JsonProperty(PropertyName = "result")]
         public T Result { get; set; }
     }
 
@@ -30,10 +28,8 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Response
             Message = message;
         }
 
-        [JsonProperty(PropertyName = "status")]
         public int Status { get; set; }
 
-        [JsonProperty(PropertyName = "message")]
         public string Message { get; set; }
 
         public bool ShouldSerializeMessage()

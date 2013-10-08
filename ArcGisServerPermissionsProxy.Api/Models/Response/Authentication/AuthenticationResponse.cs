@@ -1,15 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
+using ArcGisServerPermissionsProxy.Api.Raven.Models;
 
 namespace ArcGisServerPermissionsProxy.Api.Models.Response.Authentication
 {
     public class AuthenticationResponse
     {
-        public AuthenticationResponse(string token)
+        public AuthenticationResponse(TokenModel token, User user)
         {
             Token = token;
+            User = user;
         }
 
-        [JsonProperty(PropertyName="token")]
-        public string Token { get; set; } 
+        public User User { get; set; }
+
+        public TokenModel Token { get; set; } 
     }
 }

@@ -31,6 +31,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             TokenModel token;
             Database = login.Application;
 
+            User user;
             using (var s = AsyncSession)
             {
                 var items = await s.Query<User, UserByEmailIndex>()
@@ -44,7 +45,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                   new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
                 }
 
-                User user;
                 try
                 {
                     user = items.Single();
@@ -91,7 +91,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
             return Request.CreateResponse(HttpStatusCode.OK,
                                           new ResponseContainer<AuthenticationResponse>(
-                                              new AuthenticationResponse(token.Token)));
+                                              new AuthenticationResponse(token, user)));
         }
     }
 }

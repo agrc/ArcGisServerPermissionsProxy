@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace ArcGisServerPermissionsProxy.Api.Raven.Models
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class User
     {
         private string _application;
@@ -31,6 +33,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// The email address of the user.
         /// </value>
         [EmailAddress]
+        [JsonProperty]
         public string Email { get; set; }
 
         /// <summary>
@@ -102,6 +105,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// <value>
         /// The name.
         /// </value>
+        [JsonProperty]
         public string Name { get; set; }
 
         /// <summary>
@@ -110,6 +114,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// <value>
         /// The agency.
         /// </value>
+        [JsonProperty]
         public string Agency { get; set; }
 
         /// <summary>
