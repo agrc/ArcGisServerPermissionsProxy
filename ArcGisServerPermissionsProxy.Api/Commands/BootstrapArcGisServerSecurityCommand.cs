@@ -19,14 +19,19 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
         private const string CreateRoleUrl = "http://localhost/arcgis/admin/security/roles/add";
         private const string AssignRoleUrl = "http://localhost/arcgis/admin/security/users/assignRoles";
 
-        private readonly AdminCredentials _adminInformation;
-        private readonly AdminController.CreateApplicationParams _parameters;
+        public AdminCredentials AdminInformation;
+        public AdminController.CreateApplicationParams Parameters;
+
+        public BootstrapArcGisServerSecurityCommandAsync()
+        {
+            
+        }
 
         public BootstrapArcGisServerSecurityCommandAsync(AdminController.CreateApplicationParams parameters,
                                                          AdminCredentials adminInformation)
         {
-            _parameters = parameters;
-            _adminInformation = adminInformation;
+            Parameters = parameters;
+            AdminInformation = adminInformation;
         }
 
         public override async Task<IEnumerable<string>> Execute()
@@ -39,12 +44,12 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                     await
                     CommandExecutor.ExecuteCommandAsync(
                         new GetTokenCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams(),
-                                                 new GetTokenCommandAsyncBase.User(_adminInformation.Username,
-                                                                                   _adminInformation.Password)));
+                                                 new GetTokenCommandAsyncBase.User(AdminInformation.Username,
+                                                                                   AdminInformation.Password)));
 
                 //post to create user
                 var usersAndRolesToCreate =
-                    _parameters.Roles.Select(x => string.Format("{0}_{1}", _parameters.Application, x));
+                    Parameters.Roles.Select(x => string.Format("{0}_{1}", Parameters.Application, x));
 
                 var mediaType = new[]{new TextPlainResponseFormatter()};
 
@@ -114,7 +119,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
 
         public override string ToString()
         {
-            return string.Format("{0}, Parameters: {1}", "BootstrapArcGisServerSecurityCommand", _parameters);
+            return string.Format("{0}, Parameters: {1}", "BootstrapArcGisServerSecurityCommand", Parameters);
         }
     }
 }

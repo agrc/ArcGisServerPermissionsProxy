@@ -7,22 +7,33 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands;
+using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Commands.Users;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
-using Raven.Client.Extensions;
-using Raven.Client.Indexes;
+using Ninject;
 
 namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 {
     public class AdminController : RavenApiController
     {
+        [Inject]
+        public BootstrapArcGisServerSecurityCommandAsync BootstrapCommand { get; set; }
+
+        [Inject]
+        public IDatabaseExists DatabaseExists { get; set; }
+
+        [Inject]
+        public IIndexable IndexCreation { get; set; }
+
         [HttpPost]
         public async Task<HttpResponseMessage> CreateApplication(CreateApplicationParams parameters)
         {
@@ -36,7 +47,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
             using (var s = Session)
             {
-                DocumentStore.DatabaseCommands.EnsureDatabaseExists(Database);
+                DatabaseExists.Esure(DocumentStore, Database);
 
                 var catalog = new AssemblyCatalog(typeof (UserByEmailIndex).Assembly);
                 var provider = new CatalogExportProvider(catalog)
@@ -44,29 +55,57 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                         SourceProvider = new CatalogExportProvider(catalog)
                     };
 
-                IndexCreation.CreateIndexes(provider, DocumentStore.DatabaseCommands.ForDatabase(Database),
-                                            DocumentStore.Conventions);
+                IndexCreation.CreateIndexes(provider, DocumentStore, Database);
 
                 if (!parameters.Roles.Select(x => x.ToLower()).Contains("admin"))
                 {
                     parameters.Roles.Add("admin");
                 }
 
-                var existingConfig = s.Load<Config>("1");
-                if (existingConfig == null)
+                var config = s.Load<Config>("1");
+                if (config == null)
                 {
-                    var config = new Config(parameters.AdminEmails, parameters.Roles);
+                    config = new Config(parameters.AdminEmails, parameters.Roles);
 
                     s.Store(config, "1");
-                    s.SaveChanges();
                 }
+
+                foreach (var useremail in parameters.AdminEmails)
+                {
+                    var password = CommandExecutor.ExecuteCommand(new GeneratePasswordCommand(12));
+
+                    var hashed = await
+                                 CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
+
+                    var adminUser = new User("admin", useremail, "", hashed.HashedPassword, hashed.Salt,
+                                             Database, "admin")
+                        {
+                            Active = true,
+                            Approved = true
+                        };
+
+
+                    s.Store(adminUser);
+
+                    await Task.Factory.StartNew(() =>
+                                                CommandExecutor.ExecuteCommand(
+                                                    new PasswordResetEmailCommand(
+                                                        new PasswordResetEmailCommand.MailTemplate(
+                                                            new[] {adminUser.Email},
+                                                            config.AdministrativeEmails,
+                                                            adminUser.Name,
+                                                            password, "url",
+                                                            parameters.Application))));
+                }
+
+                s.SaveChanges();
             }
 
             //add admin email to admin group and send email to reset password.
-            var messages =
-                await
-                CommandExecutor.ExecuteCommandAsync(new BootstrapArcGisServerSecurityCommandAsync(parameters,
-                                                                                                  App.AdminInformation));
+            BootstrapCommand.Parameters = parameters;
+            BootstrapCommand.AdminInformation = App.AdminInformation;
+
+            var messages = await CommandExecutor.ExecuteCommandAsync(BootstrapCommand);
 
             if (messages.Any())
             {
