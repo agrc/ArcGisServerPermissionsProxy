@@ -15,9 +15,9 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
 {
     public class BootstrapArcGisServerSecurityCommandAsync : CommandAsync<IEnumerable<string>> 
     {
-        private const string CreateUserUrl = "http://localhost/arcgis/admin/security/users/add";
-        private const string CreateRoleUrl = "http://localhost/arcgis/admin/security/roles/add";
-        private const string AssignRoleUrl = "http://localhost/arcgis/admin/security/users/assignRoles";
+        private const string CreateUserUrl = "http://localhost:6080/arcgis/admin/security/users/add";
+        private const string CreateRoleUrl = "http://localhost:6080/arcgis/admin/security/roles/add";
+        private const string AssignRoleUrl = "http://localhost:6080/arcgis/admin/security/users/assignRoles";
 
         public AdminCredentials AdminInformation;
         public AdminController.CreateApplicationParams Parameters;
