@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using Ninject.Activation;
 using Ninject.Modules;
@@ -14,6 +15,9 @@ namespace ArcGisServerPermissionsProxy.Api.Configuration.Ninject.Modules
             Bind<IDocumentStore>()
                 .ToMethod(Init)
                 .InSingletonScope();
+
+            Bind<IDatabaseExists>().To<DatabaseExists>();
+            Bind<IIndexable>().To<Indexable>();
         }
 
         private static IDocumentStore Init(IContext context)
