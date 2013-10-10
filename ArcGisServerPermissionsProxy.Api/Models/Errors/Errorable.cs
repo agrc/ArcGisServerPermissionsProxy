@@ -1,9 +1,11 @@
 ﻿using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
+using Newtonsoft.Json;
 
 namespace ArcGisServerPermissionsProxy.Api.Models.Errors
 {
     public class Errorable
     {
+        [JsonProperty(PropertyName = "error")]
         public ArcGisServerError Error { get; set; }
 
         public bool Successful
