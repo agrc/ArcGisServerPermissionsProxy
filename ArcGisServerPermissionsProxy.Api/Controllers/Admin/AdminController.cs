@@ -72,18 +72,23 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
                 foreach (var useremail in parameters.AdminEmails)
                 {
+                    if (s.Query<User, UserByEmailIndex>()
+                         .Any(x => x.Email == useremail))
+                    {
+                        continue;
+                    }
+
                     var password = CommandExecutor.ExecuteCommand(new GeneratePasswordCommand(12));
 
                     var hashed = await
                                  CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
 
                     var adminUser = new User("admin", useremail, "", hashed.HashedPassword, hashed.Salt,
-                                             Database, "admin")
+                                             database, "admin")
                         {
                             Active = true,
                             Approved = true
                         };
-
 
                     s.Store(adminUser);
 
