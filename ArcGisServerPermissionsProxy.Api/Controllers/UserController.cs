@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
@@ -12,7 +11,6 @@ using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
-using ArcGisServerPermissionsProxy.Api.Models.Response.Account;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
@@ -87,13 +85,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                     await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(user.Password, App.Pepper));
 
                 var newUser = new User(user.Name, user.Email, user.Agency, password.HashedPassword, password.Salt,
-                                       user.Application, null);
+                                       user.Application, null, null);
 
                 await s.StoreAsync(newUser);
 
                 var config = await s.LoadAsync<Config>("1");
 
-                Task.Factory.StartNew(() =>
+                await Task.Factory.StartNew(() =>
                     {
                         CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
                                                            new NewUserAdminNotificationEmailCommand.MailTemplate(
@@ -225,87 +223,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
-        }
-
-        [HttpGet]
-        public async Task<HttpResponseMessage> GetAllWaiting(string application)
-        {
-            if (!ValidationService.IsValid(application))
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
-            }
-
-            Database = application;
-
-            using (var s = AsyncSession)
-            {
-                var waitingUsers = await s.Query<User, UsersByApprovedIndex>()
-                                          .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                          .Where(x => x.Active && x.Approved == false)
-                                          .ToListAsync();
-
-                return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<IList<UsersWaiting>>(
-                                                  waitingUsers.Select(x => new UsersWaiting(x)).ToList()));
-            }
-        }
-
-        [HttpGet]
-        public async Task<HttpResponseMessage> GetRole(string email, string application)
-        {
-            if (string.IsNullOrEmpty(email) || !ValidationService.IsValid(application))
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
-            }
-
-            Database = application;
-
-            using (var s = AsyncSession)
-            {
-                var users = await s.Query<User, UserByEmailIndex>()
-                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                                   .Where(x => x.Email == email.ToLowerInvariant())
-                                   .ToListAsync();
-
-                User user;
-                try
-                {
-                    user = users.Single();
-                }
-                catch (InvalidOperationException)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound,
-                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<string>(user.Role));
-            }
-        }
-
-        [HttpGet]
-        public async Task<HttpResponseMessage> GetRoles(string application)
-        {
-            if (!ValidationService.IsValid(application))
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
-            }
-
-            Database = application;
-
-            using (var s = AsyncSession)
-            {
-                var conf = await s.LoadAsync<Config>("1");
-
-                return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<string[]>(conf.Roles));
-            }
         }
 
         public class ChangePasswordRequestInformation : RequestInformation
