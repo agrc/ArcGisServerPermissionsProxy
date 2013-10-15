@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.DataAnnotations;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -15,11 +17,13 @@ using ArcGisServerPermissionsProxy.Api.Commands.Users;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Models.Response.Account;
 using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
 using Ninject;
+using Raven.Client;
 
 namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 {
@@ -40,6 +44,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             if (!ModelState.IsValid)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            if (ConfigurationManager.AppSettings["creationToken"] != parameters.CreationToken)
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
             }
 
             var database = parameters.Application;
@@ -251,6 +260,88 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             }
         }
 
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetAllWaiting(string application)
+        {
+            if (!ValidationService.IsValid(application))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            Database = application;
+
+            using (var s = AsyncSession)
+            {
+                var waitingUsers = await s.Query<User, UsersByApprovedIndex>()
+                                          .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                          .Where(x => x.Active && x.Approved == false)
+                                          .ToListAsync();
+
+                return Request.CreateResponse(HttpStatusCode.OK,
+                                              new ResponseContainer<IList<UsersWaiting>>(
+                                                  waitingUsers.Select(x => new UsersWaiting(x)).ToList()));
+            }
+        }
+
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetRole(string email, string application)
+        {
+            if (string.IsNullOrEmpty(email) || !ValidationService.IsValid(application))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            Database = application;
+
+            using (var s = AsyncSession)
+            {
+                var users = await s.Query<User, UserByEmailIndex>()
+                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                   .Where(x => x.Email == email.ToLowerInvariant())
+                                   .ToListAsync();
+
+                User user;
+                try
+                {
+                    user = users.Single();
+                }
+                catch (InvalidOperationException)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK,
+                                              new ResponseContainer<string>(user.Role));
+            }
+        }
+
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetRoles(string application)
+        {
+            if (!ValidationService.IsValid(application))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            Database = application;
+
+            using (var s = AsyncSession)
+            {
+                var conf = await s.LoadAsync<Config>("1");
+
+                return Request.CreateResponse(HttpStatusCode.OK,
+                                              new ResponseContainer<string[]>(conf.Roles));
+            }
+        }
+
+
         /// <summary>
         ///     A class for accepting users in the application
         /// </summary>
@@ -296,6 +387,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
             [Required]
             public Collection<string> Roles { get; set; }
+
+            [Required]
+            public string CreationToken { get; set; }
         }
 
         /// <summary>

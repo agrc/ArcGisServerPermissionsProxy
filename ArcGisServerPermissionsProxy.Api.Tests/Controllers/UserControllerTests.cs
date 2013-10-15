@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,11 +7,8 @@ using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers;
-using ArcGisServerPermissionsProxy.Api.Formatters;
-using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
-using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
 using NUnit.Framework;
@@ -69,51 +65,10 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             _controller = new UserController
                 {
                     Request = request,
-                    DocumentStore = DocumentStore,
-                    ValidationService = new MockValidationService()
+                    DocumentStore = DocumentStore
                 };
 
             _controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
-        }
-
-        [Test]
-        public async Task GetAllWaitingReturnsAllActiveNotApprovedUsers()
-        {
-            var response = await _controller.GetAllWaiting(Database);
-
-            var result = await response.Content.ReadAsAsync<ResponseContainer<IList<User>>>(new[]
-                {
-                    new TextPlainResponseFormatter()
-                });
-
-            Assert.That(result.Result.Count, Is.EqualTo(1));
-        }
-
-        [Test]
-        public async Task GetRoleGetsTheRolesForSpecificUser()
-        {
-            var response = await _controller.GetRole("approvedActiveUser@test.com", Database);
-
-            var result = await response.Content.ReadAsAsync<ResponseContainer<string>>(new[]
-                {
-                    new TextPlainResponseFormatter()
-                });
-
-            Assert.That(result.Result, Is.EqualTo("admin"));
-        }
-
-        [Test]
-        public async Task GetRoleFailsGracefully()
-        {
-            var response = await _controller.GetRole("where@am.i", Database);
-
-            var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
-                {
-                    new TextPlainResponseFormatter()
-                });
-
-            Assert.That(result.Status, Is.EqualTo(404));
-            Assert.That(result.Message, Is.EqualTo("User not found."));
         }
 
         [Test]
@@ -186,19 +141,6 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }
 
-        [Test]
-        public async Task GetRolesReturnsAllRoles()
-        {
-            var response = await _controller.GetRoles(Database);
-
-            var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
-                {
-                    new TextPlainResponseFormatter()
-                });
-
-            Assert.That(result.Status, Is.EqualTo(200));
-            Assert.That(result.Result.Count, Is.EqualTo(4));
-
-        }
+       
     }
 }
