@@ -29,16 +29,24 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
-            var user = new User("USERNAME", "test@test.com", "AGENCY", password.HashedPassword, salt, null,
-                                "admin");
+            var adminUser = new User("USERNAME", "test@test.com", "AGENCY", password.HashedPassword, salt, null,
+                                "admin", "adminToken");
+            var normalUser = new User("USER", "notadmin@test.com", "AGENCY", password.HashedPassword, salt, null,
+                               "publisher", null);
             var app = new Application(null, "test");
 
             using (var s = DocumentStore.OpenSession())
             {
                 if (!s.Query<User, UserByEmailIndex>()
-                      .Any(x => x.Email == user.Email))
+                      .Any(x => x.Email == adminUser.Email))
                 {
-                    s.Store(user);
+                    s.Store(adminUser);
+                }
+
+                if (!s.Query<User, UserByEmailIndex>()
+                     .Any(x => x.Email == normalUser.Email))
+                {
+                    s.Store(normalUser);
                 }
 
                 if (!s.Query<Application, ApplicationByNameIndex>()
@@ -101,6 +109,60 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             Assert.That(result.Status, Is.EqualTo((int) HttpStatusCode.Unauthorized));
             Assert.That(result.Result, Is.Null);
+        }
+
+        [Test]
+        public async Task AdminUserGetsAdminTokenOnLogin()
+        {
+            var login = new LoginCredentials("test@test.com", "123abc", null);
+
+            var response = await _controller.UserLogin(login);
+
+            var result = GetResultContent(response);
+
+            Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.OK));
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(result.Result.User.AdminToken, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task NormalUserDoesNotGetAdminTokenOnLogin()
+        {
+            var login = new LoginCredentials("notadmin@test.com", "123abc", null);
+
+            var response = await _controller.UserLogin(login);
+
+            var result = GetResultContent(response);
+
+            Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.OK));
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(result.Result.User.AdminToken, Is.Null);
+        }
+
+        [Test]
+        public async Task AdminTokenChangesOnLogin()
+        {
+            var login = new LoginCredentials("test@test.com", "123abc", null);
+
+            var response = await _controller.UserLogin(login);
+
+            var result = GetResultContent(response);
+
+            Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.OK));
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(result.Result.User.AdminToken, Is.Not.Null);
+
+            var adminToken = result.Result.User.AdminToken;
+
+            response = await _controller.UserLogin(login);
+
+            result = GetResultContent(response);
+
+            Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.OK));
+            Assert.That(result.Result, Is.Not.Null);
+            Assert.That(result.Result.User.AdminToken, Is.Not.Null);
+
+            Assert.That(adminToken, Is.Not.EqualTo(result.Result.User.AdminToken));
         }
     }
 }

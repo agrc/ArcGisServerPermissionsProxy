@@ -9,7 +9,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
     {
         private string _application;
 
-        public User(string name, string email, string agency, string password, string salt, string application, string role)
+        public User(string name, string email, string agency, string password, string salt, string application, string role, string adminToken)
         {
             Email = email.ToLowerInvariant();
             Name = name;
@@ -22,6 +22,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
             Active = true;
             Token = Guid.NewGuid();
             ExpirationDateTicks = DateTime.Now.AddMonths(1).Ticks;
+            AdminToken = adminToken;
         }
 
         public string Id { get; set; }
@@ -133,5 +134,14 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// The expiration date ticks.
         /// </value>
         public long ExpirationDateTicks { get; set; }
+
+        /// <summary>
+        /// Gets or sets the admin token.
+        /// </summary>
+        /// <value>
+        /// The admin token used to validate a user as an admin for the admin endpoints.
+        /// </value>
+        [JsonProperty]
+        public string AdminToken { get; set; }
     }
 }
