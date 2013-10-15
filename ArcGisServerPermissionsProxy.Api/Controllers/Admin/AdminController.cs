@@ -463,10 +463,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             [EmailAddress]
             public string Email { get; set; }
 
-            public string AdminToken { get; set; }
-
             [Required]
-            public string AminToken { get; set; }
+            public string AdminToken { get; set; }
         }
     }
 }
