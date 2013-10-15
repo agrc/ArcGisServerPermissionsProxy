@@ -32,11 +32,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY",
                                                  hashedPassword.Result.HashedPassword, "SALT", null,
-                                                 null);
+                                                 null, null);
 
             var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY",
                                               hashedPassword.Result.HashedPassword, "SALT", null,
-                                              "admin")
+                                              "admin", null)
                 {
                     Active = false,
                     Approved = true
@@ -44,7 +44,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com",
                                                     "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
-                                                    null)
+                                                    null, null)
                 {
                     Active = false
                 };
@@ -140,7 +140,5 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }
-
-       
     }
 }

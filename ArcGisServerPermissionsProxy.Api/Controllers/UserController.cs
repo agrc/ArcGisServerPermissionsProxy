@@ -85,13 +85,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                     await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(user.Password, App.Pepper));
 
                 var newUser = new User(user.Name, user.Email, user.Agency, password.HashedPassword, password.Salt,
-                                       user.Application, null);
+                                       user.Application, null, null);
 
                 await s.StoreAsync(newUser);
 
                 var config = await s.LoadAsync<Config>("1");
 
-                Task.Factory.StartNew(() =>
+                await Task.Factory.StartNew(() =>
                     {
                         CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
                                                            new NewUserAdminNotificationEmailCommand.MailTemplate(

@@ -93,7 +93,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                  CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
 
                     var adminUser = new User("admin", useremail, "", hashed.HashedPassword, hashed.Salt,
-                                             database, "admin")
+                                             database, "admin", "admintoken")
                         {
                             Active = true,
                             Approved = true
@@ -141,10 +141,33 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                                     "Missing parameters."));
             }
 
+            if(string.IsNullOrEmpty(info.AdminToken) || !info.AdminToken.Contains("."))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    "Bad Token."));
+            }
+
             Database = info.Application;
 
             using (var s = AsyncSession)
             {
+                var adminTokenParts = info.AdminToken.Split('.');
+                if(adminTokenParts.Length != 2)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    "Bad Token."));
+                }
+
+                var adminUser = await s.LoadAsync<User>(adminTokenParts[0]);
+                if (adminUser.AdminToken != info.AdminToken)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                             new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                   "Bad Token."));
+                }
+
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
                 var response =
@@ -189,7 +212,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                                         "This token has expired after one month of inactivity."));
                 }
 
-                var info = new AcceptRequestInformation(user.Email, role, token, application);
+                var info = new AcceptRequestInformation(user.Email, role, token, application, null);
 
                 var response =
                     await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
@@ -213,10 +236,33 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                                     "Missing parameters."));
             }
 
+            if (string.IsNullOrEmpty(info.AdminToken) || !info.AdminToken.Contains("."))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    "Bad Token."));
+            }
+
             Database = info.Application;
 
             using (var s = AsyncSession)
             {
+                var adminTokenParts = info.AdminToken.Split('.');
+                if (adminTokenParts.Length != 2)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    "Bad Token."));
+                }
+
+                var adminUser = await s.LoadAsync<User>(adminTokenParts[0]);
+                if (adminUser.AdminToken != info.AdminToken)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                             new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                   "Bad Token."));
+                }
+
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
                 await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
@@ -351,10 +397,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             {
             }
 
-            public AcceptRequestInformation(string email, string role, Guid token, string application)
+            public AcceptRequestInformation(string email, string role, Guid token, string application, string adminToken)
                 : base(application, token)
             {
                 Email = email;
+                AdminToken = adminToken;
                 Role = role == null ? "" : role.ToLowerInvariant();
             }
 
@@ -366,6 +413,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             /// </value>
             [EmailAddress]
             public string Email { get; set; }
+
+            [Required]
+            public string AdminToken { get; set; }
 
             /// <summary>
             ///     Gets or sets the roles.
@@ -397,10 +447,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         /// </summary>
         public class RejectRequestInformation : UserController.RequestInformation
         {
-            public RejectRequestInformation(string email, Guid token, string application)
+            public RejectRequestInformation(string email, Guid token, string application, string adminToken)
                 : base(application, token)
             {
                 Email = email;
+                AdminToken = adminToken;
             }
 
             /// <summary>
@@ -411,6 +462,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             /// </value>
             [EmailAddress]
             public string Email { get; set; }
+
+            public string AdminToken { get; set; }
+
+            [Required]
+            public string AminToken { get; set; }
         }
     }
 }

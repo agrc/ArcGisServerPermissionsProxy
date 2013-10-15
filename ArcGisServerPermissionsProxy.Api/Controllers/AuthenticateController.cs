@@ -87,6 +87,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                   new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                         token.Error.Message));
                 }
+
+                if (user.Role.Contains("admin"))
+                {
+                    user.AdminToken = string.Format("{0}.{1}", user.Id, Guid.NewGuid());
+                }
             }
 
             return Request.CreateResponse(HttpStatusCode.OK,

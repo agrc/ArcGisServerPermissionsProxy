@@ -24,6 +24,7 @@ using NUnit.Framework;
 
 namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 {
+    [TestFixture]
     public class AdminControllerTests : RavenEmbeddableTest
     {
         private const string Database = "";
@@ -38,14 +39,16 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
+            var approvedAdmin = new User("admin", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
+                                         "SALT", null, null, "1admin.abc");
 
             var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY",
                                                  hashedPassword.Result.HashedPassword, "SALT", null,
-                                                 null);
+                                                 null, null);
 
             var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY",
                                               hashedPassword.Result.HashedPassword, "SALT", null,
-                                              "admin")
+                                              "admin", null)
                 {
                     Active = false,
                     Approved = true
@@ -53,7 +56,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com",
                                                     "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
-                                                    null)
+                                                    null, null)
                 {
                     Active = false
                 };
@@ -61,6 +64,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             using (var s = DocumentStore.OpenSession())
             {
                 s.Store(appConfig, "1");
+                s.Store(approvedAdmin, "1admin");
                 s.Store(approvedActiveUser);
                 s.Store(notApprovedActiveUser);
                 s.Store(notApprovedNotActiveUser);
@@ -82,12 +86,33 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
+        public async Task AcceptUserRejectsRequestsWithNoAdminToken()
+        {
+            var response = await
+                           _controller.Accept(
+                               new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
+                                                                            "ADMIN", Guid.Empty, Database, null));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+
+            using (var s = DocumentStore.OpenSession())
+            {
+                var user = s.Query<User, UserByEmailIndex>()
+                            .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                            .Single(x => x.Email == "notApprovedActiveUser@test.com".ToLowerInvariant());
+
+                Assert.That(user.Approved, Is.False);
+                Assert.That(user.Role, Is.Not.EquivalentTo("admin"));
+            }
+        }
+
+        [Test]
         public async Task AcceptUserSetsTheUserAcceptPropertyToTrue()
         {
             var response = await
                            _controller.Accept(
                                new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
-                                                                            "ADMIN", Guid.Empty, Database));
+                                                                            "ADMIN", Guid.Empty, Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
 
@@ -108,7 +133,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await
                            _controller.Accept(new AdminController.AcceptRequestInformation("where@am.i",
                                                                                            "Monkey", Guid.Empty,
-                                                                                           Database));
+                                                                                           Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
@@ -119,7 +144,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await
                            _controller.Accept(
                                new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
-                                                                            "Monkey", Guid.Empty, Database));
+                                                                            "Monkey", Guid.Empty, Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
@@ -129,7 +154,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Reject(new AdminController.RejectRequestInformation(
-                                                  "approvedActiveUser@test.com", Guid.Empty, Database));
+                                                  "approvedActiveUser@test.com", Guid.Empty, Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
 
@@ -281,7 +306,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                     new TextPlainResponseFormatter()
                 });
 
-            Assert.That(result.Result.Count, Is.EqualTo(1));
+            Assert.That(result.Result.Count, Is.EqualTo(2));
         }
 
         [Test]
