@@ -28,7 +28,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             base.SetUp();
 
-            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"}, new[] {"admin"});
+            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"}, new[] {"admin", "role2", "role3", "role4"});
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
@@ -90,7 +90,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
-        public async Task GetRolesGetsTheRolesForSpecificUser()
+        public async Task GetRoleGetsTheRolesForSpecificUser()
         {
             var response = await _controller.GetRole("approvedActiveUser@test.com", Database);
 
@@ -103,7 +103,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
-        public async Task GetRolesFailsGracefully()
+        public async Task GetRoleFailsGracefully()
         {
             var response = await _controller.GetRole("where@am.i", Database);
 
@@ -184,6 +184,21 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                                                                         "2", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
+        }
+
+        [Test]
+        public async Task GetRolesReturnsAllRoles()
+        {
+            var response = await _controller.GetRoles(Database);
+
+            var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
+                {
+                    new TextPlainResponseFormatter()
+                });
+
+            Assert.That(result.Status, Is.EqualTo(200));
+            Assert.That(result.Result.Count, Is.EqualTo(4));
+
         }
     }
 }
