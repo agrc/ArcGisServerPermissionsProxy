@@ -126,6 +126,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             {
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
+                if (user == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                                  new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                        "User not found."));
+                }
+
                 var password = CommandExecutor.ExecuteCommand(new GeneratePasswordCommand(12));
 
                 var hashed =
