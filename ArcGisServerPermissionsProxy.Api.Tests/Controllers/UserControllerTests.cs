@@ -90,7 +90,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
-        public async Task GetRolesGetsTheRolesForSpecificUser()
+        public async Task GetRoleGetsTheRolesForSpecificUser()
         {
             var response = await _controller.GetRole("approvedActiveUser@test.com", Database);
 
@@ -103,7 +103,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
-        public async Task GetRolesFailsGracefully()
+        public async Task GetRoleFailsGracefully()
         {
             var response = await _controller.GetRole("where@am.i", Database);
 
