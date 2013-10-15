@@ -140,7 +140,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 var config = await s.LoadAsync<Config>("1");
 
-                Task.Factory.StartNew(() =>
+                await Task.Factory.StartNew(() =>
                                       CommandExecutor.ExecuteCommand(
                                           new PasswordResetEmailCommand(
                                               new PasswordResetEmailCommand.MailTemplate(new[] {user.Email},
@@ -284,6 +284,27 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 return Request.CreateResponse(HttpStatusCode.OK,
                                               new ResponseContainer<string>(user.Role));
+            }
+        }
+
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetRoles(string application)
+        {
+            if (!ValidationService.IsValid(application))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            Database = application;
+
+            using (var s = AsyncSession)
+            {
+                var conf = await s.LoadAsync<Config>("1");
+
+                return Request.CreateResponse(HttpStatusCode.OK,
+                                              new ResponseContainer<string[]>(conf.Roles));
             }
         }
 
