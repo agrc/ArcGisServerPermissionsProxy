@@ -170,6 +170,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
 
+                if (user == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                                  new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                        "User not found."));
+                }
+
                 var response =
                     await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
 
@@ -264,6 +271,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 }
 
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
+
+                if (user == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                                  new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                        "User not found."));
+                }
 
                 await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
 
@@ -386,7 +400,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                               new ResponseContainer<string[]>(conf.Roles));
             }
         }
-
 
         /// <summary>
         ///     A class for accepting users in the application

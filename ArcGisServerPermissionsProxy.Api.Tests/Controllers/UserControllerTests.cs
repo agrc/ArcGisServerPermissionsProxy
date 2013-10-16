@@ -93,6 +93,17 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
+        public async Task ResetPasswordFailsGracefullyIfUserDoesntExist()
+        {
+            var response = await
+                           _controller.ResetPassword(
+                               new UserController.ResetRequestInformation("notauser@test.com", Database,
+                                                                          Guid.Empty));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
+        }
+
+        [Test]
         public async Task ChangePasswordChangesTheUsersPassword()
         {
             var response =
@@ -139,21 +150,6 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                                                                         "2", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
-        }
-
-        [Test]
-        public async Task GetRolesReturnsAllRoles()
-        {
-            var response = await _controller.GetRoles(Database);
-
-            var result = await response.Content.ReadAsAsync<ResponseContainer<IList<string>>>(new[]
-                {
-                    new TextPlainResponseFormatter()
-                });
-
-            Assert.That(result.Status, Is.EqualTo(200));
-            Assert.That(result.Result.Count, Is.EqualTo(4));
-
         }
     }
 }
