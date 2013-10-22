@@ -70,15 +70,15 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 if (Database == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                               new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                     "Invalid application name."));
+                                                  new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                        "Invalid application name."));
                 }
 
                 if (emailExists)
                 {
                     return Request.CreateResponse(HttpStatusCode.Conflict,
-                                              new ResponseContainer(HttpStatusCode.Conflict,
-                                                                    "Duplicate user name."));
+                                                  new ResponseContainer(HttpStatusCode.Conflict,
+                                                                        "Duplicate user name."));
                 }
 
                 var password =
@@ -91,20 +91,18 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 var config = await s.LoadAsync<Config>("1");
 
-                await Task.Factory.StartNew(() =>
-                    {
-                        CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
-                                                           new NewUserAdminNotificationEmailCommand.MailTemplate(
-                                                               config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
-                                                               user.Name, user.Agency,
-                                                               null, user.Application, newUser.Token, config.Roles)));
+
+                CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
+                                                   new NewUserAdminNotificationEmailCommand.MailTemplate(
+                                                       config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
+                                                       user.Name, user.Agency,
+                                                       null, user.Application, newUser.Token, config.Roles)));
 
 
-                        CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
-                                                           new UserRegistrationNotificationEmailCommand.MailTemplate(
-                                                               new[] {user.Email}, config.AdministrativeEmails,
-                                                               user.Name, user.Email, user.Application)));
-                    });
+                CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
+                                                   new UserRegistrationNotificationEmailCommand.MailTemplate(
+                                                       new[] {user.Email}, config.AdministrativeEmails,
+                                                       user.Name, user.Email, user.Application)));
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
@@ -145,14 +143,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 var config = await s.LoadAsync<Config>("1");
 
-                await Task.Factory.StartNew(() =>
-                                      CommandExecutor.ExecuteCommand(
-                                          new PasswordResetEmailCommand(
-                                              new PasswordResetEmailCommand.MailTemplate(new[] {user.Email},
-                                                                                         config.AdministrativeEmails,
-                                                                                         user.Name,
-                                                                                         password, "url",
-                                                                                         user.Application))));
+                CommandExecutor.ExecuteCommand(new PasswordResetEmailCommand(new PasswordResetEmailCommand.MailTemplate(
+                                                                                 new[] {user.Email},
+                                                                                 config.AdministrativeEmails,
+                                                                                 user.Name,
+                                                                                 password, "url",
+                                                                                 user.Application)));
 
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);

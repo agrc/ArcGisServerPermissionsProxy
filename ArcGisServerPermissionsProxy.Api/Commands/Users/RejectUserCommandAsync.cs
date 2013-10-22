@@ -27,13 +27,11 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 
             var config = await _s.LoadAsync<Config>("1");
 
-            Task.Factory.StartNew(() =>
-                                  CommandExecutor.ExecuteCommand(
-                                      new UserRejectedEmailCommand(
-                                          new UserRejectedEmailCommand.MailTemplate(new[] { _user.Email },
-                                                                                    config.AdministrativeEmails,
-                                                                                    _user.Name,
-                                                                                    _user.Application))));
+            CommandExecutor.ExecuteCommand(
+                new UserRejectedEmailCommand(new UserRejectedEmailCommand.MailTemplate(new[] {_user.Email},
+                                                                                       config.AdministrativeEmails,
+                                                                                       _user.Name,
+                                                                                       _user.Application)));
 
             return true;
         }

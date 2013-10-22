@@ -46,7 +46,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure
 
         public override void Execute()
         {
-            Mailman.SendAsync(MailMessage, "sending");
+            Mailman.Send(MailMessage);
         }
 
         public override void Run()

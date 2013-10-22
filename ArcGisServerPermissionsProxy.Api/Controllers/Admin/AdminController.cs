@@ -101,15 +101,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 
                     s.Store(adminUser);
 
-                    await Task.Factory.StartNew(() =>
-                                                CommandExecutor.ExecuteCommand(
-                                                    new PasswordResetEmailCommand(
-                                                        new PasswordResetEmailCommand.MailTemplate(
-                                                            new[] {adminUser.Email},
-                                                            config.AdministrativeEmails,
-                                                            adminUser.Name,
-                                                            password, "url",
-                                                            parameters.Application))));
+                    CommandExecutor.ExecuteCommand(
+                        new PasswordResetEmailCommand(new PasswordResetEmailCommand.MailTemplate(
+                                                          new[] {adminUser.Email},
+                                                          config.AdministrativeEmails,
+                                                          adminUser.Name,
+                                                          password, "url",
+                                                          parameters.Application)));
                 }
 
                 s.SaveChanges();
@@ -141,7 +139,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                                     "Missing parameters."));
             }
 
-            if(string.IsNullOrEmpty(info.AdminToken) || !info.AdminToken.Contains("."))
+            if (string.IsNullOrEmpty(info.AdminToken) || !info.AdminToken.Contains("."))
             {
                 return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                               new ResponseContainer(HttpStatusCode.Unauthorized,
@@ -153,19 +151,19 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             using (var s = AsyncSession)
             {
                 var adminTokenParts = info.AdminToken.Split('.');
-                if(adminTokenParts.Length != 2)
+                if (adminTokenParts.Length != 2)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                              new ResponseContainer(HttpStatusCode.Unauthorized,
-                                                                    "Bad Token."));
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
                 }
 
                 var adminUser = await s.LoadAsync<User>(adminTokenParts[0]);
                 if (adminUser.AdminToken != info.AdminToken)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                             new ResponseContainer(HttpStatusCode.Unauthorized,
-                                                                   "Bad Token."));
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
                 }
 
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
@@ -258,16 +256,16 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 if (adminTokenParts.Length != 2)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                              new ResponseContainer(HttpStatusCode.Unauthorized,
-                                                                    "Bad Token."));
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
                 }
 
                 var adminUser = await s.LoadAsync<User>(adminTokenParts[0]);
                 if (adminUser.AdminToken != info.AdminToken)
                 {
                     return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                             new ResponseContainer(HttpStatusCode.Unauthorized,
-                                                                   "Bad Token."));
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
                 }
 
                 var user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));

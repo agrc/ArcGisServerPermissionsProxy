@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
@@ -6,19 +8,19 @@ using ArcGisServerPermissionsProxy.Api.Controllers.Admin;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
-using System.Linq;
 using Raven.Client;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 {
     public class AcceptUserCommandAsync : CommandAsync<HttpResponseMessage>
     {
-        private readonly HttpRequestMessage _request;
-        private readonly User _user;
-        private readonly IAsyncDocumentSession _session;
         private readonly AdminController.AcceptRequestInformation _info;
+        private readonly HttpRequestMessage _request;
+        private readonly IAsyncDocumentSession _session;
+        private readonly User _user;
 
-        public AcceptUserCommandAsync(IAsyncDocumentSession session, AdminController.AcceptRequestInformation info, HttpRequestMessage request, User user)
+        public AcceptUserCommandAsync(IAsyncDocumentSession session, AdminController.AcceptRequestInformation info,
+                                      HttpRequestMessage request, User user)
         {
             _request = request;
             _user = user;
@@ -32,12 +34,14 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 
             if (_user == null)
             {
-                return _request.CreateResponse(HttpStatusCode.NotFound, new ResponseContainer(HttpStatusCode.NotFound, "User was not found."));
+                return _request.CreateResponse(HttpStatusCode.NotFound,
+                                               new ResponseContainer(HttpStatusCode.NotFound, "User was not found."));
             }
 
             if (!config.Roles.Contains(_info.Role.ToLowerInvariant()))
             {
-               return _request.CreateResponse(HttpStatusCode.NotFound, new ResponseContainer(HttpStatusCode.NotFound, "Role was not found."));
+                return _request.CreateResponse(HttpStatusCode.NotFound,
+                                               new ResponseContainer(HttpStatusCode.NotFound, "Role was not found."));
             }
 
             _user.Active = true;
@@ -46,22 +50,20 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 
             await _session.SaveChangesAsync();
 
-            await Task.Factory.StartNew(
-                () =>
-                CommandExecutor.ExecuteCommand(
-                    new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] { _user.Email },
-                                                                                           config.
-                                                                                               AdministrativeEmails,
-                                                                                           _user.Name, _info.Role,
-                                                                                           _user.Email,
-                                                                                           _user.Application))));
+            CommandExecutor.ExecuteCommand(
+                new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {_user.Email},
+                                                                                       config.
+                                                                                           AdministrativeEmails,
+                                                                                       _user.Name, _info.Role,
+                                                                                       _user.Email,
+                                                                                       _user.Application)));
 
             return null;
         }
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
