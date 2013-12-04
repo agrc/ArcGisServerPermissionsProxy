@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Security.Policy;
 using System.Web;
 using System.Web.Http;
@@ -22,7 +23,7 @@ namespace ArcGisServerPermissionsProxy.Api
 
         public static AdminCredentials AdminInformation { get; set; }
 
-        public const string Url = "http://arcgissecurity/api";
+        public static string Host { get; set; }
 
         protected void Application_Start()
         {
@@ -36,6 +37,38 @@ namespace ArcGisServerPermissionsProxy.Api
                                          ConfigurationManager.AppSettings["adminPassword"]);
 
             Password = ConfigurationManager.AppSettings["accountPassword"];
+        }
+
+        void Application_BeginRequest(Object source, EventArgs e)
+        {
+            var app = (HttpApplication)source;
+            var context = app.Context;
+
+            Host = CacheHost.Initialize(context);
+        }
+
+        static class CacheHost
+        {
+            private static string _host;
+
+            private static readonly Object SLock = new Object();
+
+            public static string Initialize(HttpContext context)
+            {
+                if (string.IsNullOrEmpty(_host))
+                {
+                    lock (SLock)
+                    {
+                        if (string.IsNullOrEmpty(_host))
+                        {
+                            var uri = context.Request.Url;
+                            _host = uri.GetLeftPart(UriPartial.Authority);
+                        }
+                    }
+                }
+
+                return _host;
+            }
         }
     }
 }

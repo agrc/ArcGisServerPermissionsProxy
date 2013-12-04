@@ -13,7 +13,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 
 Your password has been reset to: `{{Password}}`
 
-This new password is intended to be **temporary**. Please [change this temporary password]({{ChangePasswordUrl}}) to one of your choosing.
+This new password is intended to be **temporary**. Please change this temporary password to one of your choosing.
 
 If you have any questions, you may reply to this email.
 
@@ -42,16 +42,13 @@ Thank you";
 
         public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string password,
-                                string changePasswordUrl, string application)
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string password, string application)
                 : base(toAddresses, fromAddresses, name, application)
             {
                 Password = password;
-                ChangePasswordUrl = changePasswordUrl;
             }
 
             public string Password { get; set; }
-            public string ChangePasswordUrl { get; set; }
         }
     }
 }

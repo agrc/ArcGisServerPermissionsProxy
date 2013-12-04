@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
+using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers.Admin;
 using ArcGisServerPermissionsProxy.Api.Formatters;
@@ -90,7 +91,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         public async Task AcceptUserFailsGracefullyWhenEmailDoesNotExist()
         {
             var response = await
-                           _controller.Accept(new AdminController.AcceptRequestInformation("where@am.i",
+                           _controller.Accept(new AcceptRequestInformation("where@am.i",
                                                                                            "Monkey", Guid.Empty,
                                                                                            Database, "1admin.abc"));
 
@@ -102,7 +103,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Accept(
-                               new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
+                               new AcceptRequestInformation("notApprovedActiveUser@test.com",
                                                                             "Monkey", Guid.Empty, Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -113,7 +114,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Accept(
-                               new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
+                               new AcceptRequestInformation("notApprovedActiveUser@test.com",
                                                                             "ADMIN", Guid.Empty, Database, null));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
@@ -134,7 +135,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.Accept(
-                               new AdminController.AcceptRequestInformation("notApprovedActiveUser@test.com",
+                               new AcceptRequestInformation("notApprovedActiveUser@test.com",
                                                                             "ADMIN", Guid.Empty, Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
@@ -176,7 +177,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
 
-            var response = await controller.CreateApplication(new AdminController.CreateApplicationParams
+            var response = await controller.CreateApplication(new CreateApplicationParams
                 {
                     AdminEmails = new[] {"test@test.com"},
                     Application = "",
@@ -221,7 +222,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
 
-            var response = await controller.CreateApplication(new AdminController.CreateApplicationParams
+            var response = await controller.CreateApplication(new CreateApplicationParams
                 {
                     AdminEmails = new[] {"test@test.com"},
                     Application = "",
@@ -258,7 +259,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
 
-            var response = await controller.CreateApplication(new AdminController.CreateApplicationParams
+            var response = await controller.CreateApplication(new CreateApplicationParams
                 {
                     AdminEmails = new[] {"test@test.com"},
                     Application = "",
@@ -326,7 +327,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         public async Task RejectUserFailsGracefullyWhenEmailDoesNotExist()
         {
             var response = await
-                           _controller.Reject(new AdminController.RejectRequestInformation("where@am.i", Guid.Empty,
+                           _controller.Reject(new RejectRequestInformation("where@am.i", Guid.Empty,
                                                                                            Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
@@ -336,7 +337,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         public async Task RejectUserRemovesAllPrivs()
         {
             var response = await
-                           _controller.Reject(new AdminController.RejectRequestInformation(
+                           _controller.Reject(new RejectRequestInformation(
                                                   "approvedActiveUser@test.com", Guid.Empty, Database, "1admin.abc"));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
+using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
@@ -76,7 +77,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.ResetPassword(
-                               new UserController.ResetRequestInformation("approvedActiveUser@test.com", Database,
+                               new ResetRequestInformation("approvedActiveUser@test.com", Database,
                                                                           Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
@@ -97,7 +98,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             var response = await
                            _controller.ResetPassword(
-                               new UserController.ResetRequestInformation("notauser@test.com", Database,
+                               new ResetRequestInformation("notauser@test.com", Database,
                                                                           Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
@@ -109,7 +110,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response =
                 await
                 _controller.ChangePassword(
-                    new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password",
+                    new ChangePasswordRequestInformation("approvedActiveUser@test.com", "password",
                                                                         "newPassword", "newPassword", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
@@ -134,7 +135,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response =
                 await
                 _controller.ChangePassword(
-                    new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "wrong",
+                    new ChangePasswordRequestInformation("approvedActiveUser@test.com", "wrong",
                                                                         "newPassword", "newPassword", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
@@ -146,7 +147,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response =
                 await
                 _controller.ChangePassword(
-                    new UserController.ChangePasswordRequestInformation("approvedActiveUser@test.com", "password", "1",
+                    new ChangePasswordRequestInformation("approvedActiveUser@test.com", "password", "1",
                                                                         "2", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));

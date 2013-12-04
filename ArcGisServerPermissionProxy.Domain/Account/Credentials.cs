@@ -1,6 +1,6 @@
 ﻿using AgrcPasswordManagement.Models.Account;
 
-namespace ArcGisServerPermissionsProxy.Api.Models.Account
+namespace ArcGisServerPermissionProxy.Domain.Account
 {
     public class Credentials : LoginCredentials
     {

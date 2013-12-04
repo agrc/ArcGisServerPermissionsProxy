@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ArcGisServerPermissionsProxy.Api.Models.ArcGIS
+namespace ArcGisServerPermissionProxy.Domain.ArcGIS
 {
     public class ArcGisServerError
     {

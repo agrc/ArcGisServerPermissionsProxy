@@ -1,4 +1,5 @@
-﻿using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
+﻿using ArcGisServerPermissionProxy.Domain.ArcGIS;
+using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using Newtonsoft.Json;
 
 namespace ArcGisServerPermissionsProxy.Api.Models.Errors

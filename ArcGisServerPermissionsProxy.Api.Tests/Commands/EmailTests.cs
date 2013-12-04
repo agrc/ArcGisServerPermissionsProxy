@@ -30,7 +30,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                 CommandExecutor.ExecuteCommand(
                     new PasswordResetEmailCommand(
                         new PasswordResetEmailCommand.MailTemplate(new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
-                                                       new[] {"admin@application.com"}, "Name", "Password", "http://url.com", "Agency")));
+                                                       new[] {"admin@application.com"}, "Name", "Password", "Agency")));
             }
         }
 

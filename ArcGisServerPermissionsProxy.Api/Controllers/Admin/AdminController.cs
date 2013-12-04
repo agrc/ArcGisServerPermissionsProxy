@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition.Hosting;
-using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 using System.Linq;
 using System.Net;
@@ -10,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AgrcPasswordManagement.Commands;
+using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
@@ -106,7 +105,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                           new[] {adminUser.Email},
                                                           config.AdministrativeEmails,
                                                           adminUser.Name,
-                                                          password, "url",
+                                                          password,
                                                           parameters.Application)));
                 }
 
@@ -397,85 +396,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 return Request.CreateResponse(HttpStatusCode.OK,
                                               new ResponseContainer<string[]>(conf.Roles));
             }
-        }
-
-        /// <summary>
-        ///     A class for accepting users in the application
-        /// </summary>
-        public class AcceptRequestInformation : UserController.RequestInformation
-        {
-            public AcceptRequestInformation()
-            {
-            }
-
-            public AcceptRequestInformation(string email, string role, Guid token, string application, string adminToken)
-                : base(application, token)
-            {
-                Email = email;
-                AdminToken = adminToken;
-                Role = role == null ? "" : role.ToLowerInvariant();
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            [EmailAddress]
-            public string Email { get; set; }
-
-            [Required]
-            public string AdminToken { get; set; }
-
-            /// <summary>
-            ///     Gets or sets the roles.
-            /// </summary>
-            /// <value>
-            ///     The roles.
-            /// </value>
-            [Required]
-            public string Role { get; set; }
-        }
-
-        public class CreateApplicationParams
-        {
-            [Required]
-            public string Application { get; set; }
-
-            [Required]
-            public string[] AdminEmails { get; set; }
-
-            [Required]
-            public Collection<string> Roles { get; set; }
-
-            [Required]
-            public string CreationToken { get; set; }
-        }
-
-        /// <summary>
-        ///     A class for getting user role requests
-        /// </summary>
-        public class RejectRequestInformation : UserController.RequestInformation
-        {
-            public RejectRequestInformation(string email, Guid token, string application, string adminToken)
-                : base(application, token)
-            {
-                Email = email;
-                AdminToken = adminToken;
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            [EmailAddress]
-            public string Email { get; set; }
-
-            [Required]
-            public string AdminToken { get; set; }
-        }
+        } 
     }
 }

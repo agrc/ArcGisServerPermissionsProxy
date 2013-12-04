@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ArcGisServerPermissionsProxy.Api.Controllers.Admin;
+using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
@@ -20,14 +20,14 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
         private const string AssignRoleUrl = "http://localhost:6080/arcgis/admin/security/users/assignRoles";
 
         public AdminCredentials AdminInformation;
-        public AdminController.CreateApplicationParams Parameters;
+        public CreateApplicationParams Parameters;
 
         public BootstrapArcGisServerSecurityCommandAsync()
         {
             
         }
 
-        public BootstrapArcGisServerSecurityCommandAsync(AdminController.CreateApplicationParams parameters,
+        public BootstrapArcGisServerSecurityCommandAsync(CreateApplicationParams parameters,
                                                          AdminCredentials adminInformation)
         {
             Parameters = parameters;

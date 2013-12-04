@@ -3,8 +3,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
-using ArcGisServerPermissionsProxy.Api.Controllers.Admin;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
@@ -14,12 +14,12 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 {
     public class AcceptUserCommandAsync : CommandAsync<HttpResponseMessage>
     {
-        private readonly AdminController.AcceptRequestInformation _info;
+        private readonly AcceptRequestInformation _info;
         private readonly HttpRequestMessage _request;
         private readonly IAsyncDocumentSession _session;
         private readonly User _user;
 
-        public AcceptUserCommandAsync(IAsyncDocumentSession session, AdminController.AcceptRequestInformation info,
+        public AcceptUserCommandAsync(IAsyncDocumentSession session, AcceptRequestInformation info,
                                       HttpRequestMessage request, User user)
         {
             _request = request;

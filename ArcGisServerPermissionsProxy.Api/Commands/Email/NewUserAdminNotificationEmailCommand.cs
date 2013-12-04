@@ -19,12 +19,12 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 Use the links below to **accept** or **reject** this request.
 
 {{#acceptUrls}}
-[**Accept** {{name}} as {{role}}]({{AcceptUrl}})  
+[**Accept** {{name}} as {{role}}]({{acceptUrl}})  
 {{/acceptUrls}}    
 
 [**Reject** {{name}}]({{rejectUrl}})
     
-Or use [the user admin page]({{url}}).";
+Or use the user admin page.";
 
             MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
             MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
@@ -68,10 +68,10 @@ Or use [the user admin page]({{url}}).";
             {
                 foreach (var role in roles)
                 {
-                    AcceptUrls.Add(new AcceptModel(role, string.Format("{0}/admin/accept?token={1}&role={2}&application={3}", App.Url, emailToken, role, application)));
+                    AcceptUrls.Add(new AcceptModel(role, string.Format("{0}/accept?token={1}&role={2}&application={3}", Url, emailToken, role, application)));
                 }
 
-                RejectUrl = string.Format("{0}/admin/reject?token={1}&application={2}", App.Url, emailToken, application);
+                RejectUrl = string.Format("{0}/reject?token={1}&application={2}", Url, emailToken, application);
             }
 
             public override string ToString()

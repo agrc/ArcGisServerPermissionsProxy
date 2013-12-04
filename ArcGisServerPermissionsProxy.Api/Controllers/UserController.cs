@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Routing;
 using AgrcPasswordManagement.Commands;
+using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.Account;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
@@ -91,12 +95,17 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 var config = await s.LoadAsync<Config>("1");
 
-
+                var urlBuilder = new UrlHelper(ControllerContext.Request);
+                var url = string.Format("{0}{1}", App.Host, urlBuilder.Route("Default", new
+                    {
+                        Controller = "admin"
+                    }));
+                
                 CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
                                                        user.Name, user.Agency,
-                                                       null, user.Application, newUser.Token, config.Roles)));
+                                                       url, user.Application, newUser.Token, config.Roles)));
 
 
                 CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
@@ -145,7 +154,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                                                  new[] {user.Email},
                                                                                  new[]{"noreply@utah.gov"},
                                                                                  user.Name,
-                                                                                 password, "url",
+                                                                                 password,
                                                                                  user.Application)));
 
 
@@ -224,130 +233,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
-        }
-
-        public class ChangePasswordRequestInformation : RequestInformation
-        {
-            public ChangePasswordRequestInformation(string email, string currentPassword, string newPassword,
-                                                    string newPasswordRepeated, string application, Guid token)
-                : base(application, token)
-            {
-                CurrentPassword = currentPassword;
-                NewPassword = newPassword;
-                NewPasswordRepeated = newPasswordRepeated;
-                Email = email;
-            }
-
-            [Required]
-            public string CurrentPassword { get; set; }
-
-            [Required]
-            public string NewPassword { get; set; }
-
-            [Required]
-            public string NewPasswordRepeated { get; set; }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            [EmailAddress]
-            public string Email { get; set; }
-        }
-
-        /// <summary>
-        ///     A class encapsulating common request paramaters
-        /// </summary>
-        public class RequestInformation
-        {
-            private string _application;
-
-            public RequestInformation()
-            {
-            }
-
-            public RequestInformation(string application, Guid token)
-            {
-                Application = application;
-                Token = token;
-            }
-
-            /// <summary>
-            ///     Gets the database.
-            /// </summary>
-            /// <value>
-            ///     The database or application name of the user.
-            /// </value>
-            [Required]
-            public string Application
-            {
-                get { return _application == null ? null : _application.ToLowerInvariant(); }
-                set
-                {
-                    if (value == null || string.IsNullOrEmpty(value))
-                        _application = null;
-                    else
-                    {
-                        _application = value;
-                    }
-                }
-            }
-
-            /// <summary>
-            ///     Gets the token.
-            /// </summary>
-            /// <value>
-            ///     The token arcgis server generated.
-            /// </value>
-            public Guid Token { get; protected set; }
-        }
-
-        /// <summary>
-        ///     A class for reseting a users password
-        /// </summary>
-        public class ResetRequestInformation : RequestInformation
-        {
-            public ResetRequestInformation(string email, string application, Guid token)
-                : base(application, token)
-            {
-                Email = email;
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            [EmailAddress]
-            public string Email { get; set; }
-        }
-
-        /// <summary>
-        ///     A class for getting user role requests
-        /// </summary>
-        public class RoleRequestInformation : RequestInformation
-        {
-            public RoleRequestInformation()
-            {
-            }
-
-            public RoleRequestInformation(string email, string application, Guid token)
-                : base(application, token)
-            {
-                Email = email;
-            }
-
-            /// <summary>
-            ///     Gets or sets the email.
-            /// </summary>
-            /// <value>
-            ///     The email of the person to get the roles for.
-            /// </value>
-            [EmailAddress]
-            public string Email { get; set; }
         }
     }
 }
