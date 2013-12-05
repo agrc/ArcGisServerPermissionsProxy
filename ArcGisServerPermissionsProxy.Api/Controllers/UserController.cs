@@ -98,7 +98,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var urlBuilder = new UrlHelper(ControllerContext.Request);
                 var url = string.Format("{0}{1}", App.Host, urlBuilder.Route("Default", new
                     {
-                        Controller = "admin"
+                        Controller = "api",
+                        Action = "admin"
                     }));
                 
                 CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
