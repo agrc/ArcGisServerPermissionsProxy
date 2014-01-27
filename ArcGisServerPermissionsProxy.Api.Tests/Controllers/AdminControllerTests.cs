@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers.Admin;
 using ArcGisServerPermissionsProxy.Api.Formatters;
@@ -38,14 +39,14 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
-            var approvedAdmin = new User("admin", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
+            var approvedAdmin = new User("admin", "", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
                                          "SALT", null, null, "1admin.abc");
 
-            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY",
+            var notApprovedActiveUser = new User("Not Approved"," but Active", "notApprovedActiveUser@test.com", "AGENCY",
                                                  hashedPassword.Result.HashedPassword, "SALT", null,
                                                  null, null);
 
-            var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY",
+            var approvedActiveUser = new User("Approved and","Active", "approvedActiveUser@test.com", "AGENCY",
                                               hashedPassword.Result.HashedPassword, "SALT", null,
                                               "admin", null)
                 {
@@ -53,7 +54,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                     Approved = true
                 };
 
-            var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com",
+            var notApprovedNotActiveUser = new User("Not approved","or active", "notApprovedNotActiveUser@test.com",
                                                     "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
                                                     null, null)
                 {

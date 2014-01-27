@@ -6,10 +6,11 @@ using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
+using ArcGisServerPermissionProxy.Domain.Database;
+using ArcGisServerPermissionProxy.Domain.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
-using ArcGisServerPermissionsProxy.Api.Models.Response.Authentication;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
@@ -29,9 +30,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
-            var adminUser = new User("USERNAME", "test@test.com", "AGENCY", password.HashedPassword, salt, null,
+            var adminUser = new User("USER","NAME", "test@test.com", "AGENCY", password.HashedPassword, salt, null,
                                 "admin", "adminToken");
-            var normalUser = new User("USER", "notadmin@test.com", "AGENCY", password.HashedPassword, salt, null,
+            var normalUser = new User("USER", "", "notadmin@test.com", "AGENCY", password.HashedPassword, salt, null,
                                "publisher", null);
             var app = new Application(null, "test");
 

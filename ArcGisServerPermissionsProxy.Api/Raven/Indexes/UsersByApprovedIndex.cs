@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
+using ArcGisServerPermissionProxy.Domain.Database;
 using Raven.Client.Indexes;
 
 namespace ArcGisServerPermissionsProxy.Api.Raven.Indexes

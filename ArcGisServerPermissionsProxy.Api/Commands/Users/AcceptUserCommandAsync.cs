@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
@@ -54,7 +55,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                 new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {_user.Email},
                                                                                        config.
                                                                                            AdministrativeEmails,
-                                                                                       _user.Name, _info.Role,
+                                                                                       _user.FullName, _info.Role,
                                                                                        _user.Email,
                                                                                        _user.Application)));
 

@@ -10,6 +10,7 @@ using System.Web.Http.Routing;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Account;
+using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
@@ -88,7 +89,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var password =
                     await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(user.Password, App.Pepper));
 
-                var newUser = new User(user.Name, user.Email, user.Agency, password.HashedPassword, password.Salt,
+                var newUser = new User(user.First, user.Last, user.Email, user.Agency, password.HashedPassword, password.Salt,
                                        user.Application, null, null);
 
                 await s.StoreAsync(newUser);
@@ -105,14 +106,14 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
-                                                       user.Name, user.Agency,
+                                                       user.FullName, user.Agency,
                                                        url, user.Application, newUser.Token, config.Roles)));
 
 
                 CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
                                                    new UserRegistrationNotificationEmailCommand.MailTemplate(
                                                        new[] {user.Email}, config.AdministrativeEmails,
-                                                       user.Name, user.Email, user.Application)));
+                                                       user.FullName, user.Email, user.Application)));
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
@@ -154,7 +155,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 CommandExecutor.ExecuteCommand(new PasswordResetEmailCommand(new PasswordResetEmailCommand.MailTemplate(
                                                                                  new[] {user.Email},
                                                                                  new[]{"noreply@utah.gov"},
-                                                                                 user.Name,
+                                                                                 user.FullName,
                                                                                  password,
                                                                                  user.Application)));
 

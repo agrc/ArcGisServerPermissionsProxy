@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
 using Raven.Client;
 
