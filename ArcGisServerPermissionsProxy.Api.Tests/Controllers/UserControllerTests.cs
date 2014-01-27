@@ -7,6 +7,7 @@ using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
@@ -31,11 +32,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
 
-            var notApprovedActiveUser = new User("Not Approved but Active", "notApprovedActiveUser@test.com", "AGENCY",
+            var notApprovedActiveUser = new User("Not Approved","but Active", "notApprovedActiveUser@test.com", "AGENCY",
                                                  hashedPassword.Result.HashedPassword, "SALT", null,
                                                  null, null);
 
-            var approvedActiveUser = new User("Approved and Active", "approvedActiveUser@test.com", "AGENCY",
+            var approvedActiveUser = new User("Approved","and Active", "approvedActiveUser@test.com", "AGENCY",
                                               hashedPassword.Result.HashedPassword, "SALT", null,
                                               "admin", null)
                 {
@@ -43,7 +44,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                     Approved = true
                 };
 
-            var notApprovedNotActiveUser = new User("Not approved or active", "notApprovedNotActiveUser@test.com",
+            var notApprovedNotActiveUser = new User("Not approved","or active", "notApprovedNotActiveUser@test.com",
                                                     "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
                                                     null, null)
                 {

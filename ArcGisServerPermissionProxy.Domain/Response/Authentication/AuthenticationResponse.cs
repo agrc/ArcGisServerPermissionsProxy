@@ -1,7 +1,7 @@
-﻿using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
+﻿using ArcGisServerPermissionProxy.Domain.Database;
+using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 
-namespace ArcGisServerPermissionsProxy.Api.Models.Response.Authentication
+namespace ArcGisServerPermissionProxy.Domain.Response.Authentication
 {
     public class AuthenticationResponse
     {

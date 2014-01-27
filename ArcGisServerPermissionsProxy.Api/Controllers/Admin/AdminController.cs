@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.Database;
+using ArcGisServerPermissionProxy.Domain.Response.Account;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
@@ -16,7 +18,6 @@ using ArcGisServerPermissionsProxy.Api.Commands.Users;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
-using ArcGisServerPermissionsProxy.Api.Models.Response.Account;
 using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
@@ -91,7 +92,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     var hashed = await
                                  CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
 
-                    var adminUser = new User("admin", useremail, "", hashed.HashedPassword, hashed.Salt,
+                    var adminUser = new User("admin", "user", useremail, "", hashed.HashedPassword, hashed.Salt,
                                              database, "admin", "admintoken")
                         {
                             Active = true,
@@ -104,7 +105,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                         new PasswordResetEmailCommand(new PasswordResetEmailCommand.MailTemplate(
                                                           new[] {adminUser.Email},
                                                           config.AdministrativeEmails,
-                                                          adminUser.Name,
+                                                          adminUser.FullName,
                                                           password,
                                                           parameters.Application)));
                 }

@@ -2,17 +2,18 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-namespace ArcGisServerPermissionsProxy.Api.Raven.Models
+namespace ArcGisServerPermissionProxy.Domain.Database
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class User
     {
         private string _application;
 
-        public User(string name, string email, string agency, string password, string salt, string application, string role, string adminToken)
+        public User(string firstName, string lastName, string email, string agency, string password, string salt, string application, string role, string adminToken)
         {
             Email = email.ToLowerInvariant();
-            Name = name;
+            First = firstName;
+            Last = lastName;
             Agency = agency;
             Password = password;
             Salt = salt;
@@ -102,13 +103,22 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         public bool Active { get; set; }
 
         /// <summary>
-        /// Gets or sets the name.
+        /// Gets or sets the first name.
         /// </summary>
         /// <value>
-        /// The name.
+        /// The first name.
         /// </value>
         [JsonProperty]
-        public string Name { get; set; }
+        public string First { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last name.
+        /// </summary>
+        /// <value>
+        /// The last name.
+        /// </value>
+        [JsonProperty]
+        public string Last { get; set; }
 
         /// <summary>
         /// Gets or sets the agency.
@@ -143,5 +153,10 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Models
         /// </value>
         [JsonProperty]
         public string AdminToken { get; set; }
+
+        public string FullName
+        {
+            get { return string.Format("{0} {1}", First, Last).Trim(); }
+        }
     }
 }

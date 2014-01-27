@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
@@ -30,7 +31,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
             CommandExecutor.ExecuteCommand(
                 new UserRejectedEmailCommand(new UserRejectedEmailCommand.MailTemplate(new[] {_user.Email},
                                                                                        config.AdministrativeEmails,
-                                                                                       _user.Name,
+                                                                                       _user.FullName,
                                                                                        _user.Application)));
 
             return true;

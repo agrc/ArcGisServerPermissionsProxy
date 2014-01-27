@@ -1,14 +1,15 @@
-﻿using ArcGisServerPermissionsProxy.Api.Raven.Models;
+﻿using ArcGisServerPermissionProxy.Domain.Database;
 using Newtonsoft.Json;
 
-namespace ArcGisServerPermissionsProxy.Api.Models.Response.Account
+namespace ArcGisServerPermissionProxy.Domain.Response.Account
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class UsersWaiting
     {
         public UsersWaiting(User user)
         {
-            Name = user.Name;
+            First = user.First;
+            Last = user.Last;
             Agency = user.Agency;
             Email = user.Email;
         }
@@ -17,7 +18,10 @@ namespace ArcGisServerPermissionsProxy.Api.Models.Response.Account
         protected string Email { get; private set; }
 
         [JsonProperty]
-        protected string Name { get; set; }
+        protected string First { get; set; }
+        
+        [JsonProperty]
+        protected string Last { get; set; }
 
         [JsonProperty]
         protected string Agency { get; set; }
