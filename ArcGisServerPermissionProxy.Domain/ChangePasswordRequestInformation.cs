@@ -33,4 +33,23 @@ namespace ArcGisServerPermissionProxy.Domain
         [EmailAddress]
         public string Email { get; set; }
     }
+
+    public class ChangeEmailRequestInformation : RequestInformation
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; }
+
+        [Required, EmailAddress]
+        public string NewEmail { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+
+        public ChangeEmailRequestInformation(string email, string newEmail, string password, string application, Guid token) : base(application, token)
+        {
+            Email = email;
+            NewEmail = newEmail;
+            Password = password;
+        }
+    }
 }

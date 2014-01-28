@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -14,10 +12,8 @@ using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
-using ArcGisServerPermissionsProxy.Api.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
 using Raven.Client;
 
@@ -89,7 +85,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var password =
                     await CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(user.Password, App.Pepper));
 
-                var newUser = new User(user.First, user.Last, user.Email, user.Agency, password.HashedPassword, password.Salt,
+                var newUser = new User(user.First, user.Last, user.Email, user.Agency, password.HashedPassword,
+                                       password.Salt,
                                        user.Application, null, null);
 
                 await s.StoreAsync(newUser);
@@ -99,15 +96,18 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var urlBuilder = new UrlHelper(ControllerContext.Request);
                 var url = string.Format("{0}{1}", App.Host, urlBuilder.Route("Default", new
                     {
+                        // ReSharper disable Mvc.ControllerNotResolved
                         Controller = "api",
+                        // ReSharper disable Mvc.ActionNotResolved
                         Action = "admin"
                     }));
-                
+
                 CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
                                                        user.FullName, user.Agency,
-                                                       url, user.Application, newUser.Token, config.Roles, config.Description)));
+                                                       url, user.Application, newUser.Token, config.Roles,
+                                                       config.Description)));
 
 
                 CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
@@ -154,7 +154,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 CommandExecutor.ExecuteCommand(new PasswordResetEmailCommand(new PasswordResetEmailCommand.MailTemplate(
                                                                                  new[] {user.Email},
-                                                                                 new[]{"noreply@utah.gov"},
+                                                                                 new[] {"noreply@utah.gov"},
                                                                                  user.FullName,
                                                                                  password,
                                                                                  user.Application)));
@@ -235,6 +235,85 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
+        }
+
+        [HttpPut]
+        public async Task<HttpResponseMessage> ChangeEmail(ChangeEmailRequestInformation info)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            if (info.Email == info.NewEmail)
+            {
+                return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                              new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                    "New email cannot match."));
+            }
+
+            Database = info.Application;
+
+            User user = null;
+            using (var s = AsyncSession)
+            {
+                try
+                {
+                    user = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(info.Email, s));
+                }
+                catch (AggregateException aex)
+                {
+                    aex.Flatten().Handle(ex =>
+                        {
+                            if (ex is WebException)
+                            {
+                                Database = null;
+                                return true;
+                            }
+
+                            return false; 
+                        });
+                }
+
+                if (user == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                                  new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                        "User not found."));
+                }
+
+                var currentPassword = await
+                                      CommandExecutor.ExecuteCommandAsync(
+                                          new HashPasswordCommandAsync(info.Password, user.Salt,
+                                                                       App.Pepper));
+
+                if (currentPassword.HashedPassword != user.Password)
+                {
+                    return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                                  new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                        "Current password is incorrect."));
+                }
+
+                var isUnique = await s.Query<User, UserByEmailIndex>()
+                                            .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                            .Where(x => x.Email == info.NewEmail.ToLowerInvariant())
+                                            .CountAsync();
+
+                if (isUnique > 0)
+                {
+                    return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                                  new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                        "Email is in use."));
+                }
+
+                user.Email = info.NewEmail;
+
+                await s.SaveChangesAsync();
+            }
+
+            return Request.CreateResponse(HttpStatusCode.NoContent);
         }
     }
 }

@@ -1,6 +1,7 @@
 {
 	"id": "d38a4512-2afb-7c73-b4e1-992385b79923",
 	"name": "Permission Proxy",
+	"description": "",
 	"order": [],
 	"folders": [
 		{
@@ -37,7 +38,8 @@
 				"abd0651e-155d-a638-330a-03c2ddadcf88",
 				"94cd7b55-6192-5ee2-239f-dc90de576090",
 				"670d99e0-3479-1ed7-05df-0941310a92e8",
-				"76fe663b-7da1-6b0f-8adf-86995166f556"
+				"76fe663b-7da1-6b0f-8adf-86995166f556",
+				"498838d5-8c86-9f67-fd9d-4ba5d2a1a768"
 			],
 			"collection_name": "Permission Proxy",
 			"collection_id": "d38a4512-2afb-7c73-b4e1-992385b79923"
@@ -62,13 +64,15 @@
 		},
 		{
 			"id": "1ae788fe-f397-1680-f134-648767b8b3d8",
-			"url": "http://localhost/permissionproxy/api/admin/createapplication",
-			"data": "{\n  \"application\":\"unitTests\",\n  \"adminEmails\":[\"unitTest-admin@utah.gov\"],\n  \"roles\": [\"admin\", \"publisher\", \"editor\", \"readonly\"],\n  \"creationToken\": \"super_token\"\n}",
 			"headers": "Content-Type: application/json\n",
-			"dataMode": "raw",
+			"url": "http://localhost/permissionproxy/api/admin/createapplication",
+			"pathVariables": {},
 			"method": "POST",
+			"data": "{\n  \"application\": {\n    \"name\":\"unitTests\",\n    \"description\": \"The unit test project\"\n  },\n  \"adminEmails\":[\"unitTest-admin@utah.gov\"],\n  \"roles\": [\"admin\", \"publisher\", \"editor\", \"readonly\"],\n  \"creationToken\": \"super_token\"\n}",
+			"dataMode": "raw",
 			"version": 2,
-			"time": 1381856647276,
+			"tests": "",
+			"time": 1390864896428,
 			"name": "CreateApplication",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
@@ -86,6 +90,23 @@
 			"name": "GetRole",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"synced": false
+		},
+		{
+			"id": "498838d5-8c86-9f67-fd9d-4ba5d2a1a768",
+			"headers": "Content-Type: application/json\n",
+			"url": "http://localhost/permissionproxy/api/user/changeemail",
+			"pathVariables": {},
+			"method": "PUT",
+			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"password\": \"password\", \n  \"newemail\": \"stdavis2@utah.gov\",\n  \"application\": \"unitTests\"\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1390925554295,
+			"name": "ChangeEmail",
+			"description": "",
+			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"responses": [],
 			"synced": false
 		},
 		{
