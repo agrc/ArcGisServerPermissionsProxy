@@ -34,7 +34,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             base.SetUp();
 
             var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"},
-                                       new[] {"admin", "role2", "role3", "role4"});
+                                       new[] {"admin", "role2", "role3", "role4"}, "unit test description");
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
@@ -181,10 +181,12 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await controller.CreateApplication(new CreateApplicationParams
                 {
                     AdminEmails = new[] {"test@test.com"},
-                    Application = "",
+                    Application = new CreateApplicationParams.ApplicationInfo("", "The unit test project"),
                     Roles = new Collection<string> {"admin", "publisher"},
                     CreationToken = "super_admin"
                 });
+
+            Assert.That(response.IsSuccessStatusCode, Is.True);
 
             using (var s = DocumentStore.OpenSession())
             {
@@ -226,8 +228,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await controller.CreateApplication(new CreateApplicationParams
                 {
                     AdminEmails = new[] {"test@test.com"},
-                    Application = "",
-                    Roles = new Collection<string> {"admin", "publisher"},
+                    Application = new CreateApplicationParams.ApplicationInfo("", "The unit test project"),
+                    Roles = new Collection<string> { "admin", "publisher" },
                     CreationToken = "super_admin"
                 });
 
@@ -263,8 +265,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await controller.CreateApplication(new CreateApplicationParams
                 {
                     AdminEmails = new[] {"test@test.com"},
-                    Application = "",
-                    Roles = new Collection<string> {"admin", "publisher"}
+                    Application = new CreateApplicationParams.ApplicationInfo("", "The unit test project"),
+                    Roles = new Collection<string> { "admin", "publisher" }
                 });
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));

@@ -7,7 +7,6 @@ using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using CommandPattern;
 using Raven.Client;
 
@@ -57,7 +56,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                                                                                            AdministrativeEmails,
                                                                                        _user.FullName, _info.Role,
                                                                                        _user.Email,
-                                                                                       _user.Application)));
+                                                                                       config.Description)));
 
             return null;
         }

@@ -51,12 +51,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
             }
 
-            var database = parameters.Application;
-            Database = database;
+            var application = parameters.Application;
+            Database = application.Name;
 
             using (var s = Session)
             {
-                DatabaseExists.Esure(DocumentStore, Database);
+                DatabaseExists.Ensure(DocumentStore, Database);
 
                 var catalog = new AssemblyCatalog(typeof (UserByEmailIndex).Assembly);
                 var provider = new CatalogExportProvider(catalog)
@@ -74,7 +74,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 var config = s.Load<Config>("1");
                 if (config == null)
                 {
-                    config = new Config(parameters.AdminEmails, parameters.Roles);
+                    config = new Config(parameters.AdminEmails, parameters.Roles, parameters.Application.Description);
 
                     s.Store(config, "1");
                 }
@@ -93,7 +93,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                  CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
 
                     var adminUser = new User("admin", "user", useremail, "", hashed.HashedPassword, hashed.Salt,
-                                             database, "admin", "admintoken")
+                                             application.Name, "admin", "admintoken")
                         {
                             Active = true,
                             Approved = true
@@ -107,7 +107,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                           config.AdministrativeEmails,
                                                           adminUser.FullName,
                                                           password,
-                                                          parameters.Application)));
+                                                          parameters.Application.Description)));
                 }
 
                 s.SaveChanges();

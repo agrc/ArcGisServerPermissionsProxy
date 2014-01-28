@@ -11,7 +11,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"### Dear {{Name}},
 
-You have been granted permission to login to the {{Application}} web application.
+You have been granted permission to login to the {{Application}}.
 
 Your user name is `{{username}}`  
 Your assigned role is: `{{role}}`
@@ -28,7 +28,7 @@ Thank you";
                 MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
             }
 
-            MailMessage.Subject = "Access Granted";
+            MailMessage.Subject = string.Format("{0} - Access Granted", templateData.Application);
 
             Init();
         }
