@@ -49,7 +49,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
 
                 //post to create user
                 var usersAndRolesToCreate =
-                    Parameters.Roles.Select(x => string.Format("{0}_{1}", Parameters.Application, x));
+                    Parameters.Roles.Select(x => string.Format("{0}_{1}", Parameters.Application.Name, x));
 
                 var mediaType = new[]{new TextPlainResponseFormatter()};
 

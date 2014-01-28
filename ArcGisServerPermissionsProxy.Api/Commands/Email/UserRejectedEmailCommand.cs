@@ -11,7 +11,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"###Dear {{Name}},
 
-We appreciate your interest in the {{Application}} application; however, your request for access has been **rejected**. If you find this email to be in error, please respond and explain the error.
+We appreciate your interest in the {{Application}}; however, your request for access has been **rejected**. If you find this email to be in error, please respond and explain the error.
 
 Thank you for understanding.";
 
@@ -23,7 +23,7 @@ Thank you for understanding.";
                 MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
             }
 
-            MailMessage.Subject = "Access Reject";
+            MailMessage.Subject = string.Format("{0} - Access Reject", templateData.Application);
 
             Init();
         }

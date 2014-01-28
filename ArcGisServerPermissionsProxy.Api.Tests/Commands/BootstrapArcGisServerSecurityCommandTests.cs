@@ -13,7 +13,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
     public class BootstrapArcGisServerSecurityCommandTests
     {
         private AdminCredentials _adminCredentials;
-
+        
         [SetUp]
         public void Setup()
         {
@@ -26,7 +26,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
         {
             var command = new BootstrapArcGisServerSecurityCommandAsync(new CreateApplicationParams
                 {
-                    Application = "unitTests",
+                    Application = new CreateApplicationParams.ApplicationInfo("unitTests", "The unit test project"),
                     Roles = new Collection<string> {"admin", "publisher", "editor", "readonly"}
                 }, _adminCredentials);
 

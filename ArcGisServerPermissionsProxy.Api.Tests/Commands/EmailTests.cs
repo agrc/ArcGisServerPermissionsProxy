@@ -17,7 +17,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
                                                        new[] {"admin@application.com"}, "Name", "Agency",
-                                                       "http://url.com", "application", Guid.NewGuid(), new[]{"admin","editor","readonly"})));
+                                                       "http://url.com", "application", Guid.NewGuid(), new[]{"admin","editor","readonly"}, "desvription")));
             }
         }
 

@@ -4,6 +4,6 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Configuration
 {
     public interface IDatabaseExists
     {
-        void Esure(IDocumentStore database, string name);
+        void Ensure(IDocumentStore database, string name);
     }
 }

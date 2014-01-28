@@ -25,7 +25,7 @@ Thank you for your patience.";
                 MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
             }
 
-            MailMessage.Subject = "Registration Confirmation";
+            MailMessage.Subject = string.Format("{0} - Registration Confirmation", templateData.Application);
 
             Init();
         }

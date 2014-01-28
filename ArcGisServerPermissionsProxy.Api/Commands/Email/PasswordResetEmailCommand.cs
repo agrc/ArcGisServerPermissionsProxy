@@ -11,13 +11,15 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"### Dear {{Name}},
 
-Your password has been reset to: `{{Password}}`
+Your password for {{Application}} has been reset to: `{{Password}}`
 
 This new password is intended to be **temporary**. Please change this temporary password to one of your choosing.
 
 If you have any questions, you may reply to this email.
 
-Thank you";
+Thank you,
+
+The {{Application}} admin";
 
             MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
             MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
@@ -27,7 +29,7 @@ Thank you";
                 MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
             }
             
-            MailMessage.Subject = "Password Reset";
+            MailMessage.Subject = string.Format("{0} - Password Reset", templateData.Application);
 
             Init();
         }

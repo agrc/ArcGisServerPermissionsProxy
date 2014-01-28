@@ -107,13 +107,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
                                                        user.FullName, user.Agency,
-                                                       url, user.Application, newUser.Token, config.Roles)));
+                                                       url, user.Application, newUser.Token, config.Roles, config.Description)));
 
 
                 CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
                                                    new UserRegistrationNotificationEmailCommand.MailTemplate(
                                                        new[] {user.Email}, config.AdministrativeEmails,
-                                                       user.FullName, user.Email, user.Application)));
+                                                       user.FullName, user.Email, config.Description)));
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);
