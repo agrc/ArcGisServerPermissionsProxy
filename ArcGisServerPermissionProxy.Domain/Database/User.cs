@@ -24,9 +24,13 @@ namespace ArcGisServerPermissionProxy.Domain.Database
             Token = Guid.NewGuid();
             ExpirationDateTicks = DateTime.Now.AddMonths(1).Ticks;
             AdminToken = adminToken;
+            UserId = Guid.NewGuid();
         }
 
         public string Id { get; set; }
+
+        [JsonProperty]
+        public Guid UserId { get; set; }
 
         /// <summary>
         /// Gets or sets the email.

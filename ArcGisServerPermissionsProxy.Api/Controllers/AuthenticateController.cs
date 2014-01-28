@@ -76,9 +76,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                                                       login.Application)));
                 }
 
-                token =
-                    await
-                    TokenService.GetToken(
+                token = await TokenService.GetToken(
                         new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
                         new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);
 
