@@ -4,9 +4,9 @@ using System.Web.Security;
 
 namespace ArcGisServerPermissionsProxy.Api.Services
 {
-    public class FormsAuthWrapper : IFormsAuthentication
+    public class FormsAuthWrapper
     {
-        public CookieHeaderValue SetAuthCookie(string userName, bool createPersistentCookie)
+        public CookieHeaderValue SetAuthCookie(string userName, string application, bool createPersistentCookie)
         {
             var expiration = createPersistentCookie ? DateTime.Now.AddMonths(2) : DateTime.Now.AddMinutes(30);
 
@@ -15,25 +15,17 @@ namespace ArcGisServerPermissionsProxy.Api.Services
                                                        DateTime.Now,
                                                        expiration,
                                                        false,
-                                                       userName,
+                                                       application,
                                                        FormsAuthentication.FormsCookiePath);
 
             var encTicket = FormsAuthentication.Encrypt(ticket);
 
             return new CookieHeaderValue(FormsAuthentication.FormsCookieName, encTicket);
-            //FormsAuthentication.SetAuthCookie(userName, createPersistentCookie);
         }
 
         public void SignOut()
         {
             FormsAuthentication.SignOut();
         }
-    }
-
-    public interface IFormsAuthentication
-    {
-        void SignOut();
-
-        CookieHeaderValue SetAuthCookie(string userName, bool createPersistentCookie);
     }
 }
