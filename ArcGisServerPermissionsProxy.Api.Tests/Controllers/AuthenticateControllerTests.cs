@@ -1,9 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Hosting;
+using System.Web.Security;
 using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
 using ArcGisServerPermissionProxy.Domain.Database;
@@ -97,6 +102,77 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             Assert.That(result.Status, Is.EqualTo((int) HttpStatusCode.OK));
             Assert.That(result.Result, Is.Not.Null);
             Assert.That(result.Result.Token, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task RememberMeCookiePersistsFor2months()
+        {
+            var span = DateTime.Now.AddMonths(2).Ticks;
+            var login = new LoginCredentials("test@test.com", "123abc", null, true);
+
+            var response = await _controller.UserLogin(login);
+            var cookie = response.Headers.SingleOrDefault(x => x.Key == "Set-Cookie");
+
+            Assert.That(cookie, Is.Not.Null);
+
+            var value = cookie.Value.SingleOrDefault(x => x.StartsWith(".ASPXAUTH"));
+
+            Assert.That(value, Is.Not.Null);
+
+            var base64part = value.Remove(0, 10);
+            var ticket = FormsAuthentication.Decrypt(base64part);
+
+            Assert.That(ticket.Expiration.Ticks, Is.GreaterThanOrEqualTo(span));
+        }
+
+        [Test]
+        public async Task AuthCookieWithoutRememberMeLasts30Minutes()
+        {
+            var span = DateTime.Now.AddMinutes(31).Ticks;
+            var login = new LoginCredentials("test@test.com", "123abc", null, false);
+
+            var response = await _controller.UserLogin(login);
+            var cookie = response.Headers.SingleOrDefault(x => x.Key == "Set-Cookie");
+
+            Assert.That(cookie, Is.Not.Null);
+
+            var value = cookie.Value.SingleOrDefault(x => x.StartsWith(".ASPXAUTH"));
+
+            Assert.That(value, Is.Not.Null);
+
+            var base64part = value.Remove(0, 10);
+            var ticket = FormsAuthentication.Decrypt(base64part);
+
+            Assert.That(ticket.Expiration.Ticks, Is.LessThan(span));
+        }
+
+
+        [Test]
+        public async Task UserCanGetsAuthCookieWhenAuthenticated()
+        {
+            var login = new LoginCredentials("test@test.com", "123abc", null);
+
+            var response = await _controller.UserLogin(login);
+            var cookie = response.Headers.SingleOrDefault(x => x.Key == "Set-Cookie");
+
+            Assert.That(cookie, Is.Not.Null);
+
+            var value = cookie.Value.SingleOrDefault(x => x.StartsWith(".ASPXAUTH"));
+
+            Assert.That(value, Is.Not.Null);
+        }
+
+        [Test]
+        public async Task UserDoesNotGetAuthCookieWhenLoginFails()
+        {
+            var login = new LoginCredentials("test@test.com", "wrong", null);
+
+            var response = await _controller.UserLogin(login);
+            var cookie = response.Headers.SingleOrDefault(x => x.Key == "Set-Cookie");
+
+            var value = cookie.Value.SingleOrDefault(x => x.StartsWith(".ASPXAUTH"));
+
+            Assert.That(value, Is.Null);
         }
 
         [Test]

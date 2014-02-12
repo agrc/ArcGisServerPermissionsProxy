@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AgrcPasswordManagement.Commands;
@@ -13,7 +15,7 @@ using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
+using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
 using CommandPattern;
 using Ninject;
@@ -77,8 +79,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 token = await TokenService.GetToken(
-                        new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
-                        new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);
+                    new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
+                    new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);
 
                 if (!token.Successful)
                 {
@@ -93,9 +95,16 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK,
-                                          new ResponseContainer<AuthenticationResponse>(
-                                              new AuthenticationResponse(token, user)));
+            var response = Request.CreateResponse(HttpStatusCode.OK,
+                                                  new ResponseContainer<AuthenticationResponse>(
+                                                      new AuthenticationResponse(token, user)));
+
+            var formsAuth = new FormsAuthWrapper();
+            var cookie = formsAuth.SetAuthCookie(user.Email, login.Persist);
+
+            response.Headers.AddCookies(new Collection<CookieHeaderValue> {cookie});
+
+            return response;
         }
     }
 }
