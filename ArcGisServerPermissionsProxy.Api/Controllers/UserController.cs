@@ -152,13 +152,14 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 await s.SaveChangesAsync();
 
+                var config = await s.LoadAsync<Config>("1");
+
                 CommandExecutor.ExecuteCommand(new PasswordResetEmailCommand(new PasswordResetEmailCommand.MailTemplate(
                                                                                  new[] {user.Email},
                                                                                  new[] {"noreply@utah.gov"},
                                                                                  user.FullName,
                                                                                  password,
-                                                                                 user.Application)));
-
+                                                                                 config.Description)));
 
                 return Request.CreateResponse(HttpStatusCode.NoContent);
             }
