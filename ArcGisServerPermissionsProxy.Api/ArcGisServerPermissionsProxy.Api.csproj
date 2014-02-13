@@ -172,6 +172,7 @@
     <Compile Include="Raven\Configuration\IIndexable.cs" />
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
     <Compile Include="Raven\Indexes\UsersByApprovedIndex.cs" />
+    <Compile Include="Services\FormsAuthWrapper.cs" />
     <Compile Include="Services\IValidationService.cs" />
     <Compile Include="Services\MockValidationService.cs" />
     <Compile Include="Services\Token\ITokenService.cs" />
@@ -222,6 +223,7 @@
   <ItemGroup>
     <Content Include="secrets.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>

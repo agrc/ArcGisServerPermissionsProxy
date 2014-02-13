@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Security;
 using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
 using ArcGisServerPermissionProxy.Domain.Database;
@@ -13,7 +16,7 @@ using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
+using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
 using CommandPattern;
 using Ninject;
@@ -77,8 +80,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 token = await TokenService.GetToken(
-                        new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
-                        new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);
+                    new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
+                    new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);
 
                 if (!token.Successful)
                 {
@@ -93,9 +96,88 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK,
-                                          new ResponseContainer<AuthenticationResponse>(
-                                              new AuthenticationResponse(token, user)));
+            var response = Request.CreateResponse(HttpStatusCode.OK,
+                                                  new ResponseContainer<AuthenticationResponse>(
+                                                      new AuthenticationResponse(token, user)));
+
+            var formsAuth = new FormsAuthWrapper();
+            var cookie = formsAuth.SetAuthCookie(user.Email, user.Application, login.Persist);
+
+            response.Headers.AddCookies(new Collection<CookieHeaderValue> {cookie});
+
+            return response;
+        }
+
+        [HttpGet]
+        public async Task<HttpResponseMessage> RememberMe()
+        {
+            TokenModel token;
+
+            var username = User.Identity.Name;
+            var application = "";
+
+            foreach (var value in Request.Headers.GetCookies(".ASPXAUTH"))
+            {
+                var ticket = FormsAuthentication.Decrypt(value.Cookies.First().Value);
+                application = ticket.UserData;
+            }
+
+            Database = application;
+
+            User user;
+            using (var s = AsyncSession)
+            {
+                var items = await s.Query<User, UserByEmailIndex>()
+                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                   .Where(x => x.Email == username)
+                                   .ToListAsync();
+
+                if (items == null || items.Count != 1)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
+                }
+
+                try
+                {
+                    user = items.Single();
+                }
+                catch (InvalidOperationException)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound,
+                                                  new ResponseContainer(HttpStatusCode.NotFound, "User not found."));
+                }
+
+                if (user.Application != application)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        string.Format("You do not have access to {0}.",
+                                                                                      application)));
+                }
+
+                token = await TokenService.GetToken(
+                    new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
+                    new GetTokenCommandAsyncBase.User(null, App.Password), application, user.Role);
+
+                if (!token.Successful)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        token.Error.Message));
+                }
+
+                if (user.Role.Contains("admin"))
+                {
+                    user.AdminToken = string.Format("{0}.{1}", user.Id, Guid.NewGuid());
+                }
+            }
+
+            var response = Request.CreateResponse(HttpStatusCode.OK,
+                                                  new ResponseContainer<AuthenticationResponse>(
+                                                      new AuthenticationResponse(token, user)));
+
+            return response;
         }
     }
 }

@@ -25,7 +25,8 @@
 			"description": "",
 			"order": [
 				"191d820f-0fb7-f1a0-b518-8c8ec78a24cd",
-				"e6cd3fb8-851a-3ccd-0ff7-0fcb773d4ec1"
+				"e6cd3fb8-851a-3ccd-0ff7-0fcb773d4ec1",
+				"a67063d3-fefc-2ae2-0561-02e4a373a1f1"
 			],
 			"collection_name": "Permission Proxy",
 			"collection_id": "d38a4512-2afb-7c73-b4e1-992385b79923"
@@ -168,6 +169,23 @@
 			"synced": false
 		},
 		{
+			"id": "a67063d3-fefc-2ae2-0561-02e4a373a1f1",
+			"headers": "Content-Type: application/json\n",
+			"url": "http://localhost/permissionproxy/api/authenticate/rememberme",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "params",
+			"version": 2,
+			"tests": "",
+			"time": 1392249627993,
+			"name": "Authenticate",
+			"description": "",
+			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"responses": [],
+			"synced": false
+		},
+		{
 			"id": "abd0651e-155d-a638-330a-03c2ddadcf88",
 			"url": "http://localhost/permissionproxy/api/admin/getroles?application=unittests",
 			"data": [],
@@ -197,13 +215,15 @@
 		},
 		{
 			"id": "e6cd3fb8-851a-3ccd-0ff7-0fcb773d4ec1",
-			"url": "http://localhost/permissionproxy/api/authenticate/user",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"password\": \"password\"\n}",
 			"headers": "Content-Type: application/json\n",
-			"dataMode": "raw",
+			"url": "http://localhost/permissionproxy/api/authenticate/user",
+			"pathVariables": {},
 			"method": "POST",
+			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"password\": \"password\",\n  \"persist\": false\n}",
+			"dataMode": "raw",
 			"version": 2,
-			"time": 1381176750298,
+			"tests": "",
+			"time": 1392247844161,
 			"name": "Successful Login",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
