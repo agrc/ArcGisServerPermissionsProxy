@@ -26,7 +26,8 @@
 			"order": [
 				"191d820f-0fb7-f1a0-b518-8c8ec78a24cd",
 				"e6cd3fb8-851a-3ccd-0ff7-0fcb773d4ec1",
-				"a67063d3-fefc-2ae2-0561-02e4a373a1f1"
+				"a67063d3-fefc-2ae2-0561-02e4a373a1f1",
+				"c145000e-3537-ffcb-d551-d82f38c1b5a5"
 			],
 			"collection_name": "Permission Proxy",
 			"collection_id": "d38a4512-2afb-7c73-b4e1-992385b79923"
@@ -196,6 +197,24 @@
 			"time": 1381855616414,
 			"name": "GetRoles",
 			"description": "",
+			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"synced": false
+		},
+		{
+			"id": "c145000e-3537-ffcb-d551-d82f38c1b5a5",
+			"headers": "Content-Type: application/json\n",
+			"url": "http://localhost/permissionproxy/api/authenticate/forgetme",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [],
+			"dataMode": "params",
+			"name": "Logout",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1392830340293,
+			"version": 2,
+			"responses": [],
+			"tests": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
 			"synced": false
 		},

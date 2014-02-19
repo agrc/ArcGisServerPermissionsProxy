@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TEST: ReportGeneratorWizard</title>
+    <script src="//ajax.googleapis.com/ajax/libs/dojo/1.9.2/dojo/dojo.js"></script>
+    <script type="text/javascript">
+    require([
+        'dojo/request',
+        'dojo/dom',
+        'dojo/on',
+
+        'dojo/domReady!'
+    ], function(
+        request,
+        dom,
+        on
+    ) {
+        var authUrl = 'http://localhost/permissionproxy/api/authenticate/rememberme',
+            logoutUrl = 'http://localhost/permissionproxy/api/authenticate/forgetme';
+
+        on(dom.byId('login'), 'click', function() {
+            console.info('login clicked');
+            request('http://localhost/permissionproxy/api/authenticate/user', {
+                data: JSON.stringify({
+                    "email": "stdavis@utah.gov",
+                    "application": "unitTests",
+                    "password": "password",
+                    "persist": false
+                }),
+                handleAs: 'json',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        });
+
+        on(dom.byId('authenticate'), 'click', function() {
+            console.info('authenticate clicked');
+            request(authUrl);
+        });
+
+        on(dom.byId('logout'), 'click', function() {
+            console.info('logout clicked');
+            request(logoutUrl);
+        });
+    });
+</script>
+</head>
+<body>
+    <h3>
+        permission proxy
+    </h3>
+    <input type="button" id="login" value="login"></button>
+    <input type="button" id="authenticate" value="authenticate"></button>
+    <input type="button" id="logout" value="logout"></button>
+</body>
+</html>

@@ -109,6 +109,15 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         }
 
         [HttpGet]
+        public HttpResponseMessage ForgetMe()
+        {
+            var formsAuth = new FormsAuthWrapper();
+            formsAuth.SignOut();
+
+            return Request.CreateResponse(HttpStatusCode.NoContent);
+        }
+
+        [HttpGet, Authorize]
         public async Task<HttpResponseMessage> RememberMe()
         {
             TokenModel token;
