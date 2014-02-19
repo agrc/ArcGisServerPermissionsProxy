@@ -19,8 +19,15 @@ namespace ArcGisServerPermissionsProxy.Api.Services
                                                        FormsAuthentication.FormsCookiePath);
 
             var encTicket = FormsAuthentication.Encrypt(ticket);
+            
+            var cookie = new CookieHeaderValue(FormsAuthentication.FormsCookieName, encTicket)
+                {
+                    Expires = expiration,
+                    HttpOnly = true,
+                    Path = FormsAuthentication.FormsCookiePath
+                };
 
-            return new CookieHeaderValue(FormsAuthentication.FormsCookieName, encTicket);
+            return cookie;
         }
 
         public void SignOut()
