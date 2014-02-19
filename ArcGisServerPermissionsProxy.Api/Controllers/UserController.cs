@@ -96,10 +96,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 var urlBuilder = new UrlHelper(ControllerContext.Request);
                 var url = string.Format("{0}{1}", App.Host, urlBuilder.Route("Default", new
                     {
-                        // ReSharper disable Mvc.ControllerNotResolved
-                        Controller = "api",
-                        // ReSharper disable Mvc.ActionNotResolved
-                        Action = "admin"
+                        Controller = "AdminEmail"
                     }));
 
                 CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(

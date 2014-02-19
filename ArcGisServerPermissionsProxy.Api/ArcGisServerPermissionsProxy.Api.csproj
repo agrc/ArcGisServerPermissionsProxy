@@ -163,6 +163,9 @@
     <Compile Include="Commands\Users\AcceptUserCommandAsync.cs" />
     <Compile Include="Commands\Users\RejectUserCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\Modules\BootstrapArcGisServerSecurityCommandAsyncModule.cs" />
+    <Compile Include="Controllers\Admin\AdminEmailController.cs" />
+    <Compile Include="Controllers\Infrastructure\RavenController.cs" />
+    <Compile Include="Models\ViewModels\AdminEmailViewModel.cs" />
     <Compile Include="Raven\Configuration\DatabaseExists.cs" />
     <Compile Include="Raven\Configuration\IDatabaseExists.cs" />
     <Compile Include="Configuration\Ninject\Modules\TokenServiceModule.cs" />
@@ -231,6 +234,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\Stage.pubxml" />
+    <Content Include="Views\AdminEmail\Accept.cshtml" />
+    <Content Include="Views\AdminEmail\Reject.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgrcPasswordManagement\AgrcPasswordManagement.csproj">
