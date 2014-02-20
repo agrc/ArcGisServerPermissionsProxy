@@ -176,58 +176,14 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 }
 
                 var response =
-                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
+                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, user));
 
                 if (response != null)
                 {
-                    return response;
+                    return Request.CreateResponse(HttpStatusCode.NotFound, response);
                 }
 
                 return Request.CreateResponse(HttpStatusCode.Accepted);
-            }
-        }
-
-        [HttpGet]
-        public async Task<HttpResponseMessage> Accept(string application, string role, Guid token)
-        {
-            if (!ModelState.IsValid || string.IsNullOrEmpty(application) || string.IsNullOrEmpty(role) ||
-                token == Guid.Empty)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
-            }
-
-            Database = application;
-
-            using (var s = AsyncSession)
-            {
-                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserByTokenCommandAsync(token, s));
-
-                if (user.Token != token)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                                  new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
-                }
-
-                if (user.ExpirationDateTicks < DateTime.Now.Ticks)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                                  new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                        "This token has expired after one month of inactivity."));
-                }
-
-                var info = new AcceptRequestInformation(user.Email, role, token, application, null);
-
-                var response =
-                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, Request, user));
-
-                if (response != null)
-                {
-                    return response;
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK, "Done.", new TextPlainResponseFormatter());
             }
         }
 
@@ -280,41 +236,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
 
                 return Request.CreateResponse(HttpStatusCode.Accepted);
-            }
-        }
-
-        [HttpGet]
-        public async Task<HttpResponseMessage> Reject(string application, Guid token)
-        {
-            if (!ModelState.IsValid || string.IsNullOrEmpty(application) || token == Guid.Empty)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
-            }
-
-            Database = application;
-
-            using (var s = AsyncSession)
-            {
-                var user = await CommandExecutor.ExecuteCommandAsync(new GetUserByTokenCommandAsync(token, s));
-
-                if (user.Token != token)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                                  new ResponseContainer(HttpStatusCode.BadRequest, "Incorrect token."));
-                }
-
-                if (user.ExpirationDateTicks < DateTime.Now.Ticks)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                                  new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                        "This token has expired after one month of inactivity."));
-                }
-
-                await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
-
-                return Request.CreateResponse(HttpStatusCode.OK, "Done.", new TextPlainResponseFormatter());
             }
         }
 

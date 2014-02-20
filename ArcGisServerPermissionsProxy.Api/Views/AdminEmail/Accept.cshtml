@@ -1,0 +1,31 @@
+﻿@model ArcGisServerPermissionsProxy.Api.Models.ViewModels.AdminEmailViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@Model.Description - Email Administration</title>
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <h1 style="text-transform: uppercase;">@Model.Description</h1>
+        <div class="container">
+            <div class="jumbotron">
+                @if (Model.User != null)
+                {
+                    <h1>@Model.User.FullName</h1>
+                    <p>Is now registered as <span class="label label-success" style="text-transform: uppercase;">@Model.User.Role</span></p>
+                }
+                else
+                {
+                    <h1>Yikes!</h1>
+                    <p>@Model.ErrorMessage</p>
+                }
+            </div>
+        </div>
+    </body>
+</html>

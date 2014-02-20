@@ -1,47 +1,39 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
-using ArcGisServerPermissionsProxy.Api.Models.Response;
 using CommandPattern;
 using Raven.Client;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 {
-    public class AcceptUserCommandAsync : CommandAsync<HttpResponseMessage>
+    public class AcceptUserCommandAsync : CommandAsync<string>
     {
         private readonly AcceptRequestInformation _info;
-        private readonly HttpRequestMessage _request;
         private readonly IAsyncDocumentSession _session;
         private readonly User _user;
 
         public AcceptUserCommandAsync(IAsyncDocumentSession session, AcceptRequestInformation info,
-                                      HttpRequestMessage request, User user)
+                                     User user)
         {
-            _request = request;
             _user = user;
             _session = session;
             _info = info;
         }
 
-        public override async Task<HttpResponseMessage> Execute()
+        public override async Task<string> Execute()
         {
             var config = await _session.LoadAsync<Config>("1");
 
             if (_user == null)
             {
-                return _request.CreateResponse(HttpStatusCode.NotFound,
-                                               new ResponseContainer(HttpStatusCode.NotFound, "User was not found."));
+                return "User was not found.";
             }
 
             if (!config.Roles.Contains(_info.Role.ToLowerInvariant()))
             {
-                return _request.CreateResponse(HttpStatusCode.NotFound,
-                                               new ResponseContainer(HttpStatusCode.NotFound, "Role was not found."));
+                return "Role was not found.";
             }
 
             _user.Active = true;
@@ -63,7 +55,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 
         public override string ToString()
         {
-            throw new NotImplementedException();
+            return string.Format("{0}, User: {1}", "AcceptUserCommandAsync", _user);
         }
     }
 }
