@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json.Linq;
 
 namespace ArcGisServerPermissionProxy.Domain
 {
@@ -12,11 +13,14 @@ namespace ArcGisServerPermissionProxy.Domain
         {
         }
 
-        public AcceptRequestInformation(string email, string role, Guid token, string application, string adminToken)
+        public AcceptRequestInformation(string email, string role, Guid token, string application, string adminToken, long startDate = 0, long expirationDate = 0, dynamic options = null)
             : base(application, token)
         {
             Email = email;
             AdminToken = adminToken;
+            StartDate = startDate;
+            ExpirationDate = expirationDate;
+            Options = options;
             Role = role == null ? "" : role.ToLowerInvariant();
         }
 
@@ -31,6 +35,10 @@ namespace ArcGisServerPermissionProxy.Domain
 
         [Required]
         public string AdminToken { get; set; }
+
+        public long StartDate { get; set; }
+        public long ExpirationDate { get; set; }
+        public JObject Options { get; set; }
 
         /// <summary>
         ///     Gets or sets the roles.

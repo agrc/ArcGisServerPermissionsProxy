@@ -4,6 +4,7 @@ using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using CommandPattern;
+using Newtonsoft.Json;
 using Raven.Client;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Users
@@ -39,6 +40,16 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
             _user.Active = true;
             _user.Approved = true;
             _user.Role = _info.Role;
+
+            if (config.UsersCanExpire)
+            {
+                _user.AccessRules = new User.UserAccessRules
+                    {
+                        StartDate = _info.StartDate,
+                        EndDate = _info.ExpirationDate,
+                        OptionsSerialized = JsonConvert.SerializeObject(_info.Options)
+                    };
+            }
 
             await _session.SaveChangesAsync();
 

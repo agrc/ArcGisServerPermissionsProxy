@@ -79,6 +79,33 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                                                       login.Application)));
                 }
 
+                var config = await s.LoadAsync<Config>("1");
+                if (config.UsersCanExpire)
+                {
+                    var today = DateTime.UtcNow.Date.Ticks;
+                    if (user.AccessRules.StartDate == 0)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized, "Use restrictions are enabled but not setup for your account. Contact the administrators."));
+                    }
+
+                    if (user.AccessRules.StartDate > today)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        string.Format("You are are not authorized for use until {0}", new DateTime(user.AccessRules.StartDate, DateTimeKind.Utc).ToShortDateString())));
+                    }
+
+                    if (user.AccessRules.EndDate < today)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                          new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                string.Format("You were only authorized for use until {0}", new DateTime(user.AccessRules.EndDate).ToShortDateString())));
+
+                    }
+
+                }
+
                 token = await TokenService.GetToken(
                     new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
                     new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);

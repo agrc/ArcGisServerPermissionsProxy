@@ -10,6 +10,11 @@ namespace ArcGisServerPermissionsProxy.Api.Services
         {
             var expiration = createPersistentCookie ? DateTime.Now.AddMonths(2) : DateTime.Now.AddMinutes(30);
 
+            if (application == null)
+            {
+                application = "";
+            }
+
             var ticket = new FormsAuthenticationTicket(2,
                                                        userName,
                                                        DateTime.Now,

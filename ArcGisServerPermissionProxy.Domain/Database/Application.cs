@@ -1,4 +1,4 @@
-﻿namespace ArcGisServerPermissionsProxy.Api.Raven.Models
+﻿namespace ArcGisServerPermissionProxy.Domain.Database
 {
     public class Application
     {
