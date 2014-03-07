@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Hosting;
@@ -17,7 +14,6 @@ using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
-using ArcGisServerPermissionsProxy.Api.Raven.Models;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
@@ -39,6 +35,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                                 "admin", "adminToken");
             var normalUser = new User("USER", "", "notadmin@test.com", "AGENCY", password.HashedPassword, salt, null,
                                "publisher", null);
+            var expiredUser = new User("USER", "", "time@expired.com", "AGENCY", password.HashedPassword, salt, null,
+                               "publisher", null);
+
             var app = new Application(null, "test");
 
             using (var s = DocumentStore.OpenSession())
@@ -55,10 +54,24 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                     s.Store(normalUser);
                 }
 
+                if (!s.Query<User, UserByEmailIndex>()
+                     .Any(x => x.Email == expiredUser.Email))
+                {
+                    s.Store(expiredUser);
+                }
+
                 if (!s.Query<Application, ApplicationByNameIndex>()
                       .Any(x => x.Name == app.Name))
                 {
                     s.Store(app, app.Name);
+                }
+
+                var appConfig = s.Load<Config>("1");
+                if (appConfig == null)
+                {
+                    appConfig = new Config(new[]{"admin@email"}, new[]{"role"}, "unit testing description");
+
+                    s.Store(appConfig, "1");
                 }
 
                 s.SaveChanges();
@@ -105,7 +118,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         }
 
         [Test]
-        public async Task RememberMeCookiePersistsFor2months()
+        public async Task RememberMeCookiePersistsFor2Months()
         {
             var span = DateTime.Now.AddMonths(2).Ticks;
             var login = new LoginCredentials("test@test.com", "123abc", null, true);
@@ -119,7 +132,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             Assert.That(value, Is.Not.Null);
 
-            var base64part = value.Remove(0, 10);
+            var ticketValue = value.Remove(0, 10);
+            var base64part = ticketValue.Split(new[] { ';' })[0];
+
             var ticket = FormsAuthentication.Decrypt(base64part);
 
             Assert.That(ticket.Expiration.Ticks, Is.GreaterThanOrEqualTo(span));
@@ -133,19 +148,22 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             var response = await _controller.UserLogin(login);
             var cookie = response.Headers.SingleOrDefault(x => x.Key == "Set-Cookie");
-
+            
             Assert.That(cookie, Is.Not.Null);
 
             var value = cookie.Value.SingleOrDefault(x => x.StartsWith(".ASPXAUTH"));
 
             Assert.That(value, Is.Not.Null);
 
-            var base64part = value.Remove(0, 10);
+            var ticketValue = value.Remove(0, 10);
+            var parts = ticketValue.Split(new[]{';'});
+
+            var base64part = parts[0];
+
             var ticket = FormsAuthentication.Decrypt(base64part);
 
             Assert.That(ticket.Expiration.Ticks, Is.LessThan(span));
         }
-
 
         [Test]
         public async Task UserCanGetsAuthCookieWhenAuthenticated()
@@ -170,9 +188,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await _controller.UserLogin(login);
             var cookie = response.Headers.SingleOrDefault(x => x.Key == "Set-Cookie");
 
-            var value = cookie.Value.SingleOrDefault(x => x.StartsWith(".ASPXAUTH"));
-
-            Assert.That(value, Is.Null);
+            Assert.That(cookie.Value, Is.Null);
         }
 
         [Test]
@@ -240,6 +256,155 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             Assert.That(result.Result.User.AdminToken, Is.Not.Null);
 
             Assert.That(adminToken, Is.Not.EqualTo(result.Result.User.AdminToken));
+        }
+
+        [TestFixture]
+        public class ExpiredUsers : RavenEmbeddableTest
+        {
+            public override void SetUp()
+            {
+                base.SetUp();
+                var now = DateTime.UtcNow;
+                var yesterday = now.AddDays(-1);
+                var tomorrow = now.AddDays(1);
+                var twoDays = now.AddDays(2);
+                var twoDaysAgo = now.AddDays(-2);
+
+                var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
+                var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
+
+                var notSetUp = new User("USER", "NAME", "invalid@user.com", "AGENCY", password.HashedPassword, salt, null,
+                                    "admin", "adminToken");
+                var expiredUser = new User("USER", "", "too@late.com", "AGENCY", password.HashedPassword, salt, null,
+                                   "publisher", null)
+                {
+                    AccessRules = new User.UserAccessRules
+                        {
+                            StartDate = twoDaysAgo.Date.Ticks,
+                            EndDate = yesterday.Date.Ticks
+                        }
+                };
+                var earlyUser = new User("USER", "", "too@early.com", "AGENCY", password.HashedPassword, salt, null,
+                                   "publisher", null)
+                {
+                    AccessRules = new User.UserAccessRules
+                    {
+                        StartDate = tomorrow.Date.Ticks,
+                        EndDate = twoDays.Date.Ticks
+                    }
+                };
+                var validUser = new User("USER", "", "valid@user.com", "AGENCY", password.HashedPassword, salt, null,
+                                   "publisher", null)
+                {
+                    AccessRules = new User.UserAccessRules
+                    {
+                        StartDate = twoDaysAgo.Date.Ticks,
+                        EndDate = tomorrow.Date.Ticks
+                    }
+                };
+
+                var users = new[] {notSetUp, expiredUser, earlyUser, validUser};
+
+                var app = new Application(null, "test");
+
+                using (var s = DocumentStore.OpenSession())
+                {
+                    foreach (var user in users)
+                    {
+                        if (!s.Query<User, UserByEmailIndex>()
+                              .Any(x => x.Email == user.Email))
+                        {
+                            s.Store(user);
+                        }
+                    }
+
+                    if (!s.Query<Application, ApplicationByNameIndex>()
+                          .Any(x => x.Name == app.Name))
+                    {
+                        s.Store(app, app.Name);
+                    }
+
+                    var appConfig = s.Load<Config>("1");
+                    if (appConfig == null)
+                    {
+                    appConfig = new Config(new[]{"admin@email"}, new[]{"role"}, "unit testing description")
+                            {
+                                UsersCanExpire = true
+                            };
+
+                        s.Store(appConfig, "1");
+                    }
+
+                    s.SaveChanges();
+                }
+
+                var config = new HttpConfiguration();
+                var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost/");
+
+                _controller = new AuthenticateController
+                {
+                    Request = request,
+                    DocumentStore = DocumentStore,
+                    TokenService = new MockTokenService()
+                };
+
+                _controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
+            }
+
+            private AuthenticateController _controller;
+
+            [Test]
+            public async Task ExpiredUserCanNotAuthenticate()
+            {
+                var login = new LoginCredentials("too@late.com", "123abc", null);
+
+                var response = await _controller.UserLogin(login);
+
+                var result = GetResultContent(response);
+
+                Assert.That(result.Status, Is.EqualTo((int) HttpStatusCode.Unauthorized));
+                Assert.That(result.Result, Is.Null);
+            }
+
+            [Test]
+            public async Task EarlyUserCanNotAuthenticate()
+            {
+                var login = new LoginCredentials("too@early.com", "123abc", null);
+
+                var response = await _controller.UserLogin(login);
+
+                var result = GetResultContent(response);
+
+                Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.Unauthorized));
+                Assert.That(result.Result, Is.Null);
+            }
+
+            [Test]
+            public async Task NotSetupUsersFailGracefully()
+            {
+                var login = new LoginCredentials("invalid@user.com", "123abc", null);
+
+                var response = await _controller.UserLogin(login);
+
+                var result = GetResultContent(response);
+
+                Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.Unauthorized));
+                Assert.That(result.Result, Is.Null);
+            } 
+            
+            [Test]
+            public async Task ValidUsersCanAuthenticate()
+            {
+                var login = new LoginCredentials("valid@user.com", "123abc", null);
+
+                var response = await _controller.UserLogin(login);
+
+                var result = GetResultContent(response);
+
+                Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.OK));
+                Assert.That(result.Result, Is.Not.Null);
+                Assert.That(result.Result.Token, Is.Not.Null);
+            }
         }
     }
 }

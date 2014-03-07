@@ -10,6 +10,7 @@
 			"description": "",
 			"order": [
 				"7e72d231-9326-e253-23cf-e052549be698",
+				"8b5f3c3a-0ed6-09e1-2964-6da55a0f6741",
 				"1ae788fe-f397-1680-f134-648767b8b3d8",
 				"f751459d-7389-51f2-8e01-f9c82b26f382",
 				"365cec99-2e9b-dc09-9ca5-937f2735ab8b",
@@ -153,6 +154,23 @@
 			"name": "Accept",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"synced": false
+		},
+		{
+			"id": "8b5f3c3a-0ed6-09e1-2964-6da55a0f6741",
+			"headers": "Content-Type: application/json\n",
+			"url": "http://localhost/permissionproxy/api/admin/accept",
+			"pathVariables": {},
+			"method": "PUT",
+			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"role\": \"publisher\",\n  \"application\": \"unitTests\",\n  \"adminToken\": \"get from login\",\n  \"startDate\": 635295744000000000,\n  \"expirationDate\": 636874272000000000,\n  \"options\": {\n  \t\"access\": [\"this\",\"that\",\"the other\"],\n  }\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1394147102299,
+			"name": "AcceptWithAccessRules",
+			"description": "",
+			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"responses": [],
 			"synced": false
 		},
 		{

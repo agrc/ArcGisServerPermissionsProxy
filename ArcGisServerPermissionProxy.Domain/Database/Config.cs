@@ -10,6 +10,7 @@ namespace ArcGisServerPermissionProxy.Domain.Database
             AdministrativeEmails = administrativeEmails;
             Description = description;
             Roles = roles.Select(x=>x.ToLowerInvariant()).ToArray();
+            UsersCanExpire = false;
         }
 
         /// <summary>
@@ -36,5 +37,13 @@ namespace ArcGisServerPermissionProxy.Domain.Database
         /// The roles.
         /// </value>
         public string[] Roles { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether users can expire.
+        /// </summary>
+        /// <value>
+        ///   If true, then the login must check times as a part of the login process.
+        /// </value>
+        public bool UsersCanExpire { get; set; }
     }
 }
