@@ -118,7 +118,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<HttpResponseMessage> RememberMe()
+        public async Task<HttpResponseMessage> RememberMe(string appName)
         {
             TokenModel token;
 
@@ -129,6 +129,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             {
                 var ticket = FormsAuthentication.Decrypt(value.Cookies.First().Value);
                 application = ticket.UserData;
+            }
+
+            if (application != appName)
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    string.Format("User not found in {0}.", appName)));
             }
 
             Database = application;
