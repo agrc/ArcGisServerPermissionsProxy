@@ -119,7 +119,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             Assert.That(value, Is.Not.Null);
 
-            var base64part = value.Remove(0, 10);
+            var ticketValue = value.Remove(0, 10);
+            var base64part = ticketValue.Split(new[] { ';' })[0];
+
             var ticket = FormsAuthentication.Decrypt(base64part);
 
             Assert.That(ticket.Expiration.Ticks, Is.GreaterThanOrEqualTo(span));
@@ -140,7 +142,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             Assert.That(value, Is.Not.Null);
 
-            var base64part = value.Remove(0, 10);
+            var ticketValue = value.Remove(0, 10);
+            var base64part = ticketValue.Split(new[] { ';' })[0];
+
             var ticket = FormsAuthentication.Decrypt(base64part);
 
             Assert.That(ticket.Expiration.Ticks, Is.LessThan(span));
@@ -170,9 +174,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await _controller.UserLogin(login);
             var cookie = response.Headers.SingleOrDefault(x => x.Key == "Set-Cookie");
 
-            var value = cookie.Value.SingleOrDefault(x => x.StartsWith(".ASPXAUTH"));
-
-            Assert.That(value, Is.Null);
+            Assert.That(cookie.Value, Is.Null);
         }
 
         [Test]
