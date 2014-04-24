@@ -1,13 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{8CE7AE2D-B4EF-4601-89AB-47F99B02D8D3}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcGisServerPermissionsProxy.Api", "ArcGisServerPermissionsProxy.Api\ArcGisServerPermissionsProxy.Api.csproj", "{DC6C1E7F-3A95-4091-89A2-3C6DE8C46B49}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcGisServerPermissionsProxy.Api.Tests", "ArcGisServerPermissionsProxy.Api.Tests\ArcGisServerPermissionsProxy.Api.Tests.csproj", "{CB03E88B-C5F7-4AC0-B66F-1B5E9E8FEB15}"
