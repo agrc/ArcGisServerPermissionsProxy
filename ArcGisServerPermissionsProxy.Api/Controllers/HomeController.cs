@@ -1,14 +1,20 @@
 ﻿using System.Web.Mvc;
 using MarkdownSharp;
 
-namespace ArcGisServerPermissionsProxy.Api.Controllers
-{
-    public class HomeController : Controller
+namespace ArcGisServerPermissionsProxy.Api.Controllers {
+
+  public class HomeController : Controller {
+    private string _transform;
+    private string _debugText;
+    private string _releaseText;
+
+    public ActionResult Index()
     {
-        public ActionResult Index()
-        {
-            var markdown = new Markdown();
-            var model = markdown.Transform(@"# ArcGIS Server Security Proxy
+      var markdown = new Markdown();
+      var model = "";
+      const string license = "<div style='padding-top:100px;font-size:8px;color:#eee;' data-license-type='creative-commons-attribution'> <ul> <li class='license'><a href='http://creativecommons.org/licenses/by/3.0/us/' target='_blank'>Creative Commons – Attribution (CC BY 3.0) <i class='ui_cc'></i></a></li> <li class='attribution'>Identity Protection designed by <a href='http://www.thenounproject.com/grubedoo'>Jason Grube</a> from the <a href='http://www.thenounproject.com'>Noun Project</a></li> <li class='print-attribution hidden'>Identity Protection designed by Jason Grube from the thenounproject.com</li> </ul> </div>";
+      _releaseText = string.Format("<div style='margin: 50px auto 0 auto;width:500px;text-align:center'><h1>Permission Proxy</h1><img src='{0}' width='500px' height='500px'>{1}</div>", Url.Content("~/Content/icon.png"), license);
+      _debugText = @"# ArcGIS Server Security Proxy
 
 ## Installation
 
@@ -69,9 +75,17 @@ An email will be placed in the pickup location or sent over the network.
 `/api/user/resetpassword`
 
 `/api/user/changepassword`
-");
-            
-            return View((object)model);
-        }
+";
+#if DEBUG
+      _transform = markdown.Transform(_debugText);
+#endif
+#if !DEBUG
+      _transform = _releaseText;
+#endif
+      model = _transform;
+
+      return View((object) model);
     }
+  }
+
 }
