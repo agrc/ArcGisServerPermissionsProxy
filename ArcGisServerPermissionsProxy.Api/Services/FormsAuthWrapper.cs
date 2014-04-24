@@ -9,7 +9,7 @@ namespace ArcGisServerPermissionsProxy.Api.Services
         public CookieHeaderValue SetAuthCookie(string userName, string application, bool createPersistentCookie)
         {
             var expiration = createPersistentCookie ? DateTime.Now.AddMonths(2) : DateTime.Now.AddMinutes(30);
-
+            
             if (application == null)
             {
                 application = "";
