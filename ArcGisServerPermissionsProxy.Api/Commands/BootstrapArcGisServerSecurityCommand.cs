@@ -10,21 +10,28 @@ using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using CommandPattern;
+using NLog;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands
 {
     public class BootstrapArcGisServerSecurityCommandAsync : CommandAsync<IEnumerable<string>> 
     {
-        private const string CreateUserUrl = "http://localhost:6080/arcgis/admin/security/users/add";
-        private const string CreateRoleUrl = "http://localhost:6080/arcgis/admin/security/roles/add";
-        private const string AssignRoleUrl = "http://localhost:6080/arcgis/admin/security/users/assignRoles";
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private readonly string _createUserUrl = "{0}/arcgis/admin/security/users/add";
+        private readonly string _createRoleUrl = "{0}/arcgis/admin/security/roles/add";
+        private readonly string _assignRoleUrl = "{0}/arcgis/admin/security/users/assignRoles";
 
         public AdminCredentials AdminInformation;
         public CreateApplicationParams Parameters;
 
         public BootstrapArcGisServerSecurityCommandAsync()
         {
-            
+            _createUserUrl = string.Format(_createUserUrl, App.ArcGisHostUrl);
+            _createRoleUrl = string.Format(_createRoleUrl, App.ArcGisHostUrl);
+            _assignRoleUrl = string.Format(_assignRoleUrl, App.ArcGisHostUrl);
+
+          Logger.Warn("Create User: {0}, Role: {1}, Assign: {2}", _createUserUrl, _createRoleUrl, _assignRoleUrl);
         }
 
         public BootstrapArcGisServerSecurityCommandAsync(CreateApplicationParams parameters,
@@ -43,8 +50,8 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                 var token =
                     await
                     CommandExecutor.ExecuteCommandAsync(
-                        new GetTokenCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams(),
-                                                 new GetTokenCommandAsyncBase.User(AdminInformation.Username,
+                        new GetTokenCommandAsync(new GetTokenCommandAsyncBase.GetTokenParams(App.ArcGisHostUrl,
+                          App.Instance, App.Ssl, App.Port), new GetTokenCommandAsyncBase.User(AdminInformation.Username,
                                                                                    AdminInformation.Password)));
 
                 //post to create user
@@ -55,7 +62,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
 
                 foreach (var name in usersAndRolesToCreate)
                 {
-                    var createUserRequest = await client.PostAsync(CreateUserUrl,
+                    var createUserRequest = await client.PostAsync(_createUserUrl,
                                                                     new FormUrlEncodedContent(new Dictionary
                                                                                                   <string, string>
                                                                         {
@@ -72,9 +79,11 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                         responseMessages.Add(message);
                     }
 
-                    Debug.Print(await createUserRequest.Content.ReadAsStringAsync());
+                    var response = await createUserRequest.Content.ReadAsStringAsync();
+                    Debug.Print(response);
+                    Logger.Info(response);
 
-                    var createRoleRequest = await client.PostAsync(CreateRoleUrl,
+                    var createRoleRequest = await client.PostAsync(_createRoleUrl,
                                                                     new FormUrlEncodedContent(new Dictionary
                                                                                                   <string, string>
                                                                         {
@@ -90,9 +99,12 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                         responseMessages.Add(message);
                     }
 
-                    Debug.Print(await createRoleRequest.Content.ReadAsStringAsync());
+                    response = await createRoleRequest.Content.ReadAsStringAsync();
+                    Debug.Print(response);
+                    Debug.Print(response);
+                    Logger.Info(response);
 
-                    var assignRoleRequest = await client.PostAsync(AssignRoleUrl,
+                    var assignRoleRequest = await client.PostAsync(_assignRoleUrl,
                                                                     new FormUrlEncodedContent(new Dictionary
                                                                                                   <string, string>
                                                                         {
@@ -109,8 +121,10 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                         responseMessages.Add(message);
                     }
 
-
-                    Debug.Print(await assignRoleRequest.Content.ReadAsStringAsync());
+                    response = await assignRoleRequest.Content.ReadAsStringAsync();
+                    Debug.Print(response);
+                    Debug.Print(response);
+                    Logger.Info(response);
                 }
             }
 

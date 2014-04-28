@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using CommandPattern;
+using NLog;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands
 {
     public abstract class GetTokenCommandAsyncBase : CommandAsync<TokenModel>
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         protected readonly User Credentials;
         private const string BaseUrlFormat = "http{0}://{1}{2}/{3}/";
         private const string TokenUrlFormat = "{0}tokens/generateToken";
@@ -27,6 +30,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                                         getTokenParams.InstanceName);
 
             UriBuilder = new UriBuilder(string.Format(TokenUrlFormat, baseUrl));
+            Logger.Info("Get Token url: {0}, Formatting: {1}", baseUrl, TokenUrlFormat);
         }
 
         public override string ToString()

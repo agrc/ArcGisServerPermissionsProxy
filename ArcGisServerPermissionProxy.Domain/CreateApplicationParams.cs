@@ -30,6 +30,17 @@ namespace ArcGisServerPermissionProxy.Domain
             /// The description.
             /// </value>
             public string Description { get; set; }
+
+            /// <summary>
+            /// Returns a string that represents the current object.
+            /// </summary>
+            /// <returns>
+            /// A string that represents the current object.
+            /// </returns>
+            public override string ToString()
+            {
+                return string.Format("Name: {0}, Description: {1}", Name, Description);
+            }
         }
 
         [Required]
@@ -43,5 +54,16 @@ namespace ArcGisServerPermissionProxy.Domain
 
         [Required]
         public string CreationToken { get; set; }
+
+        /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
+        public override string ToString()
+        {
+            return string.Format("Application: {0}, AdminEmails: {1}, Roles: {2}, CreationToken: {3}", Application, string.Join(",", AdminEmails), string.Join(",",Roles), CreationToken);
+        }
     }
 }

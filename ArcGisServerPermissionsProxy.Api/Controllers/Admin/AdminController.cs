@@ -21,6 +21,7 @@ using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using CommandPattern;
+using NLog;
 using Ninject;
 using Raven.Client;
 
@@ -28,6 +29,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
 {
     public class AdminController : RavenApiController
     {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         [Inject]
         public BootstrapArcGisServerSecurityCommandAsync BootstrapCommand { get; set; }
 
@@ -45,8 +48,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 return Request.CreateResponse(HttpStatusCode.BadRequest);
             }
 
-            if (ConfigurationManager.AppSettings["creationToken"] != parameters.CreationToken)
+            if (App.CreationToken != parameters.CreationToken)
             {
+                Logger.Info("Token does not match {1}. Input Params: {0}", parameters, App.CreationToken);
                 return Request.CreateResponse(HttpStatusCode.Unauthorized);
             }
 

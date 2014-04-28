@@ -111,11 +111,14 @@
     <None Include="Postman\UserController.json" />
     <Content Include="secrets.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="secrets.example.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Postman\AdminController.json" />
   </ItemGroup>

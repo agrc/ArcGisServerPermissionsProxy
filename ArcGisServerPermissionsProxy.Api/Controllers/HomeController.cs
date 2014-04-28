@@ -22,7 +22,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 - Configure `secrets.config` in a similar fasion to `secrets.example.config` in the **Api** Project.
   - `adminUserName` is the admin account for arcgis server
   - `adminPassword` is the admin accounts password
-  - `accountPassword` is the default password for all internal server accounts
+  - `accountPassword` is the default password for all internal server accounts  
+  - `creationToken` is the super top secret password you use to send requests to the admin api  
+  - `serverUrl` is the base url of your server eg: http://localhost:6080
 - Configure the SMTP pickup directory/Network settings in the `web.config`
 
 ## Running Tests

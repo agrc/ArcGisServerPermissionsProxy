@@ -19,13 +19,15 @@ using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
 using CommandPattern;
+using NLog;
 using Ninject;
 using Raven.Client;
 
-namespace ArcGisServerPermissionsProxy.Api.Controllers
-{
-    public class AuthenticateController : RavenApiController
-    {
+namespace ArcGisServerPermissionsProxy.Api.Controllers {
+
+    public class AuthenticateController : RavenApiController {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         [Inject]
         public ITokenService TokenService { get; set; }
 
@@ -86,28 +88,34 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                     if (user.AccessRules.StartDate == 0)
                     {
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                                  new ResponseContainer(HttpStatusCode.Unauthorized, "Use restrictions are enabled but not setup for your account. Contact the administrators."));
+                                                      new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                            "Use restrictions are enabled but not setup for your account. Contact the administrators."));
                     }
 
                     if (user.AccessRules.StartDate > today)
                     {
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
-                                                                        string.Format("You are are not authorized for use until {0}", new DateTime(user.AccessRules.StartDate, DateTimeKind.Utc).ToShortDateString())));
+                                                      new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                            string.Format(
+                                                                                "You are are not authorized for use until {0}",
+                                                                                new DateTime(
+                                                                                    user.AccessRules.StartDate,
+                                                                                    DateTimeKind.Utc).ToShortDateString())));
                     }
 
                     if (user.AccessRules.EndDate < today)
                     {
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                          new ResponseContainer(HttpStatusCode.Unauthorized,
-                                                string.Format("You were only authorized for use until {0}", new DateTime(user.AccessRules.EndDate).ToShortDateString())));
-
+                                                      new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                            string.Format(
+                                                                                "You were only authorized for use until {0}",
+                                                                                new DateTime(user.AccessRules.EndDate).
+                                                                                    ToShortDateString())));
                     }
-
                 }
 
                 token = await TokenService.GetToken(
-                    new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
+                    new GetTokenCommandAsyncBase.GetTokenParams(App.ArcGisHostUrl, App.Instance, App.Ssl, App.Port),
                     new GetTokenCommandAsyncBase.User(null, App.Password), login.Application, user.Role);
 
                 if (!token.Successful)
@@ -152,10 +160,32 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             var username = User.Identity.Name;
             var application = "";
 
-            foreach (var value in Request.Headers.GetCookies(".ASPXAUTH"))
+            foreach (var cookieState in Request.Headers.GetCookies().SelectMany(x=>x.Cookies))    
             {
-                var ticket = FormsAuthentication.Decrypt(value.Cookies.First().Value);
+
+                Logger.Info("Getting auth cookie: {0}, {1}", cookieState.Name, cookieState.Value);
+
+                if (!cookieState.Name.Contains("ASPXAUTH"))
+                {
+                    continue;
+                }
+
+                FormsAuthenticationTicket ticket;
+                try
+                {
+                    ticket = FormsAuthentication.Decrypt(cookieState.Value);
+                }
+                catch (Exception ex)
+                {
+                    Logger.FatalException("failing to read cookie.", ex);
+                    continue;
+                }
+
+                Logger.Info("ticket: {0}", ticket);
+
                 application = ticket.UserData;
+
+                Logger.Info("App from ticket {0}", application);
             }
 
             if (application != appName)
@@ -200,7 +230,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 }
 
                 token = await TokenService.GetToken(
-                    new GetTokenCommandAsyncBase.GetTokenParams("localhost", "arcgis", false, 6080),
+                    new GetTokenCommandAsyncBase.GetTokenParams(App.ArcGisHostUrl,
+                                                                App.Instance, App.Ssl, App.Port),
                     new GetTokenCommandAsyncBase.User(null, App.Password), application, user.Role);
 
                 if (!token.Successful)
@@ -223,4 +254,5 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             return response;
         }
     }
+
 }

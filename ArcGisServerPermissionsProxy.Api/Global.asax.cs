@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
+using NLog;
 using Ninject;
 
 namespace ArcGisServerPermissionsProxy.Api
@@ -12,6 +13,8 @@ namespace ArcGisServerPermissionsProxy.Api
     public class App : HttpApplication
     {
         public static IKernel Kernel { get; set; }
+
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         public static string Pepper
         {
@@ -23,6 +26,12 @@ namespace ArcGisServerPermissionsProxy.Api
         public static AdminCredentials AdminInformation { get; set; }
 
         public static string Host { get; set; }
+
+        public static string ArcGisHostUrl { get; set; }
+        public static string Instance { get; set; }
+        public static int Port { get; set; }
+        public static bool Ssl { get; set; }
+        public static string CreationToken  { get; set; }
 
         protected void Application_Start()
         {
@@ -36,9 +45,17 @@ namespace ArcGisServerPermissionsProxy.Api
                                          ConfigurationManager.AppSettings["adminPassword"]);
 
             Password = ConfigurationManager.AppSettings["accountPassword"];
+            ArcGisHostUrl = ConfigurationManager.AppSettings["host"];
+            Instance = ConfigurationManager.AppSettings["instance"];
+            Port = Convert.ToInt16(ConfigurationManager.AppSettings["port"]);
+            Ssl = Convert.ToBoolean(ConfigurationManager.AppSettings["SSL"]);
+            CreationToken = ConfigurationManager.AppSettings["creationToken"];
+
+            Logger.Info("App Startup {0}Host: {1}{0}ArcGisHost: {2}{0}Instance: {3}{0}Port: {4}{0}SSL: {5}{0}CreationToken: {6}{0}", 
+              Environment.NewLine, Host, ArcGisHostUrl, Instance, Port, Ssl, CreationToken);
         }
 
-        void Application_BeginRequest(Object source, EventArgs e)
+      void Application_BeginRequest(Object source, EventArgs e)
         {
             var app = (HttpApplication)source;
             var context = app.Context;
