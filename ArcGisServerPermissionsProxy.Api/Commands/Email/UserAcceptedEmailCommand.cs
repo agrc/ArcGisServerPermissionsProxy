@@ -22,12 +22,6 @@ Thank you";
 
             MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
             MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
-
-            if (templateData.FromAddresses.Length > 1)
-            {
-                MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
-            }
-
             MailMessage.Subject = string.Format("{0} - Access Granted", templateData.Application);
 
             Init();
