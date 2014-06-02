@@ -17,6 +17,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
         [SetUp]
         public void Setup()
         {
+            App.Cache();
             _adminCredentials = new AdminCredentials(ConfigurationManager.AppSettings["adminUserName"],
                                                      ConfigurationManager.AppSettings["adminPassword"]);
         }

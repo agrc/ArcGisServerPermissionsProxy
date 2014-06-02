@@ -31,6 +31,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         public override void SetUp()
         {
             base.SetUp();
+            App.Cache();
 
             var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"},
                                        new[] {"admin", "role2", "role3", "role4"}, "unit test description");

@@ -18,9 +18,9 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-        private readonly string _createUserUrl = "{0}/arcgis/admin/security/users/add";
-        private readonly string _createRoleUrl = "{0}/arcgis/admin/security/roles/add";
-        private readonly string _assignRoleUrl = "{0}/arcgis/admin/security/users/assignRoles";
+        private readonly string _createUserUrl = "http://{0}/arcgis/admin/security/users/add";
+        private readonly string _createRoleUrl = "http://{0}/arcgis/admin/security/roles/add";
+        private readonly string _assignRoleUrl = "http://{0}/arcgis/admin/security/users/assignRoles";
 
         public AdminCredentials AdminInformation;
         public CreateApplicationParams Parameters;
@@ -35,7 +35,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
         }
 
         public BootstrapArcGisServerSecurityCommandAsync(CreateApplicationParams parameters,
-                                                         AdminCredentials adminInformation)
+                                                         AdminCredentials adminInformation) : this()
         {
             Parameters = parameters;
             AdminInformation = adminInformation;
