@@ -214,3 +214,7 @@ pip-log.txt
 .mr.developer.cfg
 
 secrets.config
+secrets.Production.config
+secrets.Release.config
+secrets.Stage.config
+secrets.Debug.config

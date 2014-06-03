@@ -208,6 +208,7 @@
     <Content Include="Global.asax" />
     <Content Include="secrets.config">
       <SubType>Designer</SubType>
+      <TransformOnBuild>true</TransformOnBuild>
     </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -246,6 +247,23 @@
     <None Include="Properties\PublishProfiles\Stage.pubxml" />
     <Content Include="Views\AdminEmail\Accept.cshtml" />
     <Content Include="Views\AdminEmail\Reject.cshtml" />
+    <Content Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
+    <None Include="secrets.Debug.config">
+      <DependentUpon>secrets.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="secrets.Production.config">
+      <DependentUpon>secrets.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="secrets.Release.config">
+      <DependentUpon>secrets.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
+    <None Include="secrets.Stage.config">
+      <DependentUpon>secrets.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AgrcPasswordManagement\AgrcPasswordManagement.csproj">
@@ -264,6 +282,12 @@
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Label="SlowCheetah">
+    <SlowCheetahToolsPath>$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\..\packages\SlowCheetah.2.5.10.6\tools\))</SlowCheetahToolsPath>
+    <SlowCheetah_EnableImportFromNuGet Condition=" '$(SC_EnableImportFromNuGet)'=='' ">true</SlowCheetah_EnableImportFromNuGet>
+    <SlowCheetah_NuGetImportPath Condition=" '$(SlowCheetah_NuGetImportPath)'=='' ">$([System.IO.Path]::GetFullPath( $(MSBuildProjectDirectory)\Properties\SlowCheetah\SlowCheetah.Transforms.targets ))</SlowCheetah_NuGetImportPath>
+    <SlowCheetahTargets Condition=" '$(SlowCheetah_EnableImportFromNuGet)'=='true' and Exists('$(SlowCheetah_NuGetImportPath)') ">$(SlowCheetah_NuGetImportPath)</SlowCheetahTargets>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
@@ -289,6 +313,7 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="$(SlowCheetahTargets)" Condition="Exists('$(SlowCheetahTargets)')" Label="SlowCheetah" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
