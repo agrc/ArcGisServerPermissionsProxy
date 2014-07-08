@@ -129,6 +129,15 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                 {
                     user.AdminToken = string.Format("{0}.{1}", user.Id, Guid.NewGuid());
                 }
+
+                try
+                {
+                    user.LastLogin = DateTime.UtcNow.Ticks;
+                }
+                catch (Exception)
+                {
+                    //swallow. who cares?
+                }
             }
 
             var response = Request.CreateResponse(HttpStatusCode.OK,
@@ -244,6 +253,15 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                 if (user.Role.Contains("admin"))
                 {
                     user.AdminToken = string.Format("{0}.{1}", user.Id, Guid.NewGuid());
+                }
+
+                try
+                {
+                    user.LastLogin = DateTime.UtcNow.Ticks;
+                }
+                catch (Exception)
+                {
+                    //swallow. who cares?
                 }
             }
 

@@ -166,6 +166,9 @@ namespace ArcGisServerPermissionProxy.Domain.Database
         }
 
         [JsonProperty]
+        public long LastLogin { get; set; }
+
+        [JsonProperty]
         public UserAccessRules AccessRules { get; set; }
 
         public bool ShouldSerializeAccessRules()
