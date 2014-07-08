@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.ArcGIS;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Account;
-using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using CommandPattern;
 using NLog;
 
@@ -17,21 +18,23 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
     public class BootstrapArcGisServerSecurityCommandAsync : CommandAsync<IEnumerable<string>> 
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-        private readonly string _createUserUrl = "http://{0}/arcgis/admin/security/users/add";
-        private readonly string _createRoleUrl = "http://{0}/arcgis/admin/security/roles/add";
-        private readonly string _assignRoleUrl = "http://{0}/arcgis/admin/security/users/assignRoles";
+        private readonly string _urlTemplate = "http{0}://{1}{2}/{3}/";
+        private readonly string _createUserUrl = "{0}admin/security/users/add";
+        private readonly string _createRoleUrl = "{0}admin/security/roles/add";
+        private readonly string _assignRoleUrl = "{0}admin/security/users/assignRoles";
 
         public AdminCredentials AdminInformation;
         public CreateApplicationParams Parameters;
 
         public BootstrapArcGisServerSecurityCommandAsync()
         {
-            _createUserUrl = string.Format(_createUserUrl, App.ArcGisHostUrl);
-            _createRoleUrl = string.Format(_createRoleUrl, App.ArcGisHostUrl);
-            _assignRoleUrl = string.Format(_assignRoleUrl, App.ArcGisHostUrl);
+            var port = App.Port > 0 ? ":" + App.Port.ToString(CultureInfo.InvariantCulture) : "";
+            _urlTemplate = string.Format(_urlTemplate, App.Ssl ? "s" : "", App.ArcGisHostUrl, port, App.Instance);
+            _createUserUrl = string.Format(_createUserUrl, _urlTemplate);
+            _createRoleUrl = string.Format(_createRoleUrl, _urlTemplate);
+            _assignRoleUrl = string.Format(_assignRoleUrl, _urlTemplate);
 
-          Logger.Warn("Create User: {0}, Role: {1}, Assign: {2}", _createUserUrl, _createRoleUrl, _assignRoleUrl);
+            Logger.Warn("Create User: {0}, Role: {1}, Assign: {2}", _createUserUrl, _createRoleUrl, _assignRoleUrl);
         }
 
         public BootstrapArcGisServerSecurityCommandAsync(CreateApplicationParams parameters,
@@ -62,6 +65,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
 
                 foreach (var name in usersAndRolesToCreate)
                 {
+                    Logger.Info("Posting to create user: {0}, {1}, {2}, {3}", _createUserUrl, name, ConfigurationManager.AppSettings["accountPassword"], token.Token);
                     var createUserRequest = await client.PostAsync(_createUserUrl,
                                                                     new FormUrlEncodedContent(new Dictionary
                                                                                                   <string, string>
@@ -72,16 +76,17 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                                                                             {"token", token.Token}
                                                                         }));
 
+                    Logger.Info(createUserRequest.IsSuccessStatusCode);
+                    var response = await createUserRequest.Content.ReadAsStringAsync();
+                    Debug.Print(response);
+                    Logger.Info("Create user response: {0}", response);
+
                     var createUserResponse = await createUserRequest.Content.ReadAsAsync<AdminServerStatus>(mediaType);
 
                     foreach (var message in createUserResponse.Messages)
                     {
                         responseMessages.Add(message);
                     }
-
-                    var response = await createUserRequest.Content.ReadAsStringAsync();
-                    Debug.Print(response);
-                    Logger.Info(response);
 
                     var createRoleRequest = await client.PostAsync(_createRoleUrl,
                                                                     new FormUrlEncodedContent(new Dictionary

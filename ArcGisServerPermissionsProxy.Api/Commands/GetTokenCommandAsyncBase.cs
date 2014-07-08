@@ -45,13 +45,17 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
             using (var client = new HttpClient())
             {
                 var response = await client.GetAsync(_tokenUri);
+                Logger.Info("Get token status code: {0}", response.StatusCode);
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     return null;
                 }
 
-                Console.WriteLine(await response.Content.ReadAsStringAsync());
+                var content = await response.Content.ReadAsStringAsync();
+
+                Logger.Info(content);
+                Console.WriteLine(content);
 
                 return await response.Content.ReadAsAsync<TokenModel>(new[]
                     {

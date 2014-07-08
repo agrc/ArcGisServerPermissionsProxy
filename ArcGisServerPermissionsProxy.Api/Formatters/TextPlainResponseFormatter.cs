@@ -8,6 +8,7 @@ namespace ArcGisServerPermissionsProxy.Api.Formatters
         public TextPlainResponseFormatter()
         {
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/plain"));
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
         }
     }
 }
