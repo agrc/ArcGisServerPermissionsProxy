@@ -15,7 +15,8 @@
 				"f751459d-7389-51f2-8e01-f9c82b26f382",
 				"365cec99-2e9b-dc09-9ca5-937f2735ab8b",
 				"abd0651e-155d-a638-330a-03c2ddadcf88",
-				"c70684b0-86ce-3a76-faa2-9514753ed59e"
+				"c70684b0-86ce-3a76-faa2-9514753ed59e",
+				"20538b12-b8d5-427b-8124-fd2d8d0e9ae5"
 			],
 			"collection_name": "Permission Proxy",
 			"collection_id": "d38a4512-2afb-7c73-b4e1-992385b79923"
@@ -28,7 +29,8 @@
 				"191d820f-0fb7-f1a0-b518-8c8ec78a24cd",
 				"e6cd3fb8-851a-3ccd-0ff7-0fcb773d4ec1",
 				"a67063d3-fefc-2ae2-0561-02e4a373a1f1",
-				"c145000e-3537-ffcb-d551-d82f38c1b5a5"
+				"c145000e-3537-ffcb-d551-d82f38c1b5a5",
+				"1caa45f6-c434-d735-74c9-3b2a317aa5b9"
 			],
 			"collection_name": "Permission Proxy",
 			"collection_id": "d38a4512-2afb-7c73-b4e1-992385b79923"
@@ -78,6 +80,43 @@
 			"time": 1390864896428,
 			"name": "CreateApplication",
 			"description": "",
+			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"synced": false
+		},
+		{
+			"id": "1caa45f6-c434-d735-74c9-3b2a317aa5b9",
+			"headers": "Content-Type: application/json\n",
+			"url": "http://localhost/permissionproxy/api/authenticate/user",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": "{\n  \"email\":\"unitTest-admin@utah.gov\",\n  \"application\": \"unitTests\",\n  \"password\": \"paste from email\",\n  \"persist\": false\n}",
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"time": 1405624024312,
+			"name": "Admin Authentication",
+			"description": "",
+			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"responses": [],
+			"synced": false
+		},
+		{
+			"id": "20538b12-b8d5-427b-8124-fd2d8d0e9ae5",
+			"headers": "",
+			"url": "http://localhost/permissionproxy/api/admin/GetAllApproved?application=unitTests",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "GET",
+			"data": [],
+			"dataMode": "params",
+			"name": "GetAllApproved",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1405634344921,
+			"version": 2,
+			"responses": [],
+			"tests": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
 			"synced": false
 		},

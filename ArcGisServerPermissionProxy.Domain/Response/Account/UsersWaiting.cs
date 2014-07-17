@@ -26,4 +26,5 @@ namespace ArcGisServerPermissionProxy.Domain.Response.Account
         [JsonProperty]
         protected string Agency { get; set; }
     }
+
 }

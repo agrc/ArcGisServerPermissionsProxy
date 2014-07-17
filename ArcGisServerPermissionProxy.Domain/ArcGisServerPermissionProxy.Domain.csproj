@@ -73,6 +73,7 @@
     <Compile Include="Database\User.cs" />
     <Compile Include="RequestInformation.cs" />
     <Compile Include="ResetRequestInformation.cs" />
+    <Compile Include="Response\Account\ApprovedUser.cs" />
     <Compile Include="Response\Account\UsersWaiting.cs" />
     <Compile Include="Response\Authentication\AuthenticationResponse.cs" />
     <Compile Include="Response\Password\PasswordReset.cs" />

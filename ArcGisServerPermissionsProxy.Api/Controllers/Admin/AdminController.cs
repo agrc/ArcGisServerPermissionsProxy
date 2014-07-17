@@ -267,6 +267,32 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             }
         }
 
+
+        [HttpGet]
+        public async Task<HttpResponseMessage> GetAllApproved(string application)
+        {
+            if (!ValidationService.IsValid(application))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            Database = application;
+
+            using (var s = AsyncSession)
+            {
+                var waitingUsers = await s.Query<User, UsersByApprovedIndex>()
+                                          .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                          .Where(x => x.Active && x.Approved)
+                                          .ToListAsync();
+
+                return Request.CreateResponse(HttpStatusCode.OK,
+                                              new ResponseContainer<IList<ApprovedUser>>(
+                                                  waitingUsers.Select(x => new ApprovedUser(x)).ToList()));
+            }
+        }
+
         [HttpGet]
         public async Task<HttpResponseMessage> GetRole(string email, string application)
         {
