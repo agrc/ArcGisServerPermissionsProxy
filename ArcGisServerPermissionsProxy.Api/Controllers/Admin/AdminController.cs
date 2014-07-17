@@ -179,7 +179,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 }
 
                 var response =
-                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, user));
+                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, user, adminUser.FullName));
 
                 if (response != null)
                 {
@@ -236,7 +236,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                                         "User not found."));
                 }
 
-                await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
+                await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user, adminUser.FullName));
 
                 return Request.CreateResponse(HttpStatusCode.Accepted);
             }

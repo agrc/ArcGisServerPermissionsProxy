@@ -47,7 +47,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 var info = new AcceptRequestInformation(user.Email, role, token, application, null);
 
                 var response =
-                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, user));
+                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, user, "an Admin email link"));
 
                 if (response != null)
                 {
@@ -88,7 +88,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     return View(new AdminEmailViewModel(config.Description, "This token has expired after one month of inactivity.", user));
                 }
 
-                await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user));
+                await CommandExecutor.ExecuteCommandAsync(new RejectUserCommandAsync(s, user, "an Admin email link"));
 
 
                 return View(new AdminEmailViewModel(config.Description, user));

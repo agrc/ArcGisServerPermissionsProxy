@@ -14,11 +14,13 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
         private readonly AcceptRequestInformation _info;
         private readonly IAsyncDocumentSession _session;
         private readonly User _user;
+        private readonly string _approvingAdmin;
 
         public AcceptUserCommandAsync(IAsyncDocumentSession session, AcceptRequestInformation info,
-                                     User user)
+                                     User user, string ApprovingAdmin)
         {
             _user = user;
+            _approvingAdmin = ApprovingAdmin;
             _session = session;
             _info = info;
         }
@@ -60,6 +62,17 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                                                                                        _user.FullName, _info.Role,
                                                                                        _user.Email,
                                                                                        config.Description)));
+            if (config.AdministrativeEmails.Length > 1)
+            {
+                var nofity = config.AdministrativeEmails.Where(x => x != _approvingAdmin).ToArray();
+
+                CommandExecutor.ExecuteCommand(
+                    new UserEngagedNotificationEmailCommand(
+                        new UserEngagedNotificationEmailCommand.MailTemplate(nofity,
+                                                                             _user.FullName, "Accepted", _user.Role,
+                                                                             _approvingAdmin,
+                                                                             config.Description)));
+            }
 
             return null;
         }

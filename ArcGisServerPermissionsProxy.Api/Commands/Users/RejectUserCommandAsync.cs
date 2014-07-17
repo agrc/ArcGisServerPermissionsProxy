@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
@@ -10,10 +11,12 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
     {
         private readonly IAsyncDocumentSession _s;
         private readonly User _user;
+        private readonly string _rejectingUser;
 
-        public RejectUserCommandAsync(IAsyncDocumentSession s, User user)
+        public RejectUserCommandAsync(IAsyncDocumentSession s, User user, string rejectingUser)
         {
             _user = user;
+            _rejectingUser = rejectingUser;
             _s = s;
         }
 
@@ -32,6 +35,18 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                                                                                        config.AdministrativeEmails,
                                                                                        _user.FullName,
                                                                                        config.Description)));
+
+            if (config.AdministrativeEmails.Length > 1)
+            {
+                var nofity = config.AdministrativeEmails.Where(x => x != _rejectingUser).ToArray();
+
+                CommandExecutor.ExecuteCommand(
+                    new UserEngagedNotificationEmailCommand(
+                        new UserEngagedNotificationEmailCommand.MailTemplate(nofity,
+                                                                             _user.FullName, "Rejected", _user.Role,
+                                                                             _rejectingUser,
+                                                                             config.Description)));
+            }
 
             return true;
         }
