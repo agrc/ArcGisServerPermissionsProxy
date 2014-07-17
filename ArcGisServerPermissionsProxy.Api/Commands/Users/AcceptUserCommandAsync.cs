@@ -39,6 +39,13 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                 return "Role was not found.";
             }
 
+            if (_user.Active && _user.Approved &&
+                _user.Role == _info.Role)
+            {
+                // do not notify if nothing is changing.
+                return null;
+            }
+
             _user.Active = true;
             _user.Approved = true;
             _user.Role = _info.Role;

@@ -22,6 +22,14 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
 
         public override async Task<bool> Execute()
         {
+            if (_user.Active == false && 
+                _user.Approved == false &&
+                string.IsNullOrEmpty(_user.Role))
+            {
+                // do not notify if nothing is changing.
+                return true;
+            }
+
             _user.Active = false;
             _user.Approved = false;
             _user.Role = null;
