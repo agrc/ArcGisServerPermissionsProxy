@@ -22,6 +22,12 @@ Thank you";
 
             MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
             MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
+            
+            foreach (var replyTo in templateData.FromAddresses)
+            {
+                MailMessage.ReplyToList.Add(replyTo);
+            }
+
             MailMessage.Subject = string.Format("{0} - Access Granted", templateData.Application);
 
             Init();

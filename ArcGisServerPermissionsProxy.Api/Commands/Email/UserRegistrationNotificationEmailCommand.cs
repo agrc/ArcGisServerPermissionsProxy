@@ -22,7 +22,10 @@ Thank you for your patience.";
 
             if (templateData.FromAddresses.Length > 1)
             {
-                MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
+                foreach (var replyTo in templateData.FromAddresses)
+                {
+                    MailMessage.ReplyToList.Add(replyTo);
+                }
             }
 
             MailMessage.Subject = string.Format("{0} - Registration Confirmation", templateData.Application);

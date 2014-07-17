@@ -26,7 +26,10 @@ The {{Application}} admin";
 
             if (templateData.FromAddresses.Length > 1)
             {
-                MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
+                foreach (var replyTo in templateData.FromAddresses)
+                {
+                    MailMessage.ReplyToList.Add(replyTo);
+                }
             }
             
             MailMessage.Subject = string.Format("{0} - Password Reset", templateData.Application);

@@ -20,7 +20,10 @@ Thank you for understanding.";
 
             if (templateData.FromAddresses.Length > 1)
             {
-                MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
+                foreach (var replyTo in templateData.FromAddresses)
+                {
+                    MailMessage.ReplyToList.Add(replyTo);
+                }
             }
 
             MailMessage.Subject = string.Format("{0} - Access Reject", templateData.Application);

@@ -31,7 +31,10 @@ Or use the user admin page.";
 
             if (templateData.FromAddresses.Length > 1)
             {
-                MailMessage.CC.Add(string.Join(",", Enumerable.Skip(templateData.FromAddresses, 1)));
+                foreach (var replyTo in templateData.FromAddresses)
+                {
+                    MailMessage.ReplyToList.Add(replyTo);
+                }
             }
 
             MailMessage.Subject = string.Format("{0} - Notification of Registration", templateData.Description);
