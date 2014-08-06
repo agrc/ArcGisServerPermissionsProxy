@@ -11,8 +11,11 @@ namespace ArcGisServerPermissionsProxy.Api
         {
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{action}"
-            );
+                routeTemplate: "api/{controller}/{action}",
+                defaults: new
+                {
+                    action = "get"
+                });
 
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
