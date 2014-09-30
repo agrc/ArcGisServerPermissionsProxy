@@ -84,7 +84,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                 var config = await s.LoadAsync<Config>("1");
                 if (config.UsersCanExpire)
                 {
-                    var today = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow.Date)).Ticks;
+                    var today = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow)).Ticks;
 
                     if (user.AccessRules.StartDate == 0)
                     {
