@@ -133,7 +133,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                 try
                 {
-                    user.LastLogin = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow.Date)).Ticks;
+                    user.LastLogin = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow)).Ticks;
                 }
                 catch (Exception)
                 {
@@ -258,7 +258,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                 try
                 {
-                    user.LastLogin = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow.Date)).Ticks;
+                    user.LastLogin = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow)).Ticks;
                 }
                 catch (Exception)
                 {
