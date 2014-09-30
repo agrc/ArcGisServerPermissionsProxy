@@ -101,6 +101,7 @@
     <Compile Include="Commands\BootstrapArcGisServerSecurityCommandTests.cs" />
     <Compile Include="Commands\GetTokenCommandTests.cs" />
     <Compile Include="Commands\EmailTests.cs" />
+    <Compile Include="Commands\TimeCommandTests.cs" />
     <Compile Include="Controllers\AdminControllerTests.cs" />
     <Compile Include="Controllers\UserControllerTests.cs" />
     <Compile Include="Fakes\Raven\IndexCreationFake.cs" />

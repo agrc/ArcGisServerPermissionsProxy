@@ -23,7 +23,7 @@ namespace ArcGisServerPermissionProxy.Domain.Database
             Approved = false;
             Active = true;
             Token = Guid.NewGuid();
-            ExpirationDateTicks = DateTime.Now.AddMonths(1).Ticks;
+            ExpirationDateTicks = DateTime.UtcNow.AddMonths(1).Ticks;
             AdminToken = adminToken;
             UserId = Guid.NewGuid();
             AccessRules = new UserAccessRules();

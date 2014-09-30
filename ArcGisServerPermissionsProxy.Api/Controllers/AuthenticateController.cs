@@ -84,7 +84,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                 var config = await s.LoadAsync<Config>("1");
                 if (config.UsersCanExpire)
                 {
-                    var today = DateTime.UtcNow.Date.Ticks;
+                    var today = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow.Date)).Ticks;
+
                     if (user.AccessRules.StartDate == 0)
                     {
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
@@ -132,7 +133,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                 try
                 {
-                    user.LastLogin = DateTime.UtcNow.Ticks;
+                    user.LastLogin = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow.Date)).Ticks;
                 }
                 catch (Exception)
                 {
@@ -257,7 +258,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                 try
                 {
-                    user.LastLogin = DateTime.UtcNow.Ticks;
+                    user.LastLogin = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow.Date)).Ticks;
                 }
                 catch (Exception)
                 {

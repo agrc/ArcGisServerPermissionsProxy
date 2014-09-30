@@ -154,6 +154,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Commands\BootstrapArcGisServerSecurityCommand.cs" />
+    <Compile Include="Commands\ConvertToJavascriptUtcCommand.cs" />
+    <Compile Include="Commands\ConvertToNetUtcCommand.cs" />
     <Compile Include="Commands\Email\UserEngagedNotificationEmailCommand.cs" />
     <Compile Include="Commands\Email\Infrastructure\EmailCommand.cs" />
     <Compile Include="Commands\Email\Infrastructure\MailTemplateBase.cs" />
@@ -245,6 +247,7 @@
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Properties\PublishProfiles\Productin-StopGap.pubxml" />
     <None Include="Properties\PublishProfiles\Production.pubxml" />
     <None Include="Properties\PublishProfiles\Stage.pubxml" />
     <Content Include="Views\AdminEmail\Accept.cshtml" />
@@ -257,6 +260,7 @@
     <None Include="secrets.Production.config">
       <DependentUpon>secrets.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
     <None Include="secrets.Release.config">
       <DependentUpon>secrets.config</DependentUpon>

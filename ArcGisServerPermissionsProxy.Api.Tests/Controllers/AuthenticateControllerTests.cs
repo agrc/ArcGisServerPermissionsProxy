@@ -10,6 +10,7 @@ using AgrcPasswordManagement.Commands;
 using AgrcPasswordManagement.Models.Account;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionProxy.Domain.Response.Authentication;
+using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
@@ -265,10 +266,10 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             {
                 base.SetUp();
                 var now = DateTime.UtcNow;
-                var yesterday = now.AddDays(-1);
-                var tomorrow = now.AddDays(1);
-                var twoDays = now.AddDays(2);
-                var twoDaysAgo = now.AddDays(-2);
+                var yesterday = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(now.AddDays(-1))).Ticks;
+                var tomorrow = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(now.AddDays(1))).Ticks;
+                var twoDays = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(now.AddDays(2))).Ticks;
+                var twoDaysAgo = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(now.AddDays(-2))).Ticks;
 
                 var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
                 var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
@@ -280,8 +281,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 {
                     AccessRules = new User.UserAccessRules
                         {
-                            StartDate = twoDaysAgo.Date.Ticks,
-                            EndDate = yesterday.Date.Ticks
+                            StartDate = twoDaysAgo,
+                            EndDate = yesterday
                         }
                 };
                 var earlyUser = new User("USER", "", "too@early.com", "AGENCY", password.HashedPassword, salt, null,
@@ -289,8 +290,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 {
                     AccessRules = new User.UserAccessRules
                     {
-                        StartDate = tomorrow.Date.Ticks,
-                        EndDate = twoDays.Date.Ticks
+                        StartDate = tomorrow,
+                        EndDate = twoDays
                     }
                 };
                 var validUser = new User("USER", "", "valid@user.com", "AGENCY", password.HashedPassword, salt, null,
@@ -298,8 +299,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 {
                     AccessRules = new User.UserAccessRules
                     {
-                        StartDate = twoDaysAgo.Date.Ticks,
-                        EndDate = tomorrow.Date.Ticks
+                        StartDate = twoDaysAgo,
+                        EndDate = tomorrow
                     }
                 };
 

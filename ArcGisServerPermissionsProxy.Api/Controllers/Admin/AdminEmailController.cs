@@ -39,7 +39,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     return View(new AdminEmailViewModel(config.Description, "Incorrect token.", user));
                 }
 
-                if (user.ExpirationDateTicks < DateTime.Now.Ticks)
+                if (user.ExpirationDateTicks < DateTime.UtcNow.Ticks)
                 {
                     return View(new AdminEmailViewModel(config.Description, "This token has expired after one month of inactivity.", user));
                 }
@@ -58,6 +58,12 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             }
         }
 
+        /// <summary>
+        /// Rejects the specified application.
+        /// </summary>
+        /// <param name="application">The application.</param>
+        /// <param name="token">The token.</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> Reject(string application, Guid token)
         {
@@ -83,7 +89,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                     return View(new AdminEmailViewModel(config.Description, "Incorrect token.", user));
                 }
 
-                if (user.ExpirationDateTicks < DateTime.Now.Ticks)
+                if (user.ExpirationDateTicks < DateTime.UtcNow.Ticks)
                 {
                     return View(new AdminEmailViewModel(config.Description, "This token has expired after one month of inactivity.", user));
                 }
