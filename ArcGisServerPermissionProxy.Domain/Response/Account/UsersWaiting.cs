@@ -12,7 +12,17 @@ namespace ArcGisServerPermissionProxy.Domain.Response.Account
             Last = user.Last;
             Agency = user.Agency;
             Email = user.Email;
+
+            if (user.AccessRules == null)
+            {
+                return;
+            }
+
+            AccessRules = user.AccessRules;
         }
+
+        [JsonProperty]
+        protected User.UserAccessRules AccessRules { get; set; }
 
         [JsonProperty]
         protected string Email { get; private set; }
@@ -25,6 +35,11 @@ namespace ArcGisServerPermissionProxy.Domain.Response.Account
 
         [JsonProperty]
         protected string Agency { get; set; }
+
+        public bool ShouldSerializeAccessRules()
+        {
+            return AccessRules.StartDate > 0;
+        }
     }
 
 }

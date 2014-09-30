@@ -262,8 +262,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                           .ToListAsync();
 
                 return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<IList<UsersWaiting>>(
-                                                  waitingUsers.Select(x => new UsersWaiting(x)).ToList()));
+                                              new ResponseContainer<IList<User>>(waitingUsers));
             }
         }
 
@@ -288,8 +287,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                           .ToListAsync();
 
                 return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<IList<ApprovedUser>>(
-                                                  waitingUsers.Select(x => new ApprovedUser(x)).ToList()));
+                                              new ResponseContainer<IList<User>>(waitingUsers));
             }
         }
 
