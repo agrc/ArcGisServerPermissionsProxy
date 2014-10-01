@@ -28,6 +28,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
     [TestFixture]
     public class AdminControllerTests : RavenEmbeddableTest
     {
+        public User ApprovedAdmin { get; set; }
+
         public override void SetUp()
         {
             base.SetUp();
@@ -39,7 +41,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
-            var approvedAdmin = new User("admin", "", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
+            ApprovedAdmin = new User("admin", "", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
                                          "SALT", null, null, "1admin.abc");
 
             var notApprovedActiveUser = new User("Not Approved"," but Active", "notApprovedActiveUser@test.com", "AGENCY",
@@ -64,7 +66,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             using (var s = DocumentStore.OpenSession())
             {
                 s.Store(appConfig, "1");
-                s.Store(approvedAdmin, "1admin");
+                s.Store(ApprovedAdmin, "1admin");
                 s.Store(approvedActiveUser);
                 s.Store(notApprovedActiveUser);
                 s.Store(notApprovedNotActiveUser);
@@ -275,7 +277,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         [Test]
         public async Task GetAllWaitingReturnsAllActiveNotApprovedUsers()
         {
-            var response = await _controller.GetAllWaiting(Database);
+            var response = await _controller.GetAllWaiting("", ApprovedAdmin.AdminToken);
 
             var result = await response.Content.ReadAsAsync<ResponseContainer<IList<User>>>(new[]
                 {
