@@ -56,7 +56,7 @@
 		{
 			"id": "191d820f-0fb7-f1a0-b518-8c8ec78a24cd",
 			"url": "http://localhost/permissionproxy/api/authenticate/user",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"wrong\": \"test\"\n}",
+			"data": [],
 			"headers": "Content-Type: application/json\n",
 			"dataMode": "raw",
 			"method": "POST",
@@ -65,7 +65,8 @@
 			"name": "Bad Login",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"wrong\": \"test\"\n}"
 		},
 		{
 			"id": "1ae788fe-f397-1680-f134-648767b8b3d8",
@@ -73,7 +74,7 @@
 			"url": "http://localhost/permissionproxy/api/admin/createapplication",
 			"pathVariables": {},
 			"method": "POST",
-			"data": "{\n  \"application\": {\n    \"name\":\"unitTests\",\n    \"description\": \"The unit test project\"\n  },\n  \"adminEmails\":[\"unitTest-admin@utah.gov\"],\n  \"roles\": [\"admin\", \"publisher\", \"editor\", \"readonly\"],\n  \"creationToken\": \"super_token\"\n}",
+			"data": [],
 			"dataMode": "raw",
 			"version": 2,
 			"tests": "",
@@ -81,7 +82,8 @@
 			"name": "CreateApplication",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"application\": {\n    \"name\":\"unitTests\",\n    \"description\": \"The unit test project\"\n  },\n  \"adminEmails\":[\"unitTest-admin@utah.gov\"],\n  \"roles\": [\"admin\", \"publisher\", \"editor\", \"readonly\"],\n  \"creationToken\": \"super_token\"\n}"
 		},
 		{
 			"id": "1caa45f6-c434-d735-74c9-3b2a317aa5b9",
@@ -90,7 +92,7 @@
 			"preRequestScript": "",
 			"pathVariables": {},
 			"method": "POST",
-			"data": "{\n  \"email\":\"unitTest-admin@utah.gov\",\n  \"application\": \"unitTests\",\n  \"password\": \"paste from email\",\n  \"persist\": false\n}",
+			"data": [],
 			"dataMode": "raw",
 			"version": 2,
 			"tests": "",
@@ -99,25 +101,25 @@
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
 			"responses": [],
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"unitTest-admin@utah.gov\",\n  \"application\": \"unitTests\",\n  \"password\": \"paste from email\",\n  \"persist\": false\n}"
 		},
 		{
 			"id": "20538b12-b8d5-427b-8124-fd2d8d0e9ae5",
 			"headers": "",
-			"url": "http://localhost/permissionproxy/api/admin/GetAllApproved?application=unitTests",
-			"pathVariables": {},
+			"url": "http://localhost/permissionproxy/api/admin/GetAllApproved?application=unitTests&adminToken=get from db",
 			"preRequestScript": "",
+			"pathVariables": {},
 			"method": "GET",
 			"data": [],
 			"dataMode": "params",
+			"version": 2,
+			"tests": "",
+			"time": 1412122491273,
 			"name": "GetAllApproved",
 			"description": "",
-			"descriptionFormat": "html",
-			"time": 1405634344921,
-			"version": 2,
-			"responses": [],
-			"tests": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
+			"responses": [],
 			"synced": false
 		},
 		{
@@ -140,7 +142,7 @@
 			"url": "http://localhost/permissionproxy/api/user/changeemail",
 			"pathVariables": {},
 			"method": "PUT",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"password\": \"password\", \n  \"newemail\": \"stdavis2@utah.gov\",\n  \"application\": \"unitTests\"\n}",
+			"data": [],
 			"dataMode": "raw",
 			"version": 2,
 			"tests": "",
@@ -149,7 +151,8 @@
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
 			"responses": [],
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"password\": \"password\", \n  \"newemail\": \"stdavis2@utah.gov\",\n  \"application\": \"unitTests\"\n}"
 		},
 		{
 			"id": "670d99e0-3479-1ed7-05df-0941310a92e8",
@@ -157,7 +160,7 @@
 			"url": "http://localhost/permissionproxy/api/user/register",
 			"pathVariables": {},
 			"method": "POST",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"password\":\"password\",\n  \"application\": \"unitTests\",\n  \"first\": \"Scott\",\n  \"last\": \"Davis\",\n  \"agency\": \"AGRC\"\n}",
+			"data": [],
 			"dataMode": "raw",
 			"version": 2,
 			"tests": "",
@@ -165,12 +168,13 @@
 			"name": "Register",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"password\":\"password\",\n  \"application\": \"unitTests\",\n  \"first\": \"Scott\",\n  \"last\": \"Davis\",\n  \"agency\": \"AGRC\"\n}"
 		},
 		{
 			"id": "76fe663b-7da1-6b0f-8adf-86995166f556",
 			"url": "http://localhost/permissionproxy/api/user/resetpassword",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\"\n}",
+			"data": [],
 			"headers": "Content-Type: application/json\n",
 			"dataMode": "raw",
 			"method": "PUT",
@@ -179,12 +183,13 @@
 			"name": "ResetPassword",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\"\n}"
 		},
 		{
 			"id": "7e72d231-9326-e253-23cf-e052549be698",
 			"url": "http://localhost/permissionproxy/api/admin/accept",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"role\": \"publisher\",\n  \"application\": \"unitTests\",\n  \"adminToken\": \"get from login\"\n}",
+			"data": [],
 			"headers": "Content-Type: application/json\n",
 			"dataMode": "raw",
 			"method": "PUT",
@@ -193,7 +198,8 @@
 			"name": "Accept",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"role\": \"publisher\",\n  \"application\": \"unitTests\",\n  \"adminToken\": \"get from login\"\n}"
 		},
 		{
 			"id": "8b5f3c3a-0ed6-09e1-2964-6da55a0f6741",
@@ -201,7 +207,7 @@
 			"url": "http://localhost/permissionproxy/api/admin/accept",
 			"pathVariables": {},
 			"method": "PUT",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"role\": \"publisher\",\n  \"application\": \"unitTests\",\n  \"adminToken\": \"get from login\",\n  \"startDate\": 635295744000000000,\n  \"expirationDate\": 636874272000000000,\n  \"options\": {\n  \t\"access\": [\"this\",\"that\",\"the other\"],\n  }\n}",
+			"data": [],
 			"dataMode": "raw",
 			"version": 2,
 			"tests": "",
@@ -210,12 +216,13 @@
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
 			"responses": [],
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"role\": \"publisher\",\n  \"application\": \"unitTests\",\n  \"adminToken\": \"get from login\",\n  \"startDate\": 635295744000000000,\n  \"expirationDate\": 636874272000000000,\n  \"options\": {\n  \t\"access\": [\"this\",\"that\",\"the other\"],\n  }\n}"
 		},
 		{
 			"id": "94cd7b55-6192-5ee2-239f-dc90de576090",
 			"url": "http://localhost/permissionproxy/api/user/changepassword",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"currentPassword\": \"password\", \n  \"newpassword\": \"changed\",\n  \"newpasswordrepeated\": \"changed\",\n  \"application\": \"unitTests\"\n}",
+			"data": [],
 			"headers": "Content-Type: application/json\n",
 			"dataMode": "raw",
 			"method": "PUT",
@@ -224,7 +231,8 @@
 			"name": "ChangePassword",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"currentPassword\": \"password\", \n  \"newpassword\": \"changed\",\n  \"newpasswordrepeated\": \"changed\",\n  \"application\": \"unitTests\"\n}"
 		},
 		{
 			"id": "a67063d3-fefc-2ae2-0561-02e4a373a1f1",
@@ -277,13 +285,16 @@
 		},
 		{
 			"id": "c70684b0-86ce-3a76-faa2-9514753ed59e",
-			"url": "http://localhost/permissionproxy/api/admin/getallwaiting?application=unitTests",
-			"data": [],
 			"headers": "",
-			"dataMode": "params",
+			"url": "http://localhost/permissionproxy/api/admin/getallwaiting?application=unitTests&adminToken=get from db",
+			"preRequestScript": "",
+			"pathVariables": {},
 			"method": "GET",
+			"data": [],
+			"dataMode": "params",
 			"version": 2,
-			"time": 1381855627517,
+			"tests": "",
+			"time": 1412122485621,
 			"name": "GetAllWaiting",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
@@ -295,7 +306,7 @@
 			"url": "http://localhost/permissionproxy/api/authenticate/user",
 			"pathVariables": {},
 			"method": "POST",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"password\": \"password\",\n  \"persist\": false\n}",
+			"data": [],
 			"dataMode": "raw",
 			"version": 2,
 			"tests": "",
@@ -303,12 +314,13 @@
 			"name": "Successful Login",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"password\": \"password\",\n  \"persist\": false\n}"
 		},
 		{
 			"id": "f751459d-7389-51f2-8e01-f9c82b26f382",
 			"url": "http://localhost/permissionproxy/api/admin/reject",
-			"data": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"adminToken\": \"get from login\"\n}",
+			"data": [],
 			"headers": "Content-Type: application/json\n",
 			"dataMode": "raw",
 			"method": "DELETE",
@@ -317,7 +329,8 @@
 			"name": "Reject",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
-			"synced": false
+			"synced": false,
+			"rawModeData": "{\n  \"email\":\"stdavis@utah.gov\",\n  \"application\": \"unitTests\",\n  \"adminToken\": \"get from login\"\n}"
 		}
 	]
 }

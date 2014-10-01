@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
-using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,13 +9,11 @@ using System.Web.Http;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Database;
-using ArcGisServerPermissionProxy.Domain.Response.Account;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Commands.Users;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
-using ArcGisServerPermissionsProxy.Api.Formatters;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
 using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
@@ -25,10 +22,9 @@ using NLog;
 using Ninject;
 using Raven.Client;
 
-namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
-{
-    public class AdminController : RavenApiController
-    {
+namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
+
+    public class AdminController : RavenApiController {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         [Inject]
@@ -179,7 +175,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 }
 
                 var response =
-                    await CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, user, adminUser.FullName));
+                    await
+                    CommandExecutor.ExecuteCommandAsync(new AcceptUserCommandAsync(s, info, user, adminUser.FullName));
 
                 if (response != null)
                 {
@@ -243,7 +240,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
         }
 
         [HttpGet]
-        public async Task<HttpResponseMessage> GetAllWaiting(string application)
+        public async Task<HttpResponseMessage> GetAllWaiting(string application = null, string adminToken = null)
         {
             if (!ValidationService.IsValid(application))
             {
@@ -252,10 +249,33 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                                     "Missing parameters."));
             }
 
+            if (string.IsNullOrEmpty(adminToken) || !adminToken.Contains("."))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    "Bad Token."));
+            }
+
             Database = application;
 
             using (var s = AsyncSession)
             {
+                var adminTokenParts = adminToken.Split('.');
+                if (adminTokenParts.Length != 2)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
+                }
+
+                var adminUser = await s.LoadAsync<User>(adminTokenParts[0]);
+                if (adminUser.AdminToken != adminToken)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
+                }
+
                 var waitingUsers = await s.Query<User, UsersByApprovedIndex>()
                                           .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                                           .Where(x => x.Active && x.Approved == false)
@@ -266,9 +286,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
             }
         }
 
-
         [HttpGet]
-        public async Task<HttpResponseMessage> GetAllApproved(string application)
+        public async Task<HttpResponseMessage> GetAllApproved(string application = null, string adminToken = null)
         {
             if (!ValidationService.IsValid(application))
             {
@@ -277,10 +296,33 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                                                                     "Missing parameters."));
             }
 
+            if (string.IsNullOrEmpty(adminToken) || !adminToken.Contains("."))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    "Bad Token."));
+            }
+
             Database = application;
 
             using (var s = AsyncSession)
             {
+                var adminTokenParts = adminToken.Split('.');
+                if (adminTokenParts.Length != 2)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
+                }
+
+                var adminUser = await s.LoadAsync<User>(adminTokenParts[0]);
+                if (adminUser.AdminToken != adminToken)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
+                }
+
                 var waitingUsers = await s.Query<User, UsersByApprovedIndex>()
                                           .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                                           .Where(x => x.Active && x.Approved)
@@ -345,6 +387,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin
                 return Request.CreateResponse(HttpStatusCode.OK,
                                               new ResponseContainer<string[]>(conf.Roles));
             }
-        } 
+        }
     }
+
 }
