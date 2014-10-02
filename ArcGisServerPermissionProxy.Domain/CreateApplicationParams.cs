@@ -14,6 +14,14 @@ namespace ArcGisServerPermissionProxy.Domain
             }
 
             /// <summary>
+            /// Gets or sets the user admininstration URL for the website.
+            /// </summary>
+            /// <value>
+            /// The admin URL.
+            /// </value>
+            public string AdminUrl { get; set; }
+
+            /// <summary>
             /// Gets or sets the name of the application.
             /// This will be used to identify the application
             /// </summary>

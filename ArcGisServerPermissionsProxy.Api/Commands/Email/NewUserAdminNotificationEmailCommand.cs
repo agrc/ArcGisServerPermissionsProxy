@@ -14,7 +14,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"### Dear Admin,
 
-{{name}} from {{agency}} has requested access to the {{Description}}.
+**{{name}}** from **{{agency}}** has requested access to the **{{Description}}**.
 
 Use the links below to **accept** or **reject** this request.
 
@@ -24,7 +24,7 @@ Use the links below to **accept** or **reject** this request.
 
 [**Reject** {{name}}]({{rejectUrl}})
     
-Or use the user admin page.";
+Or use the [User admininstration page]({{AdminUrl}}).";
 
             MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
             MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
@@ -53,7 +53,7 @@ Or use the user admin page.";
         public class MailTemplate : MailTemplateBase
         {
             public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string agency, string url,
-                                string application, Guid emailToken, IEnumerable<string> roles, string description)
+                                string application, Guid emailToken, IEnumerable<string> roles, string description, string adminUrl)
                 : base(toAddresses, fromAddresses, name, application)
             {
                 Agency = agency;
@@ -61,8 +61,10 @@ Or use the user admin page.";
                 Description = description;
                 AcceptUrls = new Collection<AcceptModel>();
                 FormatLinks(emailToken, roles, application);
+                AdminUrl = adminUrl;
             }
 
+            public string AdminUrl { get; set; }
             public string Agency { get; set; }
             public string Url { get; set; }
             public string Description { get; set; }

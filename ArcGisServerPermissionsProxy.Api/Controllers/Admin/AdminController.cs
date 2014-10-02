@@ -73,7 +73,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                 var config = s.Load<Config>("1");
                 if (config == null)
                 {
-                    config = new Config(parameters.AdminEmails, parameters.Roles, parameters.Application.Description);
+                    config = new Config(parameters.AdminEmails, parameters.Roles, parameters.Application.Description, parameters.Application.AdminUrl);
 
                     s.Store(config, "1");
                 }
