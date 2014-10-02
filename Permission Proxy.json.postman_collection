@@ -72,18 +72,19 @@
 			"id": "1ae788fe-f397-1680-f134-648767b8b3d8",
 			"headers": "Content-Type: application/json\n",
 			"url": "http://localhost/permissionproxy/api/admin/createapplication",
+			"preRequestScript": "",
 			"pathVariables": {},
 			"method": "POST",
 			"data": [],
 			"dataMode": "raw",
 			"version": 2,
 			"tests": "",
-			"time": 1390864896428,
+			"time": 1412281489979,
 			"name": "CreateApplication",
 			"description": "",
 			"collectionId": "d38a4512-2afb-7c73-b4e1-992385b79923",
 			"synced": false,
-			"rawModeData": "{\n  \"application\": {\n    \"name\":\"unitTests\",\n    \"description\": \"The unit test project\"\n  },\n  \"adminEmails\":[\"unitTest-admin@utah.gov\"],\n  \"roles\": [\"admin\", \"publisher\", \"editor\", \"readonly\"],\n  \"creationToken\": \"super_token\"\n}"
+			"rawModeData": "{\n  \"application\": {\n    \"name\":\"unitTests\",\n    \"description\": \"The unit test project\",\n    \"adminUrl\": \"www.unittests.com\"\n  },\n  \"adminEmails\":[\"unitTest-admin@utah.gov\"],\n  \"roles\": [\"admin\", \"publisher\", \"editor\", \"readonly\"],\n  \"creationToken\": \"super_token\"\n}"
 		},
 		{
 			"id": "1caa45f6-c434-d735-74c9-3b2a317aa5b9",
