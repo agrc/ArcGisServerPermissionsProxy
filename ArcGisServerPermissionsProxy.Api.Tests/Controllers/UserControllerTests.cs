@@ -7,12 +7,15 @@ using System.Web.Http;
 using System.Web.Http.Hosting;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.Account;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Controllers;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
+using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Tests.Infrastructure;
 using CommandPattern;
 using NUnit.Framework;
+using Raven.Imports.Newtonsoft.Json;
 
 namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 {
@@ -33,11 +36,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             var notApprovedActiveUser = new User("Not Approved","but Active", "notApprovedActiveUser@test.com", "AGENCY",
                                                  hashedPassword.Result.HashedPassword, "SALT", null,
-                                                 null, null);
+                                                 null, null, null);
 
             var approvedActiveUser = new User("Approved","and Active", "approvedActiveUser@test.com", "AGENCY",
                                               hashedPassword.Result.HashedPassword, "SALT", null,
-                                              "admin", null)
+                                              "admin", null, null)
                 {
                     Active = false,
                     Approved = true
@@ -45,7 +48,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             var notApprovedNotActiveUser = new User("Not approved","or active", "notApprovedNotActiveUser@test.com",
                                                     "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
-                                                    null, null)
+                                                    null, null, null)
                 {
                     Active = false
                 };
@@ -66,7 +69,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             _controller = new UserController
                 {
                     Request = request,
-                    DocumentStore = DocumentStore
+                    DocumentStore = DocumentStore,
+                    UrlBuilder = new MockUrlBuilder()
                 };
 
             _controller.Request.Properties[HttpPropertyKeys.HttpConfigurationKey] = config;
@@ -151,6 +155,33 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                                                                         "2", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
+        }
+
+        [Test]
+        public async Task CanRegisterWithAdditionalOptions()
+        {
+            var additional = new {address = "123 house st", phone = "111"};
+            var response = await _controller.Register(new Credentials("additional@options.com", "aA123456!", null)
+                {
+                    Additional = additional,
+                    Agency = "Agency",
+                    First = "First",
+                    Last = "Last"
+                });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+
+            using (var s = DocumentStore.OpenSession())
+            {
+                var user = s.Query<User, UserByEmailIndex>()
+                            .Customize(x => x.WaitForNonStaleResults())
+                            .Single(x => x.Email == "additional@options.com");
+
+                var temp = JsonConvert.SerializeObject(additional);
+                var expected = JsonConvert.DeserializeObject(temp);
+
+                Assert.That(user.Additional, Is.EqualTo(expected));
+            }
         }
     }
 }

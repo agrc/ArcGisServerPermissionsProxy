@@ -10,7 +10,7 @@ namespace ArcGisServerPermissionProxy.Domain.Database
         private string _application;
 
         public User(string firstName, string lastName, string email, string agency, string password, string salt,
-                    string application, string role, string adminToken)
+                    string application, string role, string adminToken, object additional)
         {
             Email = email.ToLowerInvariant();
             First = firstName;
@@ -27,6 +27,7 @@ namespace ArcGisServerPermissionProxy.Domain.Database
             AdminToken = adminToken;
             UserId = Guid.NewGuid();
             AccessRules = new UserAccessRules();
+            AdditionalSerialized = JsonConvert.SerializeObject(additional);
         }
 
         public string Id { get; set; }
@@ -168,6 +169,30 @@ namespace ArcGisServerPermissionProxy.Domain.Database
         [JsonProperty]
         public long LastLogin { get; set; }
 
+        [JsonIgnore]
+        public string AdditionalSerialized { get; set; }
+
+        /// <summary>
+        /// Gets or sets the additional options.
+        /// </summary>
+        /// <value>
+        /// The options is a hold all of fields about the user to be 
+        /// used by the client application.
+        /// </value>
+        [Raven.Imports.Newtonsoft.Json.JsonIgnore]
+        public object Additional
+        {
+            get
+            {
+                return string.IsNullOrEmpty(AdditionalSerialized) ?
+                    null :
+                    JsonConvert.DeserializeObject(AdditionalSerialized);
+            }
+        }
+
+        [JsonIgnore]
+        public string OptionsSerialized { get; set; }
+
         [JsonProperty]
         public UserAccessRules AccessRules { get; set; }
 
@@ -198,7 +223,7 @@ namespace ArcGisServerPermissionProxy.Domain.Database
             public long EndDate { get; set; }
 
             /// <summary>
-            /// Gets or sets the options.
+            /// Gets or sets the security access options.
             /// </summary>
             /// <value>
             /// The options is a hold all of extra access information to be 

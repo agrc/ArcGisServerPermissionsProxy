@@ -15,6 +15,8 @@ namespace ArcGisServerPermissionProxy.Domain.Account
 
         public string Agency { get; set; }
 
+        public object Additional { get; set; }
+
         public string FullName
         {
             get { return string.Format("{0} {1}", First, Last).Trim(); }

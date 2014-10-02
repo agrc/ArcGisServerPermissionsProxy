@@ -171,6 +171,7 @@
     <Compile Include="Commands\Users\AcceptUserCommandAsync.cs" />
     <Compile Include="Commands\Users\RejectUserCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\Modules\BootstrapArcGisServerSecurityCommandAsyncModule.cs" />
+    <Compile Include="Configuration\Ninject\Modules\UrlHelperModule.cs" />
     <Compile Include="Controllers\Admin\AdminEmailController.cs" />
     <Compile Include="Controllers\Infrastructure\RavenController.cs" />
     <Compile Include="Controllers\VersionController.cs" />
@@ -185,11 +186,14 @@
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
     <Compile Include="Raven\Indexes\UsersByApprovedIndex.cs" />
     <Compile Include="Services\FormsAuthWrapper.cs" />
+    <Compile Include="Services\IUrlBuilder.cs" />
     <Compile Include="Services\IValidationService.cs" />
+    <Compile Include="Services\MockUrlBuilder.cs" />
     <Compile Include="Services\MockValidationService.cs" />
     <Compile Include="Services\Token\ITokenService.cs" />
     <Compile Include="Services\Token\MockTokenService.cs" />
     <Compile Include="Services\Token\TokenService.cs" />
+    <Compile Include="Services\UrlBuilder.cs" />
     <Compile Include="Services\ValidationService.cs" />
     <Compile Include="Commands\GetUsersTokenForApplicationCommandAsync.cs" />
     <Compile Include="Configuration\Ninject\NinjectDependencyResolver.cs" />
@@ -256,6 +260,7 @@
     <None Include="secrets.Debug.config">
       <DependentUpon>secrets.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
     <None Include="secrets.Production.config">
       <DependentUpon>secrets.config</DependentUpon>

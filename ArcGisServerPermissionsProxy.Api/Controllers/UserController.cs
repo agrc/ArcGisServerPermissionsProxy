@@ -13,14 +13,20 @@ using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
+using ArcGisServerPermissionsProxy.Api.Services;
 using CommandPattern;
+using Ninject;
 using Raven.Client;
 
 namespace ArcGisServerPermissionsProxy.Api.Controllers
 {
     public class UserController : RavenApiController
     {
+        [Inject]
+        public IUrlBuilder UrlBuilder { get; set; }
+
         [HttpPost]
         public async Task<HttpResponseMessage> Register(Credentials user)
         {
@@ -32,14 +38,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
             }
 
             Database = user.Application;
-
-            // does database exist
-            if (Database == null)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                              new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Invalid application name."));
-            }
 
             using (var s = AsyncSession)
             {
@@ -68,13 +66,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                         });
                 }
 
-                if (Database == null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest,
-                                                  new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                        "Invalid application name."));
-                }
-
                 if (emailExists)
                 {
                     return Request.CreateResponse(HttpStatusCode.Conflict,
@@ -87,17 +78,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 var newUser = new User(user.First, user.Last, user.Email, user.Agency, password.HashedPassword,
                                        password.Salt,
-                                       user.Application, null, null);
+                                       user.Application, null, null, user.Additional);
 
                 await s.StoreAsync(newUser);
 
                 var config = await s.LoadAsync<Config>("1");
 
-                var urlBuilder = new UrlHelper(ControllerContext.Request);
-                var url = string.Format("{0}{1}", App.Host, urlBuilder.Route("Default", new
-                    {
-                        Controller = "AdminEmail"
-                    }));
+                var url = UrlBuilder.CreateUrl(ControllerContext, App.Host, "Default", "AdminEmail");
 
                 CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
@@ -111,6 +98,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                    new UserRegistrationNotificationEmailCommand.MailTemplate(
                                                        new[] {user.Email}, config.AdministrativeEmails,
                                                        user.FullName, user.Email, config.Description)));
+                
+                await s.SaveChangesAsync();
             }
 
             return Request.CreateResponse(HttpStatusCode.Created);

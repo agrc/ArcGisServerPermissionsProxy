@@ -92,7 +92,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                                  CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
 
                     var adminUser = new User("admin", "user", useremail, "", hashed.HashedPassword, hashed.Salt,
-                                             application.Name, "admin", "admintoken")
+                                             application.Name, "admin", "admintoken", null)
                         {
                             Active = true,
                             Approved = true
