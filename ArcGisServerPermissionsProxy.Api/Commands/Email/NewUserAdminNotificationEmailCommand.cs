@@ -16,15 +16,17 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
 
 **{{name}}** from **{{agency}}** has requested access to the **{{Description}}**.
 
-Use the links below to **accept** or **reject** this request.
+Use the links below to **accept** the user into their appropriate role or **reject** this users request.
 
 {{#acceptUrls}}
 [**Accept** {{name}} as {{role}}]({{acceptUrl}})  
 {{/acceptUrls}}    
 
-[**Reject** {{name}}]({{rejectUrl}})
-    
-Or use the [User admininstration page]({{AdminUrl}}).";
+[**Reject** {{name}}]({{rejectUrl}})";
+            if(templateData != null && templateData.AdminUrl != null && !string.IsNullOrEmpty(templateData.AdminUrl))
+MessageTemplate += @"
+
+You can also perform these administravtive actions from the [user admininstration page]({{AdminUrl}}).";
 
             MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
             MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
