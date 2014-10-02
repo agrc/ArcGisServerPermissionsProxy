@@ -5,13 +5,22 @@ namespace ArcGisServerPermissionProxy.Domain.Database
 {
     public class Config
     {
-        public Config(string[] administrativeEmails, IEnumerable<string> roles, string description)
+        public Config(string[] administrativeEmails, IEnumerable<string> roles, string description, string adminUrl)
         {
             AdministrativeEmails = administrativeEmails;
             Description = description;
+            AdminUrl = adminUrl;
             Roles = roles.Select(x=>x.ToLowerInvariant()).ToArray();
             UsersCanExpire = false;
         }
+
+        /// <summary>
+        /// Gets or sets the user admininstratiln URL.
+        /// </summary>
+        /// <value>
+        /// The admin URL.
+        /// </value>
+        public string AdminUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the administrative emails. These email adresses will become admin users

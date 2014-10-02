@@ -269,6 +269,7 @@
     <None Include="secrets.Stage.config">
       <DependentUpon>secrets.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
