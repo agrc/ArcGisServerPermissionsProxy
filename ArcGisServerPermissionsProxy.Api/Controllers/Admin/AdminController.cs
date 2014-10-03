@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
+using ArcGisServerPermissionProxy.Domain.Account;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
@@ -19,6 +20,7 @@ using ArcGisServerPermissionsProxy.Api.Raven.Configuration;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using CommandPattern;
 using NLog;
+using Newtonsoft.Json;
 using Ninject;
 using Raven.Client;
 
@@ -387,6 +389,69 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                 return Request.CreateResponse(HttpStatusCode.OK,
                                               new ResponseContainer<string[]>(conf.Roles));
             }
+        }
+
+        [HttpPut]
+        public async Task<HttpResponseMessage> UpdateUser(UpdateUser user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    "Missing parameters."));
+            }
+
+            if (string.IsNullOrEmpty(user.AdminToken) || !user.AdminToken.Contains("."))
+            {
+                return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                              new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                    "Bad Token."));
+            }
+
+            Database = user.Application;
+
+            using (var s = AsyncSession)
+            {
+                var adminTokenParts = user.AdminToken.Split('.');
+                if (adminTokenParts.Length != 2)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
+                }
+
+                var adminUser = await s.LoadAsync<User>(adminTokenParts[0]);
+                if (adminUser.AdminToken != user.AdminToken)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                  new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                        "Bad Token."));
+                }
+
+                var dbuser = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(user.Email, s));
+
+                if (dbuser == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
+                                                  new ResponseContainer(HttpStatusCode.PreconditionFailed,
+                                                                        "User not found."));
+                }
+
+                dbuser.Email = user.Email;
+                dbuser.Role = user.Role;
+                dbuser.First = user.First;
+                dbuser.Last = user.Last;
+                dbuser.Agency = user.Agency;
+                dbuser.AccessRules = user.AccessRules;
+                if (user.Additional != null)
+                {
+                    dbuser.AdditionalSerialized = JsonConvert.SerializeObject(user.Additional);
+                }
+
+                await s.SaveChangesAsync();
+            }
+
+            return Request.CreateResponse(HttpStatusCode.Accepted);
         }
     }
 
