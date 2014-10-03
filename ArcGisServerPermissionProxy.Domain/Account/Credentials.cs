@@ -1,4 +1,5 @@
 ﻿using AgrcPasswordManagement.Models.Account;
+using ArcGisServerPermissionProxy.Domain.Database;
 
 namespace ArcGisServerPermissionProxy.Domain.Account
 {
@@ -16,6 +17,8 @@ namespace ArcGisServerPermissionProxy.Domain.Account
         public string Agency { get; set; }
 
         public object Additional { get; set; }
+
+        public User.UserAccessRules AccessRules { get; set; }
 
         public string FullName
         {

@@ -78,7 +78,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 var newUser = new User(user.First, user.Last, user.Email, user.Agency, password.HashedPassword,
                                        password.Salt,
-                                       user.Application, null, null, user.Additional);
+                                       user.Application, null, null, user.AccessRules, user.Additional);
 
                 await s.StoreAsync(newUser);
 

@@ -17,10 +17,9 @@ using CommandPattern;
 using NUnit.Framework;
 using Raven.Imports.Newtonsoft.Json;
 
-namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
-{
-    public class UserControllerTests : RavenEmbeddableTest
-    {
+namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
+
+    public class UserControllerTests : RavenEmbeddableTest {
         private const string Database = "";
         private UserController _controller;
 
@@ -28,27 +27,29 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
         {
             base.SetUp();
 
-            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"}, new[] {"admin", "role2", "role3", "role4"}, "unit test description", "http://testurl.com/admin.html");
+            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"},
+                                       new[] {"admin", "role2", "role3", "role4"}, "unit test description",
+                                       "http://testurl.com/admin.html");
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
-
-            var notApprovedActiveUser = new User("Not Approved","but Active", "notApprovedActiveUser@test.com", "AGENCY",
+            var notApprovedActiveUser = new User("Not Approved", "but Active", "notApprovedActiveUser@test.com",
+                                                 "AGENCY",
                                                  hashedPassword.Result.HashedPassword, "SALT", null,
-                                                 null, null, null);
+                                                 null, null, null, null);
 
-            var approvedActiveUser = new User("Approved","and Active", "approvedActiveUser@test.com", "AGENCY",
+            var approvedActiveUser = new User("Approved", "and Active", "approvedActiveUser@test.com", "AGENCY",
                                               hashedPassword.Result.HashedPassword, "SALT", null,
-                                              "admin", null, null)
+                                              "admin", null, null, null)
                 {
                     Active = false,
                     Approved = true
                 };
 
-            var notApprovedNotActiveUser = new User("Not approved","or active", "notApprovedNotActiveUser@test.com",
+            var notApprovedNotActiveUser = new User("Not approved", "or active", "notApprovedNotActiveUser@test.com",
                                                     "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
-                                                    null, null, null)
+                                                    null, null, null, null)
                 {
                     Active = false
                 };
@@ -82,7 +83,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await
                            _controller.ResetPassword(
                                new ResetRequestInformation("approvedActiveUser@test.com", Database,
-                                                                          Guid.Empty));
+                                                           Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
 
@@ -103,7 +104,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var response = await
                            _controller.ResetPassword(
                                new ResetRequestInformation("notauser@test.com", Database,
-                                                                          Guid.Empty));
+                                                           Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }
@@ -115,7 +116,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 await
                 _controller.ChangePassword(
                     new ChangePasswordRequestInformation("approvedActiveUser@test.com", "password",
-                                                                        "newPassword", "newPassword", "", Guid.Empty));
+                                                         "newPassword", "newPassword", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
 
@@ -128,7 +129,6 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                             .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                             .Single(x => x.Email == "approvedActiveUser@test.com");
 
-
                 Assert.That(user.Password, Is.EqualTo(hashedPassword.Result.HashedPassword));
             }
         }
@@ -140,7 +140,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 await
                 _controller.ChangePassword(
                     new ChangePasswordRequestInformation("approvedActiveUser@test.com", "wrong",
-                                                                        "newPassword", "newPassword", "", Guid.Empty));
+                                                         "newPassword", "newPassword", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }
@@ -152,7 +152,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 await
                 _controller.ChangePassword(
                     new ChangePasswordRequestInformation("approvedActiveUser@test.com", "password", "1",
-                                                                        "2", "", Guid.Empty));
+                                                         "2", "", Guid.Empty));
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
         }
@@ -177,11 +177,46 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                             .Customize(x => x.WaitForNonStaleResults())
                             .Single(x => x.Email == "additional@options.com");
 
-                var temp = JsonConvert.SerializeObject(additional);
-                var expected = JsonConvert.DeserializeObject(temp);
+                var expected = JsonConvert.SerializeObject(additional);
 
-                Assert.That(user.Additional, Is.EqualTo(expected));
+                Assert.That(user.AdditionalSerialized, Is.EqualTo(expected));
+            }
+        }
+
+        [Test]
+        public async Task CanRegisterWithRestrictionOptions()
+        {
+            var options = new
+                {
+                    Count = new[] {"Kane"}
+                };
+
+            var accessRules = new User.UserAccessRules
+                {
+                    EndDate = 1234567890, StartDate = 1234567890, Options = JsonConvert.SerializeObject(options)
+                };
+            var response = await _controller.Register(new Credentials("additional@options.com", "aA123456!", null)
+                {
+                    AccessRules = accessRules,
+                    Agency = "Agency",
+                    First = "First",
+                    Last = "Last"
+                });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+
+            using (var s = DocumentStore.OpenSession())
+            {
+                var user = s.Query<User, UserByEmailIndex>()
+                            .Customize(x => x.WaitForNonStaleResults())
+                            .Single(x => x.Email == "additional@options.com");
+
+                var actual = JsonConvert.SerializeObject(user.AccessRules);
+                var expected = JsonConvert.SerializeObject(accessRules);
+
+                Assert.That(actual, Is.EqualTo(expected));
             }
         }
     }
+
 }

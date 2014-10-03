@@ -33,11 +33,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
             var adminUser = new User("USER","NAME", "test@test.com", "AGENCY", password.HashedPassword, salt, null,
-                                "admin", "adminToken", null);
+                                "admin", "adminToken", null, null);
             var normalUser = new User("USER", "", "notadmin@test.com", "AGENCY", password.HashedPassword, salt, null,
-                               "publisher", null, null);
+                               "publisher", null, null, null);
             var expiredUser = new User("USER", "", "time@expired.com", "AGENCY", password.HashedPassword, salt, null,
-                               "publisher", null, null);
+                               "publisher", null, null, null);
 
             var app = new Application(null, "test");
 
@@ -275,9 +275,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
 
                 var notSetUp = new User("USER", "NAME", "invalid@user.com", "AGENCY", password.HashedPassword, salt, null,
-                                    "admin", "adminToken", null);
+                                    "admin", "adminToken", null, null);
                 var expiredUser = new User("USER", "", "too@late.com", "AGENCY", password.HashedPassword, salt, null,
-                                   "publisher", null, null)
+                                   "publisher", null, null, null)
                 {
                     AccessRules = new User.UserAccessRules
                         {
@@ -286,7 +286,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                         }
                 };
                 var earlyUser = new User("USER", "", "too@early.com", "AGENCY", password.HashedPassword, salt, null,
-                                   "publisher", null, null)
+                                   "publisher", null, null, null)
                 {
                     AccessRules = new User.UserAccessRules
                     {
@@ -295,7 +295,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                     }
                 };
                 var validUser = new User("USER", "", "valid@user.com", "AGENCY", password.HashedPassword, salt, null,
-                                   "publisher", null, null)
+                                   "publisher", null, null, null)
                 {
                     AccessRules = new User.UserAccessRules
                     {

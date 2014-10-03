@@ -42,15 +42,15 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
             ApprovedAdmin = new User("admin", "", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
-                                         "SALT", null, null, "1admin.abc", null);
+                                         "SALT", null, null, "1admin.abc", null, null);
 
             var notApprovedActiveUser = new User("Not Approved"," but Active", "notApprovedActiveUser@test.com", "AGENCY",
                                                  hashedPassword.Result.HashedPassword, "SALT", null,
-                                                 null, null, null);
+                                                 null, null, null, null);
 
             var approvedActiveUser = new User("Approved and","Active", "approvedActiveUser@test.com", "AGENCY",
                                               hashedPassword.Result.HashedPassword, "SALT", null,
-                                              "admin", null, null)
+                                              "admin", null, null, null)
                 {
                     Active = false,
                     Approved = true
@@ -58,7 +58,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
 
             var notApprovedNotActiveUser = new User("Not approved","or active", "notApprovedNotActiveUser@test.com",
                                                     "AGENCY", hashedPassword.Result.HashedPassword, "SALT", null,
-                                                    null, null, null)
+                                                    null, null, null, null)
                 {
                     Active = false
                 };

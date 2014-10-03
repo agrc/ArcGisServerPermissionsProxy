@@ -2,15 +2,15 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-namespace ArcGisServerPermissionProxy.Domain.Database
-{
+namespace ArcGisServerPermissionProxy.Domain.Database {
+
     [JsonObject(MemberSerialization.OptIn)]
-    public class User
-    {
+    public class User {
         private string _application;
 
         public User(string firstName, string lastName, string email, string agency, string password, string salt,
-                    string application, string role, string adminToken, object additional)
+                    string application, string role, string adminToken, UserAccessRules userAccessRules,
+                    object additional)
         {
             Email = email.ToLowerInvariant();
             First = firstName;
@@ -26,7 +26,7 @@ namespace ArcGisServerPermissionProxy.Domain.Database
             ExpirationDateTicks = DateTime.UtcNow.AddMonths(1).Ticks;
             AdminToken = adminToken;
             UserId = Guid.NewGuid();
-            AccessRules = new UserAccessRules();
+            AccessRules = userAccessRules;
             AdditionalSerialized = JsonConvert.SerializeObject(additional);
         }
 
@@ -172,71 +172,54 @@ namespace ArcGisServerPermissionProxy.Domain.Database
         [JsonIgnore]
         public string AdditionalSerialized { get; set; }
 
-        /// <summary>
-        /// Gets or sets the additional options.
-        /// </summary>
-        /// <value>
-        /// The options is a hold all of fields about the user to be 
-        /// used by the client application.
-        /// </value>
         [Raven.Imports.Newtonsoft.Json.JsonIgnore]
+        [JsonProperty]
         public object Additional
         {
             get
             {
-                return string.IsNullOrEmpty(AdditionalSerialized) ?
-                    null :
-                    JsonConvert.DeserializeObject(AdditionalSerialized);
+                return string.IsNullOrEmpty(AdditionalSerialized)
+                           ? null
+                           : JsonConvert.DeserializeObject(AdditionalSerialized);
             }
         }
-
-        [JsonIgnore]
-        public string OptionsSerialized { get; set; }
 
         [JsonProperty]
         public UserAccessRules AccessRules { get; set; }
 
-        public bool ShouldSerializeAccessRules()
-        {
-            return AccessRules.StartDate > 0;
-        }
-
+//        public bool ShouldSerializeAccessRules()
+//        {
+//            return AccessRules.StartDate > 0;
+//        }
         /// <summary>
-        /// Rules class for accessing the website
+        ///     Rules class for accessing the website
         /// </summary>
-        public class UserAccessRules
-        {
+        public class UserAccessRules {
             /// <summary>
-            /// Gets or sets the start date in utc ticks.
+            ///     Gets or sets the start date in utc ticks.
             /// </summary>
             /// <value>
-            /// The start date in ticks for when the user has access to the system.
+            ///     The start date in ticks for when the user has access to the system.
             /// </value>
             public long StartDate { get; set; }
 
             /// <summary>
-            /// Gets or sets the end date in UTC ticks.
+            ///     Gets or sets the end date in UTC ticks.
             /// </summary>
             /// <value>
-            /// The end date in ticks for when the users access expires.
+            ///     The end date in ticks for when the users access expires.
             /// </value>
             public long EndDate { get; set; }
 
-            /// <summary>
-            /// Gets or sets the security access options.
-            /// </summary>
-            /// <value>
-            /// The options is a hold all of extra access information to be 
-            /// used by the client application.
-            /// </value>
             [Raven.Imports.Newtonsoft.Json.JsonIgnore]
             public object Options
             {
+                set { OptionsSerialized = JsonConvert.SerializeObject(value); }
                 get
                 {
-                    return string.IsNullOrEmpty(OptionsSerialized) ?
-                        null :
-                        JsonConvert.DeserializeObject(OptionsSerialized);
+                    return string.IsNullOrEmpty(OptionsSerialized)
+                               ? null
+                               : JsonConvert.DeserializeObject(OptionsSerialized);
                 }
             }
 
@@ -244,4 +227,5 @@ namespace ArcGisServerPermissionProxy.Domain.Database
             public string OptionsSerialized { get; set; }
         }
     }
+
 }
