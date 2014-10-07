@@ -394,7 +394,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
         [HttpPut]
         public async Task<HttpResponseMessage> UpdateUser(UpdateUser user)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || string.IsNullOrEmpty(user.UserId))
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
@@ -428,7 +428,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                                                                         "Bad Token."));
                 }
 
-                var dbuser = await CommandExecutor.ExecuteCommandAsync(new GetUserCommandAsync(user.Email, s));
+                var dbuser = await s.LoadAsync<User>(user.UserId);
 
                 if (dbuser == null)
                 {
@@ -443,6 +443,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                 dbuser.Last = user.Last;
                 dbuser.Agency = user.Agency;
                 dbuser.AccessRules = user.AccessRules;
+
                 if (user.Additional != null)
                 {
                     dbuser.AdditionalSerialized = JsonConvert.SerializeObject(user.Additional);
