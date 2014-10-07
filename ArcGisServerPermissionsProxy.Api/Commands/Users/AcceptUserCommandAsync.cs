@@ -56,7 +56,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                     {
                         StartDate = _info.StartDate,
                         EndDate = _info.ExpirationDate,
-                        OptionsSerialized = JsonConvert.SerializeObject(_info.Options)
+                        Options = JsonConvert.SerializeObject(_info.Options)
                     };
             }
 

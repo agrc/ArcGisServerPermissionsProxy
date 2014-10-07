@@ -61,6 +61,7 @@
     <Compile Include="AcceptRequestInformation.cs" />
     <Compile Include="Account\AdminCredentials.cs" />
     <Compile Include="Account\Credentials.cs" />
+    <Compile Include="Account\UpdateUser.cs" />
     <Compile Include="ArcGIS\AdminServerStatus.cs" />
     <Compile Include="ArcGIS\ArcGisServerError.cs" />
     <Compile Include="ArcGIS\TokenModel.cs" />
