@@ -32,9 +32,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var errors = string.Join("; ", ModelState.Values
+                                        .SelectMany(x => x.Errors)
+                                        .Select(x => x.ErrorMessage));
+
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
+                                                                    string.Format("Missing parameters. {0}", errors)));
             }
 
             Database = user.Application;
@@ -89,7 +93,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                 CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
-                                                       user.FullName, user.Agency,
+                                                       user.FullName, user.Agency, user.Email,
                                                        url, user.Application, newUser.Token, config.Roles,
                                                        config.Description, config.AdminUrl)));
 
@@ -110,9 +114,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var errors = string.Join("; ", ModelState.Values
+                                         .SelectMany(x => x.Errors)
+                                         .Select(x => x.ErrorMessage));
+
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
+                                                                    string.Format("Missing parameters. {0}", errors)));
             }
 
             Database = info.Application;
@@ -156,9 +164,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var errors = string.Join("; ", ModelState.Values
+                                        .SelectMany(x => x.Errors)
+                                        .Select(x => x.ErrorMessage));
+
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
+                                                                    string.Format("Missing parameters. {0}", errors)));
             }
 
             if (info.NewPassword != info.NewPasswordRepeated)
@@ -229,9 +241,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var errors = string.Join("; ", ModelState.Values
+                                         .SelectMany(x => x.Errors)
+                                         .Select(x => x.ErrorMessage));
+
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
+                                                                    string.Format("Missing parameters. {0}", errors)));
             }
 
             if (info.Email == info.NewEmail)

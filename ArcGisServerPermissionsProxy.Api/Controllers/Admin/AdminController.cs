@@ -43,7 +43,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
         {
             if (!ModelState.IsValid)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                var errors = string.Join("; ", ModelState.Values
+                                        .SelectMany(x => x.Errors)
+                                        .Select(x => x.ErrorMessage));
+
+                return Request.CreateResponse(HttpStatusCode.BadRequest,
+                                              new ResponseContainer(HttpStatusCode.BadRequest,
+                                                                    string.Format("Missing parameters. {0}", errors)));
             }
 
             if (App.CreationToken != parameters.CreationToken)
@@ -135,9 +141,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
         {
             if (!ModelState.IsValid)
             {
+                var errors = string.Join("; ", ModelState.Values
+                                        .SelectMany(x => x.Errors)
+                                        .Select(x => x.ErrorMessage));
+
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
+                                                                    string.Format("Missing parameters. {0}", errors)));
             }
 
             if (string.IsNullOrEmpty(info.AdminToken) || !info.AdminToken.Contains("."))
@@ -194,9 +204,13 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
         {
             if (!ModelState.IsValid)
             {
+                var errors = string.Join("; ", ModelState.Values
+                                         .SelectMany(x => x.Errors)
+                                         .Select(x => x.ErrorMessage));
+
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
-                                                                    "Missing parameters."));
+                                                                    string.Format("Missing parameters. {0}", errors)));
             }
 
             if (string.IsNullOrEmpty(info.AdminToken) || !info.AdminToken.Contains("."))
