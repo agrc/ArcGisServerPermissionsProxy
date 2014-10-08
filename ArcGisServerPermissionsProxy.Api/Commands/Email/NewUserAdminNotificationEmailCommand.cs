@@ -14,9 +14,9 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"### Dear Admin,
 
-**{{name}}** from **{{agency}}** has requested access to the **{{Description}}**.
+**{{name}}**, _({{email}})_, from **{{agency}}** has requested access to the **{{Description}}**.
 
-Use the links below to **accept** the user into their appropriate role or **reject** this users request.
+Use the links below to **accept** {{name}} into their appropriate role or **reject** this users request.
 
 {{#acceptUrls}}
 [**Accept** {{name}} as {{role}}]({{acceptUrl}})  
@@ -54,11 +54,12 @@ You can also perform these administravtive actions from the [user admininstratio
 
         public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string agency, string url,
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string agency, string email, string url,
                                 string application, Guid emailToken, IEnumerable<string> roles, string description, string adminUrl)
                 : base(toAddresses, fromAddresses, name, application)
             {
                 Agency = agency;
+                Email = email;
                 Url = url;
                 Description = description;
                 AcceptUrls = new Collection<AcceptModel>();
@@ -68,6 +69,7 @@ You can also perform these administravtive actions from the [user admininstratio
 
             public string AdminUrl { get; set; }
             public string Agency { get; set; }
+            public string Email { get; set; }
             public string Url { get; set; }
             public string Description { get; set; }
             public Collection<AcceptModel> AcceptUrls { get; set; }
