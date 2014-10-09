@@ -184,6 +184,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Raven\Configuration\IIndexable.cs" />
     <Compile Include="Raven\Indexes\ApplicationByNameIndex.cs" />
+    <Compile Include="Raven\Indexes\UserByIdIndex.cs" />
     <Compile Include="Raven\Indexes\UsersByApprovedIndex.cs" />
     <Compile Include="Services\FormsAuthWrapper.cs" />
     <Compile Include="Services\IUrlBuilder.cs" />

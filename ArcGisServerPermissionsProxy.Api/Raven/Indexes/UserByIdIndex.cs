@@ -2,17 +2,16 @@
 using ArcGisServerPermissionProxy.Domain.Database;
 using Raven.Client.Indexes;
 
-namespace ArcGisServerPermissionsProxy.Api.Raven.Indexes
-{
-    public class UserByEmailIndex : AbstractIndexCreationTask<User>
+namespace ArcGisServerPermissionsProxy.Api.Raven.Indexes {
+
+    public class UserByIdIndex : AbstractIndexCreationTask<User>
     {
-        public UserByEmailIndex()
+        public UserByIdIndex()
         {
             Map = users => from user in users
                            select new
                                {
-                                   user.Email,
-                                   user.Token
+                                   user.UserId
                                };
         }
     }
