@@ -15,12 +15,20 @@ namespace ArcGisServerPermissionProxy.Domain.Database
         }
 
         /// <summary>
-        /// Gets or sets the user admininstratiln URL.
+        /// Gets or sets the user admininstrative URL.
         /// </summary>
         /// <value>
-        /// The admin URL.
+        /// This page will be appended to `BaseUrl` to access the admin page.
         /// </value>
         public string AdminUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the base URL of the application.
+        /// </summary>
+        /// <value>
+        /// The base URL.
+        /// </value>
+        public string BaseUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the administrative emails. These email adresses will become admin users

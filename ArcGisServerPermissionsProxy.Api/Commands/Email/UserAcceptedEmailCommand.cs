@@ -11,10 +11,13 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"### Dear {{Name}},
 
-You have been granted permission to login to the {{Application}}.
+You have been granted permission to [login]({{BaseUrl}}) to the {{Application}}.
 
-Your user name is `{{username}}`  
-Your assigned role is: `{{role}}`
+You can access the {{Application}} at `{{BaseUrl}}`.
+
+Your user name is: **{{username}}**  
+Your assigned role is: **{{role}}**  
+Your password is what you provided when you registered.
 
 If you have any questions, you may reply to this email.
 
@@ -45,15 +48,17 @@ Thank you";
         public class MailTemplate : MailTemplateBase
         {
             public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string role,
-                                string userName, string application)
+                                string userName, string application, string baseUrl)
                 : base(toAddresses, fromAddresses, name, application)
             {
                 UserName = userName;
+                BaseUrl = baseUrl;
                 Role = role;
             }
 
             public string Role { get; set; }
             public string UserName { get; set; }
+            public string BaseUrl { get; set; }
 
             public override string ToString()
             {

@@ -68,7 +68,8 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                                                                                            AdministrativeEmails,
                                                                                        _user.FullName, _info.Role,
                                                                                        _user.Email,
-                                                                                       config.Description)));
+                                                                                       config.Description,
+                                                                                       config.BaseUrl)));
             if (config.AdministrativeEmails.Length > 1)
             {
                 var nofity = config.AdministrativeEmails.Where(x => x != _approvingAdmin).ToArray();

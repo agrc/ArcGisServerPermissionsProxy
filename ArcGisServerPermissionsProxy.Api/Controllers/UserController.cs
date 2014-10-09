@@ -95,7 +95,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
                                                        config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
                                                        user.FullName, user.Agency, user.Email,
                                                        url, user.Application, newUser.Token, config.Roles,
-                                                       config.Description, config.AdminUrl)));
+                                                       config.Description, config.BaseUrl, config.AdminUrl)));
 
 
                 CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(

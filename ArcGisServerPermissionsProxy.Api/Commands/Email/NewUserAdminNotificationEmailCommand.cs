@@ -26,7 +26,7 @@ Use the links below to **accept** {{name}} into their appropriate role or **reje
             if(templateData != null && templateData.AdminUrl != null && !string.IsNullOrEmpty(templateData.AdminUrl))
 MessageTemplate += @"
 
-You can also perform these administravtive actions from the [user admininstration page]({{AdminUrl}}).";
+You can also perform these administravtive actions from the [user admininstration page]({{BaseUrl}}{{AdminUrl}}).";
 
             MailMessage.To.Add(string.Join(",", templateData.ToAddresses));
             MailMessage.From = new MailAddress(Enumerable.First(templateData.FromAddresses));
@@ -54,14 +54,15 @@ You can also perform these administravtive actions from the [user admininstratio
 
         public class MailTemplate : MailTemplateBase
         {
-            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string agency, string email, string url,
-                                string application, Guid emailToken, IEnumerable<string> roles, string description, string adminUrl)
+            public MailTemplate(string[] toAddresses, string[] fromAddresses, string name, string agency, string email, string adminEmailUrl,
+                                string application, Guid emailToken, IEnumerable<string> roles, string description, string baseUrl, string adminUrl)
                 : base(toAddresses, fromAddresses, name, application)
             {
                 Agency = agency;
                 Email = email;
-                Url = url;
+                AdminEmailUrl = adminEmailUrl;
                 Description = description;
+                BaseUrl = baseUrl;
                 AcceptUrls = new Collection<AcceptModel>();
                 FormatLinks(emailToken, roles, application);
                 AdminUrl = adminUrl;
@@ -70,8 +71,9 @@ You can also perform these administravtive actions from the [user admininstratio
             public string AdminUrl { get; set; }
             public string Agency { get; set; }
             public string Email { get; set; }
-            public string Url { get; set; }
+            public string AdminEmailUrl { get; set; }
             public string Description { get; set; }
+            public string BaseUrl { get; set; }
             public Collection<AcceptModel> AcceptUrls { get; set; }
             public string RejectUrl { get; set; }
 
@@ -79,15 +81,15 @@ You can also perform these administravtive actions from the [user admininstratio
             {
                 foreach (var role in roles)
                 {
-                    AcceptUrls.Add(new AcceptModel(role, string.Format("{0}/accept?token={1}&role={2}&application={3}", Url, emailToken, role, application)));
+                    AcceptUrls.Add(new AcceptModel(role, string.Format("{0}/accept?token={1}&role={2}&application={3}", AdminEmailUrl, emailToken, role, application)));
                 }
 
-                RejectUrl = string.Format("{0}/reject?token={1}&application={2}", Url, emailToken, application);
+                RejectUrl = string.Format("{0}/reject?token={1}&application={2}", AdminEmailUrl, emailToken, application);
             }
 
             public override string ToString()
             {
-                return string.Format("Agency: {0}, Url: {1}", Agency, Url);
+                return string.Format("Agency: {0}, Url: {1}", Agency, AdminEmailUrl);
             }
 
             public class AcceptModel

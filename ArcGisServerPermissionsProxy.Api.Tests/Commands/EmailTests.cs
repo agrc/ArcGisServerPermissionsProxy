@@ -17,7 +17,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
                                                        new[] {"admin@application.com", "replyToList1@application.com", "replyToList2@application.com"}, "Name", "Agency",
-                                                       "email@location.com", "http://url.com", "application", Guid.NewGuid(), new[] { "admin", "editor", "readonly" }, "description", "http://localhost/git/pel/src/user_admin.html")));
+                                                       "email@location.com", "http://url.com", "application", Guid.NewGuid(), new[] { "admin", "editor", "readonly" }, "description", "http://localhost/git/pel/src/", "user_admin.html")));
             }
 
             [Test]
@@ -27,7 +27,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                                                    new NewUserAdminNotificationEmailCommand.MailTemplate(
                                                        new[] { "sgourley@utah.gov", "stdavis@utah.gov" },
                                                        new[] { "admin@application.com", "replyToList1@application.com", "replyToList2@application.com" }, "Name", "Agency",
-                                                       "email@location.com", "http://url.com", "application", Guid.NewGuid(), new[] { "admin", "editor", "readonly" }, "description", "")));
+                                                       "email@location.com", "http://url.com", "application", Guid.NewGuid(), new[] { "admin", "editor", "readonly" }, "description", "", "")));
             }
         }
 
@@ -52,7 +52,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
             {
                 CommandExecutor.ExecuteCommand(
                     new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {"sgourley@utah.gov", "stdavis@utah.gov"},
-                                                       new[] {"admin@application.com"}, "Name", "role1", "UserName", "Application")));
+                                                       new[] { "admin@application.com" }, "Name", "role1", "UserName", "Application", "http://localhost/git/pel/src/")));
             }
         }
 
