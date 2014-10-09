@@ -159,11 +159,19 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
         [Test]
         public async Task AdminsCanEditUsers()
         {
+            Guid userId;
+            using (var s = DocumentStore.OpenSession())
+            {
+                userId = s.Query<User, UserByEmailIndex>()
+                                          .Customize(x => x.WaitForNonStaleResults())
+                                          .Single(x => x.Email == "admin@email.com".ToLowerInvariant()).UserId;
+            }
+
             var updateUser = new UpdateUser
                 {
                     AdminToken = "1admin.abc", 
                     Agency = "new agency",
-                    UserId = "1admin",
+                    UserId = userId,
                     Email = "new@email.com",
                     Role = "role2", // currently admin
                     First = "new first", 
@@ -209,12 +217,39 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
                 {
                     AdminToken = "1admin.abc", 
                     Agency = "new agency",
-                    UserId = "not found"
+                    UserId = new Guid("11111111111111111111111111111111")
                 };
 
             var response = await _controller.UpdateUser(updateUser);
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.PreconditionFailed));
+        }
+
+        [Test]
+        public async Task UpdateFailsGracefullyIfDuplicateId()
+        {
+            User alreadyInUseUser;
+            const string alreadyInUseEmail = "approvedActiveUser@test.com";
+
+            using (var s = DocumentStore.OpenSession())
+            {
+                alreadyInUseUser = s.Query<User, UserByEmailIndex>()
+                            .Customize(x => x.WaitForNonStaleResults())
+                            .Single(x => x.Email == "notApprovedActiveUser@test.com");
+            }
+
+
+            var updateUser = new UpdateUser
+            {
+                AdminToken = "1admin.abc",
+                Agency = "new agency",
+                UserId = alreadyInUseUser.UserId,
+                Email = alreadyInUseEmail
+            };
+
+            var response = await _controller.UpdateUser(updateUser);
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
         }
         
         [Test]

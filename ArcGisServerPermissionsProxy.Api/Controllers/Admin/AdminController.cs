@@ -44,8 +44,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
             if (!ModelState.IsValid)
             {
                 var errors = string.Join("; ", ModelState.Values
-                                        .SelectMany(x => x.Errors)
-                                        .Select(x => x.ErrorMessage));
+                                                         .SelectMany(x => x.Errors)
+                                                         .Select(x => x.ErrorMessage));
 
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
@@ -81,7 +81,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                 var config = s.Load<Config>("1");
                 if (config == null)
                 {
-                    config = new Config(parameters.AdminEmails, parameters.Roles, parameters.Application.Description, parameters.Application.AdminUrl, parameters.Application.BaseUrl);
+                    config = new Config(parameters.AdminEmails, parameters.Roles, parameters.Application.Description,
+                                        parameters.Application.AdminUrl, parameters.Application.BaseUrl);
 
                     s.Store(config, "1");
                 }
@@ -142,8 +143,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
             if (!ModelState.IsValid)
             {
                 var errors = string.Join("; ", ModelState.Values
-                                        .SelectMany(x => x.Errors)
-                                        .Select(x => x.ErrorMessage));
+                                                         .SelectMany(x => x.Errors)
+                                                         .Select(x => x.ErrorMessage));
 
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
@@ -205,8 +206,8 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
             if (!ModelState.IsValid)
             {
                 var errors = string.Join("; ", ModelState.Values
-                                         .SelectMany(x => x.Errors)
-                                         .Select(x => x.ErrorMessage));
+                                                         .SelectMany(x => x.Errors)
+                                                         .Select(x => x.ErrorMessage));
 
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
@@ -408,7 +409,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
         [HttpPut]
         public async Task<HttpResponseMessage> UpdateUser(UpdateUser user)
         {
-            if (!ModelState.IsValid || string.IsNullOrEmpty(user.UserId))
+            if (!ModelState.IsValid || user.UserId == Guid.Empty)
             {
                 return Request.CreateResponse(HttpStatusCode.BadRequest,
                                               new ResponseContainer(HttpStatusCode.BadRequest,
@@ -442,13 +443,58 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                                                                         "Bad Token."));
                 }
 
-                var dbuser = await s.LoadAsync<User>(user.UserId);
+                User dbuser = null;
+                var dbusers = await s.Query<User, UserByIdIndex>()
+                                    .Where(x => x.UserId == user.UserId)
+                                    .ToListAsync();
+
+                try
+                {
+                    dbuser = dbusers.Single();
+                }
+                catch (InvalidOperationException)
+                {
+                    // swallow, no user found
+                }
 
                 if (dbuser == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.PreconditionFailed,
                                                   new ResponseContainer(HttpStatusCode.PreconditionFailed,
                                                                         "User not found."));
+                }
+
+
+                if (user.Email != dbuser.Email)
+                {
+                    var emailExists = false;
+
+                    try
+                    {
+                        emailExists = await s.Query<User, UserByEmailIndex>()
+                                             .Where(x => x.Email == user.Email)
+                                             .AnyAsync();
+                    }
+                    catch (AggregateException aex)
+                    {
+                        aex.Flatten().Handle(ex => // Note that we still need to call Flatten
+                            {
+                                if (ex is WebException)
+                                {
+                                    Database = null;
+                                    return true;
+                                }
+
+                                return false; // All other exceptions will get rethrown
+                            });
+                    }
+
+                    if (emailExists)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Conflict,
+                                                      new ResponseContainer(HttpStatusCode.Conflict,
+                                                                            "Email is already in use."));
+                    }
                 }
 
                 dbuser.Email = user.Email;

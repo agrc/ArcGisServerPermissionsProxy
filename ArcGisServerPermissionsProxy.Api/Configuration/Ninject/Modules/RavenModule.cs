@@ -34,7 +34,7 @@ namespace ArcGisServerPermissionsProxy.Api.Configuration.Ninject.Modules
                     ((HttpWebRequest)args.Request).UnsafeAuthenticatedConnectionSharing = true;
                 };
 
-            RavenConfig.Register(typeof(UserByEmailIndex), documentStore);
+            RavenConfig.Register(typeof(UserByIdIndex), documentStore);
 
             return documentStore;
         }
