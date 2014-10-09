@@ -29,7 +29,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
 
             var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"},
                                        new[] {"admin", "role2", "role3", "role4"}, "unit test description",
-                                       "http://testurl.com/admin.html");
+                                       "http://testurl.com/", "admin.html");
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));

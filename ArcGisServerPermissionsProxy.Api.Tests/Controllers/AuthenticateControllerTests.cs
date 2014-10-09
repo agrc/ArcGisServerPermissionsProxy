@@ -70,7 +70,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                 var appConfig = s.Load<Config>("1");
                 if (appConfig == null)
                 {
-                    appConfig = new Config(new[] { "admin@email" }, new[] { "role" }, "unit testing description", "http://testurl.com/admin.html");
+                    appConfig = new Config(new[] { "admin@email" }, new[] { "role" }, "unit testing description", "http://testurl.com/", "admin.html");
 
                     s.Store(appConfig, "1");
                 }
@@ -328,7 +328,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers
                     var appConfig = s.Load<Config>("1");
                     if (appConfig == null)
                     {
-                        appConfig = new Config(new[] { "admin@email" }, new[] { "role" }, "unit testing description", "http://testurl.com/admin.html")
+                        appConfig = new Config(new[] { "admin@email" }, new[] { "role" }, "unit testing description", "http://testurl.com/", "admin.html")
                             {
                                 UsersCanExpire = true
                             };

@@ -5,11 +5,12 @@ namespace ArcGisServerPermissionProxy.Domain.Database
 {
     public class Config
     {
-        public Config(string[] administrativeEmails, IEnumerable<string> roles, string description, string adminUrl)
+        public Config(string[] administrativeEmails, IEnumerable<string> roles, string description, string adminUrl, string baseUrl)
         {
             AdministrativeEmails = administrativeEmails;
             Description = description;
             AdminUrl = adminUrl;
+            BaseUrl = baseUrl;
             Roles = roles.Select(x=>x.ToLowerInvariant()).ToArray();
             UsersCanExpire = false;
         }
