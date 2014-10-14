@@ -15,8 +15,8 @@ You have been granted permission to [login]({{BaseUrl}}) to the {{Application}}.
 
 You can access the {{Application}} at `{{BaseUrl}}`.
 
-Your user name is: **{{username}}**  
-Your assigned role is: **{{role}}**  
+Your user name is: **{{UserName}}**  
+Your assigned role is: **{{Role}}**  
 Your password is what you provided when you registered.
 
 If you have any questions, you may reply to this email.

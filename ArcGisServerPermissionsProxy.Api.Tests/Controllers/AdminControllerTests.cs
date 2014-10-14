@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -34,9 +35,14 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
             base.SetUp();
             App.Cache();
 
-            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"},
-                                       new[] {"admin", "role2", "role3", "role4"}, "unit test description",
-                                       "http://testurl.com/", "admin.html");
+            var appConfig = new Config
+            {
+                AdministrativeEmails = new[] { "admin1@email.com", "admin2@email.com" },
+                Roles = new[] { "admin", "role2", "role3", "role4" },
+                Description = "unit test description",
+                AdminPage = "admin.html",
+                BaseUrl = "http://testurl.com/"
+            };
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
@@ -64,6 +70,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
                     Active = false
                 };
 
+            var accessRulesUser = new User("Not Approved", " but Active", "accessRules@test.com",
+                                                 "AGENCY",
+                                                 hashedPassword.Result.HashedPassword, "SALT", null,
+                                                 null, null, null, null);
+
             using (var s = DocumentStore.OpenSession())
             {
                 s.Store(appConfig, "1");
@@ -71,6 +82,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
                 s.Store(approvedActiveUser);
                 s.Store(notApprovedActiveUser);
                 s.Store(notApprovedNotActiveUser);
+                s.Store(accessRulesUser);
 
                 s.SaveChanges();
             }
@@ -154,6 +166,44 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
                 Assert.That(user.Approved, Is.True);
                 Assert.That(user.Role, Is.EquivalentTo("admin"));
             }
+        }
+
+        [Test]
+        public async Task AcceptUserSendsCustomApprovalEmailWithCounties()
+        {
+            using (var s = DocumentStore.OpenSession())
+            {
+                var config = s.Load<Config>("1");
+                config.CustomEmails = new CustomEmails
+                    {
+                        NotifyUserAccepted = "### Hello {{User.FullName}},\n\n **Good News!**" +
+                                             " You have been granted permission to [login]({{Config.BaseUrl}})" +
+                                             " to the {{Config.Description}}! " +
+                                             "{{#if User.AccessRules.HasRestrictions}}You have access to data " +
+                                             "in {{#each User.AccessRules.Options.county}}{{#if @first}}" +
+                                             "{{this}}{{else}}{{#if @last}} and {{this}}{{else}}, {{this}}" +
+                                             "{{/if}}{{/if}}{{/each}} until {{User.AccessRules.PrettyEndDate}}." +
+                                             "{{else}} {{/if}}\n\n You can access the {{Config.Description}} " +
+                                             "at `{{Config.BaseUrl}}`.\n\n Your user name is: **{{User.Email}}**" +
+                                             "  \n Your assigned role is: **{{User.Role}}**  \n Your password is " +
+                                             "what you provided when you registered.  \n - _Don't worry, you can" +
+                                             " reset your password if you forgot._\n\n If you have any questions," +
+                                             " you may reply to this email.\n\n Thank you and enjoy the rest of your day!"
+                    };
+                config.UsersCanExpire = true;
+
+                s.SaveChanges();
+            }
+
+            dynamic options = new ExpandoObject();
+            options.county = new[] {"Kane", "Salt Lake"};
+
+            var response = await
+                           _controller.Accept(
+                               new AcceptRequestInformation("accessRules@test.com",
+                                                            "ADMIN", Guid.Empty, Database, "1admin.abc", 0, 0, options));
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
         }
 
         [Test]

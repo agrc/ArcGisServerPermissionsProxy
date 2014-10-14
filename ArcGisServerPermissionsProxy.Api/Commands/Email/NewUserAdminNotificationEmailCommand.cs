@@ -14,15 +14,14 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email
             TemplateData = templateData;
             MessageTemplate = @"### Dear Admin,
 
-**{{name}}**, _({{email}})_, from **{{agency}}** has requested access to the **{{Description}}**.
+**{{Name}}**, _({{Email}})_, from **{{Agency}}** has requested access to the **{{Description}}**.
 
-Use the links below to **accept** {{name}} into their appropriate role or **reject** this users request.
+Use the links below to **accept** {{Name}} into their appropriate role or **reject** this users request.
 
-{{#acceptUrls}}
-[**Accept** {{name}} as {{role}}]({{acceptUrl}})  
-{{/acceptUrls}}    
+{{#AcceptUrls}}
+[**Accept** {{Name}} as {{Role}}]({{AcceptUrl}}){{/AcceptUrls}}    
 
-[**Reject** {{name}}]({{rejectUrl}})";
+[**Reject** {{Name}}]({{RejectUrl}})";
             if(templateData != null && templateData.AdminUrl != null && !string.IsNullOrEmpty(templateData.AdminUrl))
 MessageTemplate += @"
 

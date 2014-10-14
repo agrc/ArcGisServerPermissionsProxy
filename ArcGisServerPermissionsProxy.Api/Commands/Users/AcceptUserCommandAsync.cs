@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System.Dynamic;
+using System.Linq;
 using System.Threading.Tasks;
 using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
+using ArcGisServerPermissionsProxy.Api.Commands.Email.Custom;
 using CommandPattern;
 using Newtonsoft.Json;
 using Raven.Client;
@@ -39,13 +41,6 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                 return "Role was not found.";
             }
 
-            if (_user.Active && _user.Approved &&
-                _user.Role == _info.Role)
-            {
-                // do not notify if nothing is changing.
-                return null;
-            }
-
             _user.Active = true;
             _user.Approved = true;
             _user.Role = _info.Role;
@@ -56,20 +51,33 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                     {
                         StartDate = _info.StartDate,
                         EndDate = _info.ExpirationDate,
-                        Options = JsonConvert.SerializeObject(_info.Options)
+                        Options = _info.Options
                     };
             }
 
             await _session.SaveChangesAsync();
 
-            CommandExecutor.ExecuteCommand(
-                new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {_user.Email},
-                                                                                       config.
-                                                                                           AdministrativeEmails,
-                                                                                       _user.FullName, _info.Role,
-                                                                                       _user.Email,
-                                                                                       config.Description,
-                                                                                       config.BaseUrl)));
+            if (config.HasCustomEmails && !string.IsNullOrEmpty(config.CustomEmails.NotifyUserAccepted))
+            {
+                dynamic data = new ExpandoObject();
+                data.Config = config;
+                data.User = _user;
+
+                CommandExecutor.ExecuteCommand(
+                    new UserAcceptedNotificationEmailCommand(config.CustomEmails.NotifyUserAccepted, data));
+            }
+            else
+            {
+                CommandExecutor.ExecuteCommand(
+                    new UserAcceptedEmailCommand(new UserAcceptedEmailCommand.MailTemplate(new[] {_user.Email},
+                                                                                           config.
+                                                                                               AdministrativeEmails,
+                                                                                           _user.FullName, _info.Role,
+                                                                                           _user.Email,
+                                                                                           config.Description,
+                                                                                           config.BaseUrl)));
+            }
+
             if (config.AdministrativeEmails.Length > 1)
             {
                 var nofity = config.AdministrativeEmails.Where(x => x != _approvingAdmin).ToArray();

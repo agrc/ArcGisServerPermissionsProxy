@@ -27,9 +27,14 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
         {
             base.SetUp();
 
-            var appConfig = new Config(new[] {"admin1@email.com", "admin2@email.com"},
-                                       new[] {"admin", "role2", "role3", "role4"}, "unit test description",
-                                       "http://testurl.com/", "admin.html");
+            var appConfig = new Config
+                {
+                    AdministrativeEmails = new[] { "admin1@email.com", "admin2@email.com" },
+                    Roles = new[] { "admin", "role2", "role3", "role4" },
+                    Description = "unit test description",
+                    AdminPage = "admin.html",
+                    BaseUrl = "http://testurl.com/"
+                };
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
@@ -184,6 +189,117 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
         }
 
         [Test]
+        public async Task CanRegisterWithCustomEmail()
+        {
+            using (var s = DocumentStore.OpenSession())
+            {
+                var config = s.Load<Config>("1");
+                config.CustomEmails.NotifyAdminOfNewUser =
+                    "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
+                    " some administrative actions on a person that has just requested access to a site" +
+                    " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
+                    " **{{User.Agency}}** has requested access to the **{{Config.Description}}**.\n\n" +
+                    "We need you to make sure that {{User.First}} should be allowed to access this " +
+                    "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
+                    "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
+                    "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
+                    "\n\nThank you and enjoy the rest of your day!\n\n" +
+                    "_An email will be sent to all of the other administrators after you perform one " +
+                    "of these actions._";
+
+                s.SaveChanges();
+            }
+            
+            var response = await _controller.Register(new Credentials("additional@options.com", "aA123456!", null)
+                {
+                    Agency = "Agency",
+                    First = "First",
+                    Last = "Last"
+                });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        }
+        
+        [Test]
+        public async Task CanRegisterWithCustomEmailAndAdditionalText()
+        {
+            using (var s = DocumentStore.OpenSession())
+            {
+                var config = s.Load<Config>("1");
+                config.CustomEmails.NotifyAdminOfNewUser =
+                    "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
+                    " some administrative actions on a person that has just requested access to a site" +
+                    " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
+                    " **{{User.Agency}}** at {{User.Additional.address}} has requested access to the **{{Config.Description}}**.\n\n" +
+                    "We need you to make sure that {{User.First}} should be allowed to access this " +
+                    "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
+                    "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
+                    "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
+                    "\n\nThank you and enjoy the rest of your day!\n\n" +
+                    "_An email will be sent to all of the other administrators after you perform one " +
+                    "of these actions._";
+
+                s.SaveChanges();
+            }
+            var additional = new { address = "123 house st", phone = "111" };
+            var response = await _controller.Register(new Credentials("additional@options.com", "aA123456!", null)
+                {
+                    Additional = additional,
+                    Agency = "Agency",
+                    First = "First",
+                    Last = "Last"
+                });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        }
+
+        [Test]
+        public async Task CanRegisterWithCustomEmailAndRestictions()
+        {
+            // county cann't be shown since it's an array. 
+            using (var s = DocumentStore.OpenSession())
+            {
+                var config = s.Load<Config>("1");
+                config.CustomEmails.NotifyAdminOfNewUser =
+                    "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
+                    " some administrative actions on a person that has just requested access to a site" +
+                    " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
+                    " **{{User.Agency}}** has requested access to {{User.AccessRules.Options.County}} for " +
+                    "the **{{Config.Description}}** starting from {{User.AccessRules.PrettyStartDate}} through " +
+                    "{{User.AccessRules.PrettyEndDate}}.\n\n" +
+                    "We need you to make sure that {{User.First}} should be allowed to access this " +
+                    "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
+                    "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
+                    "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
+                    "\n\nThank you and enjoy the rest of your day!\n\n" +
+                    "_An email will be sent to all of the other administrators after you perform one " +
+                    "of these actions._";
+
+                s.SaveChanges();
+            }
+            var options = new
+            {
+                County = new[]{"Kane, Salt Lake" }
+            };
+
+            var accessRules = new User.UserAccessRules
+            {
+                EndDate = 1414230242338,
+                StartDate = 1413315622096,
+                Options = options
+            };
+            var response = await _controller.Register(new Credentials("additional@options.com", "aA123456!", null)
+            {
+                AccessRules = accessRules,
+                Agency = "Agency",
+                First = "First",
+                Last = "Last"
+            });
+
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        }
+
+        [Test]
         public async Task CanRegisterWithRestrictionOptions()
         {
             var options = new
@@ -193,7 +309,9 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
 
             var accessRules = new User.UserAccessRules
                 {
-                    EndDate = 1234567890, StartDate = 1234567890, Options = JsonConvert.SerializeObject(options)
+                    EndDate = 1414230242338,
+                    StartDate = 1413315622096,
+                    Options = options
                 };
             var response = await _controller.Register(new Credentials("additional@options.com", "aA123456!", null)
                 {

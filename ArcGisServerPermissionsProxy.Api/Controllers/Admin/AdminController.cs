@@ -10,6 +10,7 @@ using AgrcPasswordManagement.Commands;
 using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Account;
 using ArcGisServerPermissionProxy.Domain.Database;
+using ArcGisServerPermissionProxy.Domain.ViewModels;
 using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
@@ -73,16 +74,10 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
 
                 IndexCreation.CreateIndexes(provider, DocumentStore, Database);
 
-                if (!parameters.Roles.Select(x => x.ToLower()).Contains("admin"))
-                {
-                    parameters.Roles.Add("admin");
-                }
-
                 var config = s.Load<Config>("1");
                 if (config == null)
                 {
-                    config = new Config(parameters.AdminEmails, parameters.Roles, parameters.Application.Description,
-                                        parameters.Application.AdminUrl, parameters.Application.BaseUrl);
+                    config = AutoMapper.Mapper.Map<CreateApplicationParams, Config>(parameters);
 
                     s.Store(config, "1");
                 }
@@ -101,7 +96,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                                  CommandExecutor.ExecuteCommandAsync(new HashPasswordCommandAsync(password, App.Pepper));
 
                     var adminUser = new User("admin", "user", useremail, "", hashed.HashedPassword, hashed.Salt,
-                                             application.Name, "admin", "admintoken", null, null)
+                                             application.Name, "admin", "users/1.ea7e4af2-67e3-405a-88f9-e4f4896b617d", null, null)
                         {
                             Active = true,
                             Approved = true
@@ -298,8 +293,10 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                                           .Where(x => x.Active && x.Approved == false)
                                           .ToListAsync();
 
+                var userModels = AutoMapper.Mapper.Map<IList<User>, IList<UserViewModel>>(waitingUsers);
+
                 return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<IList<User>>(waitingUsers));
+                                              new ResponseContainer<IList<UserViewModel>>(userModels));
             }
         }
 
@@ -345,8 +342,11 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                                           .Where(x => x.Active && x.Approved)
                                           .ToListAsync();
 
+                var userModels = AutoMapper.Mapper.Map<IList<User>, IList<UserViewModel>>(waitingUsers);
+
                 return Request.CreateResponse(HttpStatusCode.OK,
-                                              new ResponseContainer<IList<User>>(waitingUsers));
+                                              new ResponseContainer<IList<UserViewModel>>(userModels));
+
             }
         }
 

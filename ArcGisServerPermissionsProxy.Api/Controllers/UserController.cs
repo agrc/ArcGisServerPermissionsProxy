@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,6 +11,7 @@ using ArcGisServerPermissionProxy.Domain;
 using ArcGisServerPermissionProxy.Domain.Account;
 using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
+using ArcGisServerPermissionsProxy.Api.Commands.Email.Custom;
 using ArcGisServerPermissionsProxy.Api.Commands.Query;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
@@ -90,13 +92,24 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers
 
                 var url = UrlBuilder.CreateUrl(ControllerContext, App.Host, "Default", "AdminEmail");
 
-                CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
-                                                   new NewUserAdminNotificationEmailCommand.MailTemplate(
-                                                       config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
-                                                       user.FullName, user.Agency, user.Email,
-                                                       url, user.Application, newUser.Token, config.Roles,
-                                                       config.Description, config.BaseUrl, config.AdminUrl)));
+                if (config.HasCustomEmails && !string.IsNullOrEmpty(config.CustomEmails.NotifyAdminOfNewUser))
+                {
+                    dynamic data = new ExpandoObject();
+                    data.Config = config;
+                    data.User = user;
 
+                    CommandExecutor.ExecuteCommand(
+                        new NotifyAdminOfNewUserEmailCommand(config.CustomEmails.NotifyAdminOfNewUser, data));
+                }
+                else
+                {
+                    CommandExecutor.ExecuteCommand(new NewUserAdminNotificationEmailCommand(
+                                                       new NewUserAdminNotificationEmailCommand.MailTemplate(
+                                                           config.AdministrativeEmails, new[] {"no-reply@utah.gov"},
+                                                           user.FullName, user.Agency, user.Email,
+                                                           url, user.Application, newUser.Token, config.Roles,
+                                                           config.Description, config.BaseUrl, config.AdminPage)));
+                }
 
                 CommandExecutor.ExecuteCommand(new UserRegistrationNotificationEmailCommand(
                                                    new UserRegistrationNotificationEmailCommand.MailTemplate(
