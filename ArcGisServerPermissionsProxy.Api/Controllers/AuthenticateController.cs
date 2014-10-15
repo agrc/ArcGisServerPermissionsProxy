@@ -90,13 +90,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                         user.AccessRules = new User.UserAccessRules();
                     }
 
-                    if (user.AccessRules.StartDate == 0)
-                    {
-                        return Request.CreateResponse(HttpStatusCode.Unauthorized,
-                                                      new ResponseContainer(HttpStatusCode.Unauthorized,
-                                                                            "Use restrictions are enabled but not setup for your account. Contact the administrators."));
-                    }
-
                     if (user.AccessRules.StartDate > today)
                     {
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
