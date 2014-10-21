@@ -1,27 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace ArcGisServerPermissionProxy.Domain.Database
+﻿namespace ArcGisServerPermissionProxy.Domain.Database
 {
     public class Config
     {
-        public Config(string[] administrativeEmails, IEnumerable<string> roles, string description, string adminUrl, string baseUrl)
-        {
-            AdministrativeEmails = administrativeEmails;
-            Description = description;
-            AdminUrl = adminUrl;
-            BaseUrl = baseUrl;
-            Roles = roles.Select(x=>x.ToLowerInvariant()).ToArray();
-            UsersCanExpire = false;
-        }
-
         /// <summary>
-        /// Gets or sets the user admininstrative URL.
+        /// Gets or sets the user admininstrative page.
         /// </summary>
         /// <value>
         /// This page will be appended to `BaseUrl` to access the admin page.
         /// </value>
-        public string AdminUrl { get; set; }
+        public string AdminPage { get; set; }
 
         /// <summary>
         /// Gets or sets the base URL of the application.
@@ -63,5 +50,21 @@ namespace ArcGisServerPermissionProxy.Domain.Database
         ///   If true, then the login must check times as a part of the login process.
         /// </value>
         public bool UsersCanExpire { get; set; }
+
+        /// <summary>
+        /// Gets or sets the custom email markdown templates.
+        /// </summary>
+        /// <value>
+        /// The custom email templates for an application.
+        /// </value>
+        public CustomEmails CustomEmails { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has custom emails.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance has custom emails; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasCustomEmails { get { return CustomEmails != null; }}
     }
 }

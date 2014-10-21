@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json.Linq;
 
 namespace ArcGisServerPermissionProxy.Domain
 {
@@ -38,7 +37,7 @@ namespace ArcGisServerPermissionProxy.Domain
 
         public long StartDate { get; set; }
         public long ExpirationDate { get; set; }
-        public JObject Options { get; set; }
+        public dynamic Options { get; set; }
 
         /// <summary>
         ///     Gets or sets the roles.

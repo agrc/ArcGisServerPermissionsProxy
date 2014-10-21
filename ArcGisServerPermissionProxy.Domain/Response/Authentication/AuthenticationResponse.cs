@@ -1,4 +1,5 @@
 ﻿using ArcGisServerPermissionProxy.Domain.Database;
+using ArcGisServerPermissionProxy.Domain.ViewModels;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 
 namespace ArcGisServerPermissionProxy.Domain.Response.Authentication
@@ -8,10 +9,10 @@ namespace ArcGisServerPermissionProxy.Domain.Response.Authentication
         public AuthenticationResponse(TokenModel token, User user)
         {
             Token = token;
-            User = user;
+            User = AutoMapper.Mapper.Map<User, UserViewModel>(user);
         }
 
-        public User User { get; set; }
+        public UserViewModel User { get; set; }
 
         public TokenModel Token { get; set; } 
     }

@@ -2,36 +2,35 @@
 using System.Net.Mime;
 using CommandPattern;
 using MarkdownSharp;
-using Nustache.Core;
 
-namespace ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure
-{
-    public abstract class EmailCommand : Command
-    {
+namespace ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure {
+
+    public abstract class EmailCommand : Command {
         protected MailMessage MailMessage;
         protected SmtpClient Mailman;
         protected Markdown Markdowner;
         private string _html;
         private string _plainText;
 
-        public abstract string MessageTemplate { get; protected internal set; }
-        public abstract dynamic TemplateData { get; protected internal set; }
-
         protected EmailCommand()
         {
             Mailman = new SmtpClient();
             MailMessage = new MailMessage
-            {
-                IsBodyHtml = true
-            };
+                {
+                    IsBodyHtml = true
+                };
 
             Markdowner = new Markdown();
         }
 
+        public abstract string MessageTemplate { get; protected internal set; }
+        public abstract dynamic TemplateData { get; protected internal set; }
+
         public void Init()
         {
-           
-            _plainText = Render.StringToString(MessageTemplate, TemplateData);
+             var template = Handlebars.Handlebars.Compile(MessageTemplate);
+            _plainText = template(TemplateData);
+
             _html = Markdowner.Transform(_plainText);
 
             MailMessage.Body = _html;
@@ -56,4 +55,5 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure
             MailMessage.Dispose();
         }
     }
+
 }

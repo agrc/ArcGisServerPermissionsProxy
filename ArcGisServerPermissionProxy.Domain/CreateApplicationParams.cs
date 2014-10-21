@@ -1,12 +1,19 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace ArcGisServerPermissionProxy.Domain
 {
     public class CreateApplicationParams
     {
+        private Collection<string> _roles;
+
         public class ApplicationInfo
         {
+            public ApplicationInfo()
+            {
+                
+            }
             public ApplicationInfo(string name, string description)
             {
                 Name = name;
@@ -19,7 +26,7 @@ namespace ArcGisServerPermissionProxy.Domain
             /// <value>
             /// To create the admin URL it is concatenated with `BaseUrl`.
             /// </value>
-            public string AdminUrl { get; set; }
+            public string AdminPage { get; set; }
 
             /// <summary>
             /// Gets or sets the base URL to the application.
@@ -57,6 +64,27 @@ namespace ArcGisServerPermissionProxy.Domain
             {
                 return string.Format("Name: {0}, Description: {1}", Name, Description);
             }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether there are[access rules].
+            /// </summary>
+            /// <value>
+            ///   <c>true</c> if users will have time related or other access rules.
+            /// </value>
+            public bool AccessRules { get; set; }
+
+            /// <summary>
+            /// Gets or sets the custom email markdown.
+            /// </summary>
+            /// <value>
+            /// The custom emails.
+            /// </value>
+            public CustomEmailMarkdown CustomEmails { get; set; }
+
+            public class CustomEmailMarkdown {
+                public string NotifyAdminOfNewUser { get; set; }
+                public string NotifyUserAccepted { get; set; }
+            }
         }
 
         [Required]
@@ -66,7 +94,19 @@ namespace ArcGisServerPermissionProxy.Domain
         public string[] AdminEmails { get; set; }
 
         [Required]
-        public Collection<string> Roles { get; set; }
+        public Collection<string> Roles
+        {
+            get { return _roles; }
+            set
+            {
+                _roles = value;
+
+                if (!_roles.Select(x => x.ToLower()).Contains("admin"))
+                {
+                    _roles.Add("admin");
+                }
+            }
+        }
 
         [Required]
         public string CreationToken { get; set; }

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+using Raven.Imports.Newtonsoft.Json;
 
 namespace ArcGisServerPermissionProxy.Domain.Database {
 
-    [JsonObject(MemberSerialization.OptIn)]
     public class User {
         private string _application;
 
@@ -27,12 +26,11 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
             AdminToken = adminToken;
             UserId = Guid.NewGuid();
             AccessRules = userAccessRules;
-            AdditionalSerialized = JsonConvert.SerializeObject(additional);
+            AdditionalSerialized = Newtonsoft.Json.JsonConvert.SerializeObject(additional);
         }
 
         public string Id { get; set; }
 
-        [JsonProperty]
         public Guid UserId { get; set; }
 
         /// <summary>
@@ -42,7 +40,6 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
         ///     The email address of the user.
         /// </value>
         [EmailAddress]
-        [JsonProperty]
         public string Email { get; set; }
 
         /// <summary>
@@ -81,7 +78,6 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
         /// <value>
         ///     The role of the user.
         /// </value>
-        [JsonProperty]
         public string Role { get; set; }
 
         /// <summary>
@@ -115,7 +111,6 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
         /// <value>
         ///     The first name.
         /// </value>
-        [JsonProperty]
         public string First { get; set; }
 
         /// <summary>
@@ -124,7 +119,6 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
         /// <value>
         ///     The last name.
         /// </value>
-        [JsonProperty]
         public string Last { get; set; }
 
         /// <summary>
@@ -133,7 +127,6 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
         /// <value>
         ///     The agency.
         /// </value>
-        [JsonProperty]
         public string Agency { get; set; }
 
         /// <summary>
@@ -158,7 +151,6 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
         /// <value>
         ///     The admin token used to validate a user as an admin for the admin endpoints.
         /// </value>
-        [JsonProperty]
         public string AdminToken { get; set; }
 
         public string FullName
@@ -166,31 +158,23 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
             get { return string.Format("{0} {1}", First, Last).Trim(); }
         }
 
-        [JsonProperty]
         public long LastLogin { get; set; }
 
-        [JsonIgnore]
         public string AdditionalSerialized { get; set; }
 
-        [Raven.Imports.Newtonsoft.Json.JsonIgnore]
-        [JsonProperty]
+        [JsonIgnore]
         public object Additional
         {
             get
             {
                 return string.IsNullOrEmpty(AdditionalSerialized)
                            ? null
-                           : JsonConvert.DeserializeObject(AdditionalSerialized);
+                           : Newtonsoft.Json.JsonConvert.DeserializeObject(AdditionalSerialized);
             }
         }
 
-        [JsonProperty]
         public UserAccessRules AccessRules { get; set; }
 
-//        public bool ShouldSerializeAccessRules()
-//        {
-//            return AccessRules.StartDate > 0;
-//        }
         /// <summary>
         ///     Rules class for accessing the website
         /// </summary>
@@ -211,19 +195,18 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
             /// </value>
             public long EndDate { get; set; }
 
-            [Raven.Imports.Newtonsoft.Json.JsonIgnore]
+            [JsonIgnore]
             public object Options
             {
-                set { OptionsSerialized = JsonConvert.SerializeObject(value); }
+                set { OptionsSerialized = Newtonsoft.Json.JsonConvert.SerializeObject(value); }
                 get
                 {
                     return string.IsNullOrEmpty(OptionsSerialized)
                                ? null
-                               : JsonConvert.DeserializeObject(OptionsSerialized);
+                               : Newtonsoft.Json.JsonConvert.DeserializeObject(OptionsSerialized);
                 }
             }
 
-            [JsonIgnore]
             public string OptionsSerialized { get; set; }
         }
     }

@@ -35,6 +35,7 @@ namespace ArcGisServerPermissionsProxy.Api {
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            AutoMapperConfig.RegisterMaps();
 
             Cache();
         }

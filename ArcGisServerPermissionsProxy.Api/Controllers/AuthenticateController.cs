@@ -15,6 +15,7 @@ using ArcGisServerPermissionsProxy.Api.Commands;
 using ArcGisServerPermissionsProxy.Api.Controllers.Infrastructure;
 using ArcGisServerPermissionsProxy.Api.Models.ArcGIS;
 using ArcGisServerPermissionsProxy.Api.Models.Response;
+using ArcGisServerPermissionsProxy.Api.Models.ViewModels;
 using ArcGisServerPermissionsProxy.Api.Raven.Indexes;
 using ArcGisServerPermissionsProxy.Api.Services;
 using ArcGisServerPermissionsProxy.Api.Services.Token;
@@ -92,6 +93,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                     if (user.AccessRules.StartDate > today)
                     {
+                        // TODO Fix date to be correct format 
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                                       new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                             string.Format(
@@ -103,6 +105,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                     if (user.AccessRules.EndDate < today)
                     {
+                        // TODO Fix date to be correct format
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                                       new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                             string.Format(
@@ -137,7 +140,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                     //swallow. who cares?
                 }
             }
-
+            
             var response = Request.CreateResponse(HttpStatusCode.OK,
                                                   new ResponseContainer<AuthenticationResponse>(
                                                       new AuthenticationResponse(token, user)));
