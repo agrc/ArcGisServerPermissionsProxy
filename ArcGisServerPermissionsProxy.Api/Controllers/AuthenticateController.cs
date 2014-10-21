@@ -95,10 +95,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                                       new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                             string.Format(
-                                                                                "You are are not authorized for use until {0}",
-                                                                                new DateTime(
-                                                                                    user.AccessRules.StartDate,
-                                                                                    DateTimeKind.Utc).ToShortDateString())));
+                                                                                "You are are not authorized for use until {0}. Please contact the administrators if you wish to request a different start date.",
+                                                                                new DateTime(CommandExecutor.ExecuteCommand(new ConvertToNetUtcCommand(user.AccessRules.StartDate)).Ticks)
+                                                                                        .ToShortDateString())));
                     }
 
                     if (user.AccessRules.EndDate < today)
@@ -106,9 +105,9 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                                       new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                             string.Format(
-                                                                                "You were only authorized for use until {0}",
-                                                                                new DateTime(user.AccessRules.EndDate).
-                                                                                    ToShortDateString())));
+                                                                                "You were only authorized for use until {0}. Please contact the administrators if you wish to request more time.",
+                                                                                new DateTime(CommandExecutor.ExecuteCommand(new ConvertToNetUtcCommand(user.AccessRules.EndDate)).Ticks)
+                                                                                    .ToShortDateString())));
                     }
                 }
 
