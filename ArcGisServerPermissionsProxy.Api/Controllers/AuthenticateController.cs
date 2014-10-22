@@ -238,6 +238,36 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                                                                                       application)));
                 }
 
+                var config = await s.LoadAsync<Config>("1");
+                if (config.UsersCanExpire)
+                {
+                    var today = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow)).Ticks;
+                    if (user.AccessRules == null)
+                    {
+                        user.AccessRules = new User.UserAccessRules();
+                    }
+
+                    if (user.AccessRules.StartDate > today)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                      new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                            string.Format(
+                                                                                "You are are not authorized for use until {0}. Please contact the administrators if you wish to request a different start date.",
+                                                                                new DateTime(CommandExecutor.ExecuteCommand(new ConvertToNetUtcCommand(user.AccessRules.StartDate)).Ticks)
+                                                                                        .ToShortDateString())));
+                    }
+
+                    if (user.AccessRules.EndDate < today)
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Unauthorized,
+                                                      new ResponseContainer(HttpStatusCode.Unauthorized,
+                                                                            string.Format(
+                                                                                "You were only authorized for use until {0}. Please contact the administrators if you wish to request more time.",
+                                                                                new DateTime(CommandExecutor.ExecuteCommand(new ConvertToNetUtcCommand(user.AccessRules.EndDate)).Ticks)
+                                                                                    .ToShortDateString())));
+                    }
+                }
+
                 token = await TokenService.GetToken(
                     new GetTokenCommandAsyncBase.GetTokenParams(App.ArcGisHostUrl,
                                                                 App.Instance, App.Ssl, App.Port),
