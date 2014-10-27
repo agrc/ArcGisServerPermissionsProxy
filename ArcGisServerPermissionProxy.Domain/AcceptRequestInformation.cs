@@ -45,7 +45,6 @@ namespace ArcGisServerPermissionProxy.Domain
         /// <value>
         ///     The roles.
         /// </value>
-        [Required]
         public string Role { get; set; }
     }
 }

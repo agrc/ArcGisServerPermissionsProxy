@@ -464,7 +464,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                                                                         "User not found."));
                 }
 
-
                 if (user.Email != dbuser.Email)
                 {
                     var emailExists = false;
@@ -494,6 +493,17 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                         return Request.CreateResponse(HttpStatusCode.Conflict,
                                                       new ResponseContainer(HttpStatusCode.Conflict,
                                                                             "Email is already in use."));
+                    }
+                }
+
+                if (user.Role != dbuser.Role)
+                {
+                    var config = await s.LoadAsync<Config>("1");
+
+                    if (!config.Roles.Contains(user.Role.ToLowerInvariant()))
+                    {
+                        return Request.CreateResponse(HttpStatusCode.Conflict,
+                                                      new ResponseContainer(HttpStatusCode.Conflict, "Role was not found."));
                     }
                 }
 

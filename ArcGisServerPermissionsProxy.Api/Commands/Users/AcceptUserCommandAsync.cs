@@ -6,7 +6,6 @@ using ArcGisServerPermissionProxy.Domain.Database;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Email.Custom;
 using CommandPattern;
-using Newtonsoft.Json;
 using Raven.Client;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Users
@@ -19,10 +18,10 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
         private readonly string _approvingAdmin;
 
         public AcceptUserCommandAsync(IAsyncDocumentSession session, AcceptRequestInformation info,
-                                     User user, string ApprovingAdmin)
+                                     User user, string approvingAdmin)
         {
             _user = user;
-            _approvingAdmin = ApprovingAdmin;
+            _approvingAdmin = approvingAdmin;
             _session = session;
             _info = info;
         }
@@ -36,24 +35,34 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Users
                 return "User was not found.";
             }
 
-            if (!config.Roles.Contains(_info.Role.ToLowerInvariant()))
+            // pass in
+            // admin
+            // null iff user.role is already set
+            // null and user.role is null
+            // not found
+
+            var hasNewRole = !string.IsNullOrEmpty(_info.Role);
+            var hasExistingRole = !string.IsNullOrEmpty(_user.Role);
+
+            if (hasNewRole)
             {
-                return "Role was not found.";
+                if (!config.Roles.Contains(_info.Role.ToLowerInvariant()))
+                {
+                    return "Role was not found.";
+                }
+
+                _user.Role = _info.Role;
+            }
+            else
+            {
+                if (!hasExistingRole)
+                {
+                    return "Role is required.";
+                }
             }
 
             _user.Active = true;
             _user.Approved = true;
-            _user.Role = _info.Role;
-
-            if (config.UsersCanExpire)
-            {
-                _user.AccessRules = new User.UserAccessRules
-                    {
-                        StartDate = _info.StartDate,
-                        EndDate = _info.ExpirationDate,
-                        Options = _info.Options
-                    };
-            }
 
             await _session.SaveChangesAsync();
 
