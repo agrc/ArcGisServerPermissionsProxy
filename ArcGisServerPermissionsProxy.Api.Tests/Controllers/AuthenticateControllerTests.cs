@@ -27,6 +27,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
         public override void SetUp()
         {
             base.SetUp();
+            AutoMapperConfig.RegisterMaps();
 
             var salt = CommandExecutor.ExecuteCommand(new GenerateSaltCommand());
             var password = CommandExecutor.ExecuteCommand(new HashPasswordCommand("123abc", salt, Pepper)).Result;
@@ -115,6 +116,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
             public override void SetUp()
             {
                 base.SetUp();
+                AutoMapperConfig.RegisterMaps();
                 var now = DateTime.UtcNow;
                 var yesterday = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(now.AddDays(-1))).Ticks;
                 var tomorrow = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(now.AddDays(1))).Ticks;
@@ -127,9 +129,18 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
 
                 var notSetUp = new User("USER", "NAME", "invalid@user.com", "AGENCY", password.HashedPassword, salt,
                                         null,
-                                        "admin", "adminToken", null, null);
+                                        "readonly", "adminToken", null, null);
                 var expiredUser = new User("USER", "", "too@late.com", "AGENCY", password.HashedPassword, salt, null,
                                            "publisher", null, null, null)
+                    {
+                        AccessRules = new User.UserAccessRules
+                            {
+                                StartDate = twoDaysAgo,
+                                EndDate = yesterday
+                            }
+                    };
+                var expiredAdmin = new User("USER", "", "idowhati@want.com", "AGENCY", password.HashedPassword, salt, null,
+                                           "admin", null, null, null)
                     {
                         AccessRules = new User.UserAccessRules
                             {
@@ -156,7 +167,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
                             }
                     };
 
-                var users = new[] {notSetUp, expiredUser, earlyUser, validUser};
+                var users = new[] {notSetUp, expiredUser, earlyUser, validUser, expiredAdmin};
 
                 var app = new Application(null, "test");
 
@@ -235,6 +246,20 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
 
                 Assert.That(result.Status, Is.EqualTo((int) HttpStatusCode.Unauthorized));
                 Assert.That(result.Result, Is.Null);
+            }
+            
+            [Test]
+            public async Task ExpiredAdminCanAuthenticate()
+            {
+                var login = new LoginCredentials("idowhati@want.com", "123abc", null);
+
+                var response = await _controller.UserLogin(login);
+
+                var result = GetResultContent(response);
+
+                Assert.That(result.Status, Is.EqualTo((int)HttpStatusCode.OK));
+                Assert.That(result.Result, Is.Not.Null);
+                Assert.That(result.Result.Token, Is.Not.Null);
             }
 
             [Test]
