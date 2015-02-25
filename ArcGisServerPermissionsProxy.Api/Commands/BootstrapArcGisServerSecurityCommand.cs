@@ -106,7 +106,6 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
 
                     response = await createRoleRequest.Content.ReadAsStringAsync();
                     Debug.Print(response);
-                    Debug.Print(response);
                     Logger.Info(response);
 
                     var assignRoleRequest = await client.PostAsync(_assignRoleUrl,
@@ -127,7 +126,6 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                     }
 
                     response = await assignRoleRequest.Content.ReadAsStringAsync();
-                    Debug.Print(response);
                     Debug.Print(response);
                     Logger.Info(response);
                 }

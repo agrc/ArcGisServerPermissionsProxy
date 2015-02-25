@@ -83,7 +83,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                 }
 
                 var config = await s.LoadAsync<Config>("1");
-                if (config.UsersCanExpire)
+                if (config.UsersCanExpire && !user.Role.Contains("admin"))
                 {
                     var today = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow)).Ticks;
                     if (user.AccessRules == null)
@@ -93,7 +93,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                     if (user.AccessRules.StartDate > today)
                     {
-                        // TODO Fix date to be correct format 
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                                       new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                             string.Format(
@@ -104,7 +103,6 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
 
                     if (user.AccessRules.EndDate < today)
                     {
-                        // TODO Fix date to be correct format
                         return Request.CreateResponse(HttpStatusCode.Unauthorized,
                                                       new ResponseContainer(HttpStatusCode.Unauthorized,
                                                                             string.Format(
@@ -239,7 +237,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                 }
 
                 var config = await s.LoadAsync<Config>("1");
-                if (config.UsersCanExpire)
+                if (config.UsersCanExpire && !user.Role.Contains("admin"))
                 {
                     var today = CommandExecutor.ExecuteCommand(new ConvertToJavascriptUtcCommand(DateTime.UtcNow)).Ticks;
                     if (user.AccessRules == null)
