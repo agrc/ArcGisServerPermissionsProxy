@@ -1,6 +1,7 @@
 ﻿using System.Net.Mail;
 using System.Net.Mime;
 using CommandPattern;
+using HandlebarsDotNet;
 using MarkdownSharp;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure {
@@ -28,7 +29,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands.Email.Infrastructure {
 
         public void Init()
         {
-             var template = Handlebars.Handlebars.Compile(MessageTemplate);
+             var template = Handlebars.Compile(MessageTemplate);
             _plainText = template(TemplateData);
 
             _html = Markdowner.Transform(_plainText);

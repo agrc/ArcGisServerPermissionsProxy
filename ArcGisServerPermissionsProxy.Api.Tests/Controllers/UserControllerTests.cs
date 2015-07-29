@@ -194,18 +194,21 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
             using (var s = DocumentStore.OpenSession())
             {
                 var config = s.Load<Config>("1");
-                config.CustomEmails.NotifyAdminOfNewUser =
-                    "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
-                    " some administrative actions on a person that has just requested access to a site" +
-                    " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
-                    " **{{User.Agency}}** has requested access to the **{{Config.Description}}**.\n\n" +
-                    "We need you to make sure that {{User.First}} should be allowed to access this " +
-                    "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
-                    "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
-                    "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
-                    "\n\nThank you and enjoy the rest of your day!\n\n" +
-                    "_An email will be sent to all of the other administrators after you perform one " +
-                    "of these actions._";
+                config.CustomEmails = new CustomEmails
+                {
+                    NotifyAdminOfNewUser =
+                        "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
+                        " some administrative actions on a person that has just requested access to a site" +
+                        " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
+                        " **{{User.Agency}}** has requested access to the **{{Config.Description}}**.\n\n" +
+                        "We need you to make sure that {{User.First}} should be allowed to access this " +
+                        "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
+                        "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
+                        "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
+                        "\n\nThank you and enjoy the rest of your day!\n\n" +
+                        "_An email will be sent to all of the other administrators after you perform one " +
+                        "of these actions._"
+                };
 
                 s.SaveChanges();
             }
@@ -226,18 +229,21 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
             using (var s = DocumentStore.OpenSession())
             {
                 var config = s.Load<Config>("1");
-                config.CustomEmails.NotifyAdminOfNewUser =
-                    "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
-                    " some administrative actions on a person that has just requested access to a site" +
-                    " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
-                    " **{{User.Agency}}** at {{User.Additional.address}} has requested access to the **{{Config.Description}}**.\n\n" +
-                    "We need you to make sure that {{User.First}} should be allowed to access this " +
-                    "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
-                    "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
-                    "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
-                    "\n\nThank you and enjoy the rest of your day!\n\n" +
-                    "_An email will be sent to all of the other administrators after you perform one " +
-                    "of these actions._";
+                config.CustomEmails = new CustomEmails
+                {
+                    NotifyAdminOfNewUser =
+                        "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
+                        " some administrative actions on a person that has just requested access to a site" +
+                        " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
+                        " **{{User.Agency}}** at {{User.Additional.address}} has requested access to the **{{Config.Description}}**.\n\n" +
+                        "We need you to make sure that {{User.First}} should be allowed to access this " +
+                        "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
+                        "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
+                        "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
+                        "\n\nThank you and enjoy the rest of your day!\n\n" +
+                        "_An email will be sent to all of the other administrators after you perform one " +
+                        "of these actions._"
+                };
 
                 s.SaveChanges();
             }
@@ -260,20 +266,23 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
             using (var s = DocumentStore.OpenSession())
             {
                 var config = s.Load<Config>("1");
-                config.CustomEmails.NotifyAdminOfNewUser =
-                    "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
-                    " some administrative actions on a person that has just requested access to a site" +
-                    " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
-                    " **{{User.Agency}}** has requested access to {{User.AccessRules.Options.County}} for " +
-                    "the **{{Config.Description}}** starting from {{User.AccessRules.PrettyStartDate}} through " +
-                    "{{User.AccessRules.PrettyEndDate}}.\n\n" +
-                    "We need you to make sure that {{User.First}} should be allowed to access this " +
-                    "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
-                    "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
-                    "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
-                    "\n\nThank you and enjoy the rest of your day!\n\n" +
-                    "_An email will be sent to all of the other administrators after you perform one " +
-                    "of these actions._";
+                config.CustomEmails = new CustomEmails
+                {
+                    NotifyAdminOfNewUser =
+                        "### Hello {{Config.Description}} Administrator,\n\nWe need you to perform" +
+                        " some administrative actions on a person that has just requested access to a site" +
+                        " that you manage.\n\n**{{User.FullName}}**, _({{User.Email}})_, from" +
+                        " **{{User.Agency}}** has requested access to {{User.AccessRules.Options.County}} for " +
+                        "the **{{Config.Description}}** starting from {{User.AccessRules.PrettyStartDate}} through " +
+                        "{{User.AccessRules.PrettyEndDate}}.\n\n" +
+                        "We need you to make sure that {{User.First}} should be allowed to access this " +
+                        "website _and_ data. You will be able to **accept** {{User.First}} into their appropriate role " +
+                        "and restrict {{User.First}}'s access to protected data or **reject** {{User.First}}'s " +
+                        "request from the [user administration page]({{Config.BaseUrl}}{{Config.adminUrl}})." +
+                        "\n\nThank you and enjoy the rest of your day!\n\n" +
+                        "_An email will be sent to all of the other administrators after you perform one " +
+                        "of these actions._"
+                };
 
                 s.SaveChanges();
             }

@@ -5,6 +5,7 @@ using ArcGisServerPermissionProxy.Domain.ViewModels;
 using ArcGisServerPermissionsProxy.Api.Commands.Email;
 using ArcGisServerPermissionsProxy.Api.Commands.Email.Custom;
 using CommandPattern;
+using HandlebarsDotNet;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 
@@ -131,7 +132,8 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                     Last = "Brown",
                     Email = "jbrown@utah.gov",
                     Agency = "DTS",
-                    Role = "Auther"
+                    Role = "Auther",
+                    AccessRules = new UserViewModel.UserAccessRules()
                 };
 
                 dynamic data = new ExpandoObject();
@@ -241,7 +243,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                         County = new[] {"Kane"}
                     };
 
-                var template = Handlebars.Handlebars.Compile(Template);
+                var template = Handlebars.Compile(Template);
 
                 var result = template(data);
 
@@ -256,7 +258,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                         County = new[] {"Kane", "Salt Lake"}
                     };
 
-                var template = Handlebars.Handlebars.Compile(Template);
+                var template = Handlebars.Compile(Template);
 
                 var result = template(data);
 
@@ -271,7 +273,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                         County = new[] {"Kane", "Salt Lake", "Weber"}
                     };
 
-                var template = Handlebars.Handlebars.Compile(Template);
+                var template = Handlebars.Compile(Template);
 
                 var result = template(data);
 
@@ -287,7 +289,7 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Commands
                         prop = new JObject {{"County", new JArray {"Kane", "Salt Lake"}}}
                     };
 
-                var template = Handlebars.Handlebars.Compile("{{#if canCount}}{{#each prop.County}}{{this}} {{/each}}{{/if}}");
+                var template = Handlebars.Compile("{{#if canCount}}{{#each prop.County}}{{this}} {{/each}}{{/if}}");
                 var actual = template(options);
 
                 Assert.That(actual, Is.EqualTo("Kane Salt Lake "));
