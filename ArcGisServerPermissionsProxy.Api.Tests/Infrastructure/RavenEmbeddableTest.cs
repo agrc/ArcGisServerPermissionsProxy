@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Raven.Client;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;
+using Raven.Database.Server;
 
 namespace ArcGisServerPermissionsProxy.Api.Tests.Infrastructure
 {
@@ -13,9 +14,11 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Infrastructure
         [SetUp]
         public virtual void SetUp()
         {
+            NonAdminHttp.EnsureCanListenToWhenInNonAdminContext(8081);
             DocumentStore = new EmbeddableDocumentStore
             {
-                RunInMemory = true
+                RunInMemory = true,
+                UseEmbeddedHttpServer = true
             }.Initialize();
 
             IndexCreation.CreateIndexes(typeof(UserByEmailIndex).Assembly, DocumentStore);

@@ -27,13 +27,6 @@ namespace ArcGisServerPermissionsProxy.Api.Configuration.Ninject.Modules
                 ConnectionStringName = "RavenDb"
             }.Initialize();
 
-            documentStore.JsonRequestFactory.ConfigureRequest +=
-                (sender, args) =>
-                {
-                    args.Request.PreAuthenticate = true;
-                    ((HttpWebRequest)args.Request).UnsafeAuthenticatedConnectionSharing = true;
-                };
-
             RavenConfig.Register(typeof(UserByIdIndex), documentStore);
 
             return documentStore;

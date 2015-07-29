@@ -1,5 +1,4 @@
 ﻿using Raven.Client;
-using Raven.Client.Extensions;
 
 namespace ArcGisServerPermissionsProxy.Api.Raven.Configuration
 {
@@ -7,7 +6,7 @@ namespace ArcGisServerPermissionsProxy.Api.Raven.Configuration
     {
         public void Ensure(IDocumentStore database, string name)
         {
-            database.DatabaseCommands.EnsureDatabaseExists(name);
+            database.DatabaseCommands.GlobalAdmin.EnsureDatabaseExists(name);
         }
     }
 }

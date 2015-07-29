@@ -186,7 +186,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers {
                 }
                 catch (Exception ex)
                 {
-                    Logger.FatalException("failing to read cookie.", ex);
+                    Logger.Fatal(ex, "failing to read cookie.");
                     continue;
                 }
 
