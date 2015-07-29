@@ -25,7 +25,7 @@ namespace ArcGisServerPermissionProxy.Domain.Database {
             ExpirationDateTicks = DateTime.UtcNow.AddMonths(1).Ticks;
             AdminToken = adminToken;
             UserId = Guid.NewGuid();
-            AccessRules = userAccessRules;
+            AccessRules = userAccessRules ?? new UserAccessRules();
             AdditionalSerialized = Newtonsoft.Json.JsonConvert.SerializeObject(additional);
         }
 
