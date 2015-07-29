@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -40,11 +39,12 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
 
         public override async Task<TokenModel> Execute()
         {
-            _tokenUri = BuildUri();
+            _tokenUri = UriBuilder.Uri;
 
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync(_tokenUri);
+                var response = await client.PostAsync(_tokenUri, BuildPostData());
+
                 Logger.Info("Get token status code: {0}", response.StatusCode);
 
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -52,10 +52,10 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
                     return null;
                 }
 
-                var content = await response.Content.ReadAsStringAsync();
-
-                Logger.Info(content);
-                Console.WriteLine(content);
+//                var content = await response.Content.ReadAsStringAsync();
+//
+//                Logger.Info(content);
+//                Console.WriteLine(content);
 
                 return await response.Content.ReadAsAsync<TokenModel>(new[]
                     {
@@ -64,25 +64,14 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
             }
         }
 
-        public virtual Uri BuildUri()
+        public virtual FormUrlEncodedContent BuildPostData()
         {
-            var queryString = new Dictionary<string, object>
+            return new FormUrlEncodedContent(new []
                 {
-                    {"username", Credentials.Username},
-                    {"password", Credentials.Password},
-                    {"f", "json"}
-                };
-
-            UriBuilder.Query = string.Join("&", queryString.Select(x => string.Concat(
-                Uri.EscapeDataString(x.Key), "=",
-                Uri.EscapeDataString(x.Value.ToString()))));
-
-            var uri = UriBuilder.Uri;
-
-            if (!uri.IsWellFormedOriginalString())
-                throw new ArgumentException("Token url is not well formed");
-
-            return uri;
+                    new KeyValuePair<string, string>("username", Credentials.Username),
+                    new KeyValuePair<string, string>("password", Credentials.Password),
+                    new KeyValuePair<string, string>("f", "json")
+                });
         }
 
         public class User

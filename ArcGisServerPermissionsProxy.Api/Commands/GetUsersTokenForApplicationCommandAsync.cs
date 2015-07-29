@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 
 namespace ArcGisServerPermissionsProxy.Api.Commands
 {
@@ -15,25 +14,13 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
             _role = role;
         }
 
-        public override Uri BuildUri()
+        public override FormUrlEncodedContent BuildPostData()
         {
-            var queryString = new Dictionary<string, object>
-                {
-                    {"username", string.Format("{0}_{1}", _application, _role)},
-                    {"password", Credentials.Password},
-                    {"f", "json"}
-                };
-
-            UriBuilder.Query = string.Join("&", queryString.Select(x => string.Concat(
-                Uri.EscapeDataString(x.Key), "=",
-                Uri.EscapeDataString(x.Value.ToString()))));
-
-            var uri = UriBuilder.Uri;
-
-            if (!uri.IsWellFormedOriginalString())
-                throw new ArgumentException("Token url is not well formed");
-
-            return uri;
+            return new FormUrlEncodedContent(new[] {
+                    new KeyValuePair<string, string>("username", string.Format("{0}_{1}", _application, _role)),
+                    new KeyValuePair<string, string>("password", Credentials.Password),
+                    new KeyValuePair<string, string>("f", "json")
+                });
         }
     }
 }
