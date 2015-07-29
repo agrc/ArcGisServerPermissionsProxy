@@ -37,18 +37,23 @@ namespace ArcGisServerPermissionsProxy.Api.Tests.Controllers {
 
             var appConfig = new Config
             {
-                AdministrativeEmails = new[] { "admin1@email.com", "admin2@email.com" },
-                Roles = new[] { "admin", "role2", "role3", "role4" },
-                Description = "unit test description",
                 AdminPage = "admin.html",
-                BaseUrl = "http://testurl.com/"
+                BaseUrl = "http://testurl.com/",
+                AdministrativeEmails = new[] { "admin1@email.com", "admin2@email.com" },
+                Description = "unit test description",
+                Roles = new[] { "admin", "role2", "role3", "role4" },
+                UsersCanExpire = false,
+                CustomEmails = null
             };
 
             var hashedPassword =
                 CommandExecutor.ExecuteCommand(new HashPasswordCommand("password", "SALT", ")(*&(*^%*&^$*^#$"));
 
-            ApprovedAdmin = new User("admin", "", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
-                                     "SALT", null, null, "1admin.abc", null, null);
+            ApprovedAdmin = new User("admin", "user", "admin@email.com", "AGENCY", hashedPassword.Result.HashedPassword,
+                "SALT", null, "admin", "1admin.abc", null, null)
+            {
+                Approved = true
+            };
 
             var notApprovedActiveUser = new User("Not Approved", " but Active", "notApprovedActiveUser@test.com",
                                                  "AGENCY",
