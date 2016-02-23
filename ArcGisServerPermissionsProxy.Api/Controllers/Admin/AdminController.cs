@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
+using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -291,6 +292,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                 var waitingUsers = await s.Query<User, UsersByApprovedIndex>()
                                           .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                                           .Where(x => x.Active && x.Approved == false)
+                                          .Take(int.Parse(ConfigurationManager.AppSettings["maxResults"]))
                                           .ToListAsync();
 
                 var userModels = AutoMapper.Mapper.Map<IList<User>, IList<UserViewModel>>(waitingUsers);
@@ -340,6 +342,7 @@ namespace ArcGisServerPermissionsProxy.Api.Controllers.Admin {
                 var waitingUsers = await s.Query<User, UsersByApprovedIndex>()
                                           .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                                           .Where(x => x.Active && x.Approved)
+                                          .Take(int.Parse(ConfigurationManager.AppSettings["maxResults"]))
                                           .ToListAsync();
 
                 var userModels = AutoMapper.Mapper.Map<IList<User>, IList<UserViewModel>>(waitingUsers);
