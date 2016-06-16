@@ -226,18 +226,20 @@
     <Content Include="Content\icon.png" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
-    <Content Include="secrets.config">
+    <None Include="secrets.config">
       <SubType>Designer</SubType>
       <TransformOnBuild>true</TransformOnBuild>
-    </Content>
+    </None>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
@@ -256,12 +258,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\mapserv.utah.gov.pubxml" />
+    <None Include="Properties\PublishProfiles\package.pubxml" />
     <None Include="Properties\PublishProfiles\Productin-StopGap.pubxml" />
     <None Include="Properties\PublishProfiles\Production.pubxml" />
     <None Include="Properties\PublishProfiles\Stage.pubxml" />
     <Content Include="Views\AdminEmail\Accept.cshtml" />
     <Content Include="Views\AdminEmail\Reject.cshtml" />
     <Content Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
+    <None Include="Properties\PublishProfiles\test.mapserv.utah.gov.pubxml" />
     <None Include="secrets.Debug.config">
       <DependentUpon>secrets.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
@@ -275,6 +280,7 @@
     <None Include="secrets.Release.config">
       <DependentUpon>secrets.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
     <None Include="secrets.Stage.config">
       <DependentUpon>secrets.config</DependentUpon>

@@ -17,7 +17,7 @@ namespace ArcGisServerPermissionsProxy.Api.Commands
         public override FormUrlEncodedContent BuildPostData()
         {
             return new FormUrlEncodedContent(new[] {
-                    new KeyValuePair<string, string>("username", string.Format("{0}_{1}", _application, _role)),
+                    new KeyValuePair<string, string>("username", string.Format("utah\\{0}_{1}", _application, _role)),
                     new KeyValuePair<string, string>("password", Credentials.Password),
                     new KeyValuePair<string, string>("f", "json")
                 });
