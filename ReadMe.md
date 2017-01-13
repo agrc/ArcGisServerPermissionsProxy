@@ -2,6 +2,7 @@
 
 ## Installation
 
+- Install MVC 4
 - Install Raven DB [version 3.0.3690](http://hibernatingrhinos.com/builds/RavenDB-Stable-3.0/3690) and configure the connection string in the `web.config`
 - Configure `secrets.config` in a similar fasion to `secrets.example.config` in the **Api** Project.
   - `adminUserName` is the admin account for arcgis server
